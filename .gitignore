@@ -1,0 +1,8 @@
+.DS_Store
+*~
+.tscache/
+.baseDir.js
+.baseDir.ts
+node_modules/
+tscommand*.txt
+
