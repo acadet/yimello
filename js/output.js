@@ -217,21 +217,29 @@ var PatchworkModule;
 
         Patchwork.build = function (className) {
             if (typeof className === "undefined") { className = 'patchwork'; }
-            Patchwork._target = DOMTree.findSingle('.' + className);
-
             var x = 0;
             var y = 0;
             var h = Patchwork._length / 2 * Math.sqrt(3);
             var content = new StringBuffer();
 
+            Patchwork._target = DOMTree.findSingle('.' + className);
+
+            Patchwork._target.setCss({
+                'width': Patchwork._target.getWidth() + Patchwork._length,
+                'left': Patchwork._target.getLeft() - Patchwork._length / 2
+            });
+
             while (y < Patchwork._target.getHeight()) {
                 while (x < Patchwork._target.getWidth()) {
-                    var t1 = new Triangle(new Point(x, y), new Point(x + Patchwork._length, y), new Point(x + Patchwork._length / 2, y + h));
-                    var t2 = new Triangle(new Point(x, y + 2 * h), new Point(x + Patchwork._length / 2, y + h), new Point(x + Patchwork._length, y + 2 * h));
+                    var t1 = new Triangle(new Point(x, y + h), new Point(x + Patchwork._length / 2, y), new Point(x + Patchwork._length, y + h));
 
-                    var line = new Line(new Point(x, y + h), new Point(x + Patchwork._length, y + h));
+                    var t2 = new Triangle(new Point(x + Patchwork._length / 2, y), new Point(x + Patchwork._length * 3 / 2, y), new Point(x + Patchwork._length, y + h));
 
-                    content.append(t1.build()).append(t2.build()).append(line.build());
+                    var t3 = new Triangle(new Point(x, y + h), new Point(x + Patchwork._length, y + h), new Point(x + Patchwork._length / 2, y + 2 * h));
+
+                    var t4 = new Triangle(new Point(x + Patchwork._length / 2, y + 2 * h), new Point(x + Patchwork._length, y + h), new Point(x + Patchwork._length * 3 / 2, y + 2 * h));
+
+                    content.append(t1.build()).append(t2.build()).append(t3.build()).append(t4.build());
 
                     x += Patchwork._length;
                 }
@@ -250,7 +258,7 @@ var PatchworkModule;
             });
         };
 
-        Patchwork._length = 30;
+        Patchwork._length = 40;
         return Patchwork;
     })(TSObject);
     PatchworkModule.Patchwork = Patchwork;

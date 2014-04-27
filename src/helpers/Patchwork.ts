@@ -86,35 +86,55 @@ module PatchworkModule {
 		}
 
 		static build(className = 'patchwork') : void {
-			Patchwork._target = DOMTree.findSingle('.' + className);
-
 			var x: number = 0;
 			var y: number = 0;
 			var h: number = Patchwork._length / 2 * Math.sqrt(3);
 			var content : StringBuffer = new StringBuffer();
 
+
+			Patchwork._target = DOMTree.findSingle('.' + className);
+
+			Patchwork._target.setCss({
+				'width': Patchwork._target.getWidth() + Patchwork._length,
+				'left': Patchwork._target.getLeft() - Patchwork._length / 2
+			});
+
 			while (y < Patchwork._target.getHeight()) {
 				while (x < Patchwork._target.getWidth()) {
-					
-					var t1 : Triangle = 
+
+					var t1 : Triangle =
 						new Triangle(
-							new Point(x, y),
-							new Point(x + Patchwork._length, y),
-							new Point(x + Patchwork._length / 2, y + h)
-						);					
-					var t2 : Triangle =
-						new Triangle(
-							new Point(x, y + 2 * h),
-							new Point(x + Patchwork._length / 2, y + h),
-							new Point(x + Patchwork._length, y + 2 * h)
+							new Point(x, y + h),
+							new Point(x + Patchwork._length / 2, y),
+							new Point(x + Patchwork._length, y + h)
 						);
 
-					var line = new Line(new Point(x, y + h), new Point(x + Patchwork._length, y + h));
+					var t2 : Triangle = 
+						new Triangle(
+							new Point(x + Patchwork._length / 2, y),
+							new Point(x + Patchwork._length * 3 / 2, y),
+							new Point(x + Patchwork._length, y + h)
+						);
+
+					var t3 : Triangle = 
+						new Triangle(
+							new Point(x, y + h),
+							new Point(x + Patchwork._length, y + h),
+							new Point(x + Patchwork._length / 2, y + 2 * h)
+						);
+
+					var t4 : Triangle = 
+						new Triangle(
+							new Point(x + Patchwork._length / 2, y + 2 * h),
+							new Point(x + Patchwork._length, y + h),
+							new Point(x + Patchwork._length * 3 / 2, y + 2 * h)
+						);
 
 					content
 						.append(t1.build())
 						.append(t2.build())
-						.append(line.build());
+						.append(t3.build())
+						.append(t4.build());
 
 					x += Patchwork._length;
 				}
@@ -135,6 +155,6 @@ module PatchworkModule {
 
 		private static _target: DOMElement;
 		private static _canvas: DOMElement;
-		private static _length : number = 30;
+		private static _length : number = 40;
 	}
 }
