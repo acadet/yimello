@@ -1,0 +1,25 @@
+$fontFolder: '../fonts/';
+
+@font-face {
+  font-family: 'Modern Sans';
+  src: url($fontFolder + 'MODERNE SANS.eot'); /* IE9 Compat Modes */
+  src: url($fontFolder + 'MODERNE SANS.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url($fontFolder + 'MODERNE SANS.woff') format('woff'), /* Modern Browsers */
+       url($fontFolder + 'MODERNE SANS.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url($fontFolder + 'MODERNE SANS.svg#bcb65e5f871894c6b949303cede8fd32') format('svg'); /* Legacy iOS */
+       
+  font-style:   normal;
+  font-weight:  400;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url($fontFolder + 'Montserrat-Regular.eot'); /* IE9 Compat Modes */
+  src: url($fontFolder + 'Montserrat-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url($fontFolder + 'Montserrat-Regular.woff') format('woff'), /* Modern Browsers */
+       url($fontFolder + 'Montserrat-Regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url($fontFolder + 'Montserrat-Regular.svg#95d90f2cd2aa64bdfee0e9f34c516e71') format('svg'); /* Legacy iOS */
+       
+  font-style:   normal;
+  font-weight:  400;
+}

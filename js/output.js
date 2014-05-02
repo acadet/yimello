@@ -16,6 +16,53 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+
+var Timer = (function (_super) {
+    __extends(Timer, _super);
+    function Timer(handler, delay, argument, frequency) {
+        if (typeof argument === "undefined") { argument = null; }
+        if (typeof frequency === "undefined") { frequency = -1; }
+        var _this = this;
+        _super.call(this);
+
+        if (frequency > 0) {
+            this._hasIntervals = true;
+            setTimeout(function () {
+                _this._timer = setInterval(function () {
+                    handler(argument);
+                }, frequency);
+            }, delay);
+        } else {
+            this._hasIntervals = false;
+            this._timer = setTimeout(function () {
+                handler(argument);
+            }, delay);
+        }
+    }
+    Timer.prototype.clear = function () {
+        if (this._hasIntervals) {
+            clearInterval(this._timer);
+        } else {
+            clearTimeout(this._timer);
+        }
+    };
+    return Timer;
+})(TSObject);
+var Exception = (function (_super) {
+    __extends(Exception, _super);
+    function Exception(msg) {
+        _super.call(this);
+        this._error = new Error(msg);
+    }
+    Exception.prototype.getMessage = function () {
+        return this._error.message;
+    };
+
+    Exception.prototype.getStackTrace = function () {
+        return this._error.stack;
+    };
+    return Exception;
+})(TSObject);
 var DOMElement = (function (_super) {
     __extends(DOMElement, _super);
     function DOMElement(jQueryObject) {
@@ -28,8 +75,27 @@ var DOMElement = (function (_super) {
         return this;
     };
 
-    DOMElement.prototype.setCss = function (properties) {
-        this._element.css(properties);
+    DOMElement.prototype.centerize = function (reference) {
+        if (typeof reference === "undefined") { reference = new DOMElement($('body')); }
+        this.horizontalCenterize(reference);
+        this.verticalCenterize(reference);
+    };
+
+    DOMElement.prototype.centerizeWithMargin = function (reference) {
+        if (typeof reference === "undefined") { reference = new DOMElement($('body')); }
+        this.horizontalCenterizeWithMargin(reference);
+        this.verticalCenterizeWithMargin(reference);
+    };
+
+    DOMElement.prototype.find = function (criterion) {
+        var results = this._element.find(criterion);
+        var list = new ArrayList();
+
+        results.each(function (i, e) {
+            list.add(DOMElement.fromJS(e));
+        });
+
+        return list;
     };
 
     DOMElement.prototype.findSingle = function (criterion) {
@@ -72,8 +138,40 @@ var DOMElement = (function (_super) {
         return this._element.outerWidth(actual);
     };
 
+    DOMElement.prototype.horizontalCenterize = function (reference) {
+        if (typeof reference === "undefined") { reference = new DOMElement($('body')); }
+        this.setCss({
+            left: (reference.getWidth() - this.getWidth()) / 2
+        });
+    };
+
+    DOMElement.prototype.horizontalCenterizeWithMargin = function (reference) {
+        if (typeof reference === "undefined") { reference = new DOMElement($('body')); }
+        this.setCss({
+            marginLeft: (reference.getWidth() - this.getWidth()) / 2
+        });
+    };
+
+    DOMElement.prototype.setCss = function (properties) {
+        this._element.css(properties);
+    };
+
     DOMElement.prototype.toString = function () {
         return this._element.html();
+    };
+
+    DOMElement.prototype.verticalCenterize = function (reference) {
+        if (typeof reference === "undefined") { reference = new DOMElement($('body')); }
+        this.setCss({
+            top: (reference.getHeight() - this.getHeight()) / 2
+        });
+    };
+
+    DOMElement.prototype.verticalCenterizeWithMargin = function (reference) {
+        if (typeof reference === "undefined") { reference = new DOMElement($('body')); }
+        this.setCss({
+            marginTop: (reference.getHeight() - this.getHeight()) / 2
+        });
     };
     return DOMElement;
 })(TSObject);
@@ -123,23 +221,57 @@ var StringBuffer = (function (_super) {
     };
     return StringBuffer;
 })(TSObject);
+var NodeWindowEvents = (function () {
+    function NodeWindowEvents() {
+    }
+    NodeWindowEvents.Blur = "blur";
+
+    NodeWindowEvents.Focus = "focus";
+
+    NodeWindowEvents.Close = "close";
+    return NodeWindowEvents;
+})();
+
+var NodeWindow = (function () {
+    function NodeWindow() {
+        throw new Exception("You cannot create a Window object");
+    }
+    NodeWindow.getInstance = function () {
+        return gui.Window.get();
+    };
+
+    NodeWindow.on = function (event, callback) {
+        NodeWindow.getInstance().on(event, callback);
+    };
+
+    NodeWindow.moveTo = function (page) {
+        NodeWindow.getInstance().window.location = page;
+    };
+    return NodeWindow;
+})();
 var ArrayList = (function (_super) {
     __extends(ArrayList, _super);
     function ArrayList() {
         _super.call(this);
 
-        this.content = new Array();
+        this._content = new Array();
     }
     ArrayList.prototype.add = function (t) {
-        this.content.push(t);
+        this._content.push(t);
     };
 
     ArrayList.prototype.getAt = function (index) {
-        return this.content[index];
+        return this._content[index];
     };
 
     ArrayList.prototype.getLength = function () {
-        return this.content.length;
+        return this._content.length;
+    };
+
+    ArrayList.prototype.map = function (f) {
+        for (var i = 0; i < this._content.length; i++) {
+            f(this._content[i]);
+        }
     };
     return ArrayList;
 })(TSObject);
@@ -181,7 +313,7 @@ var PatchworkModule;
 
             sbf.append(this._e1.toString()).append(' ').append(this._e2.toString()).append(' ').append(this._e3.toString());
 
-            sbf.append('" style="stroke: black; stroke-width: 1; fill: white;" />');
+            sbf.append('" />');
 
             return sbf.toString();
         };
@@ -224,11 +356,6 @@ var PatchworkModule;
 
             Patchwork._target = DOMTree.findSingle('.' + className);
 
-            Patchwork._target.setCss({
-                'width': Patchwork._target.getWidth() + Patchwork._length,
-                'left': Patchwork._target.getLeft() - Patchwork._length / 2
-            });
-
             while (y < Patchwork._target.getHeight()) {
                 while (x < Patchwork._target.getWidth()) {
                     var t1 = new Triangle(new Point(x, y + h), new Point(x + Patchwork._length / 2, y), new Point(x + Patchwork._length, y + h));
@@ -253,12 +380,15 @@ var PatchworkModule;
             Patchwork._canvas = Patchwork._target.findSingle('svg');
 
             Patchwork._canvas.setCss({
-                'width': '100%',
-                'height': '100%'
+                position: 'absolute',
+                top: 0,
+                width: Patchwork._target.getWidth() + Patchwork._length,
+                left: Patchwork._target.getLeft() - Patchwork._length / 2,
+                height: '100%'
             });
         };
 
-        Patchwork._length = 40;
+        Patchwork._length = 50;
         return Patchwork;
     })(TSObject);
     PatchworkModule.Patchwork = Patchwork;
@@ -266,21 +396,98 @@ var PatchworkModule;
 var Presenter = (function (_super) {
     __extends(Presenter, _super);
     function Presenter() {
-        _super.apply(this, arguments);
+        _super.call(this);
+
+        PresenterMediator.setInstance(this);
+
+        this.onStart();
+
+        NodeWindow.on(NodeWindowEvents.Blur, this._onPause);
+        NodeWindow.on(NodeWindowEvents.Focus, this._onResume);
+        NodeWindow.on(NodeWindowEvents.Close, this._onDestroy);
     }
+    Presenter.prototype.onStart = function () {
+    };
+
+    Presenter.prototype.onResume = function () {
+    };
+
+    Presenter.prototype.onPause = function () {
+    };
+
+    Presenter.prototype.onDestroy = function () {
+    };
+
+    Presenter.prototype._onResume = function () {
+        if (!PresenterMediator.hasResumed()) {
+            PresenterMediator.setResumed(true);
+            PresenterMediator.getInstance().onResume();
+        }
+    };
+
+    Presenter.prototype._onPause = function () {
+        PresenterMediator.setResumed(false);
+        PresenterMediator.getInstance().onPause();
+    };
+
+    Presenter.prototype._onDestroy = function () {
+        PresenterMediator.getInstance().onDestroy();
+        gui.Window.get().close();
+    };
     return Presenter;
 })(TSObject);
-var Patchwork = PatchworkModule.Patchwork;
+var PresenterMediator = (function (_super) {
+    __extends(PresenterMediator, _super);
+    function PresenterMediator() {
+        _super.apply(this, arguments);
+    }
+    PresenterMediator.getInstance = function () {
+        return PresenterMediator._currentInstance;
+    };
 
+    PresenterMediator.setInstance = function (p) {
+        PresenterMediator._currentInstance = p;
+        PresenterMediator._hasResumed = false;
+    };
+
+    PresenterMediator.hasResumed = function () {
+        return PresenterMediator._hasResumed;
+    };
+
+    PresenterMediator.setResumed = function (b) {
+        PresenterMediator._hasResumed = b;
+    };
+    return PresenterMediator;
+})(TSObject);
 var IntroPresenter = (function (_super) {
     __extends(IntroPresenter, _super);
     function IntroPresenter() {
         _super.call(this);
-
-        this._reset();
     }
-    IntroPresenter.prototype._reset = function () {
-        Patchwork.build();
+    IntroPresenter.prototype.onStart = function () {
+        var t;
+
+        DOMTree.findSingle('.intro-strap').centerize();
+
+        t = new Timer(function (o) {
+            NodeWindow.moveTo('tour.html');
+        }, 3000);
     };
     return IntroPresenter;
+})(Presenter);
+var TourPresenter = (function (_super) {
+    __extends(TourPresenter, _super);
+    function TourPresenter() {
+        _super.call(this);
+    }
+    TourPresenter.prototype.onStart = function () {
+        var _this = this;
+        this._slides = DOMTree.findSingle('.slides');
+        this._slideCursors = DOMTree.findSingle('.slide-cursors');
+
+        this._slides.find('.slide').map(function (e) {
+            e.centerizeWithMargin(_this._slides);
+        });
+    };
+    return TourPresenter;
 })(Presenter);

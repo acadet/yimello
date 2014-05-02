@@ -1,0 +1,31 @@
+@mixin linear-gradient($angle, $start, $end) {
+	background: -webkit-linear-gradient($angle, $start, $end);
+	background: -ms-linear-gradient($angle, $start, $end);
+	background: -moz-linear-gradient($angle, $start, $end);
+	background: -o-linear-gradient($angle, $start, $end);
+	background: linear-gradient($angle, $start, $end);
+}
+
+@mixin box-sizing($value) {
+	-webkit-box-sizing: $value;
+	-moz-box-sizing: $value;
+	-ms-box-sizing: $value;
+	-o-box-sizing: $value;
+	box-sizing: $value;
+}
+
+@mixin border-radius($value) {
+	-webkit-border-radius: $value;
+	-moz-border-radius: $value;
+	-ms-border-radius: $value;
+	-o-border-radius: $value;
+	border-radius: $value;
+}
+
+@mixin transition($property, $duration, $easing : linear, $delay : 0) {
+  -webkit-transition : $property $duration $easing $delay;
+  -moz-transition : $property $duration $easing $delay;
+  -ms-transition : $property $duration $easing $delay;
+  -o-transition : $property $duration $easing $delay;
+  transition : $property $duration $easing $delay;
+}

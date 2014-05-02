@@ -1,16 +1,18 @@
 /// <reference path="../dependencies.ts" />
 
-import Patchwork = PatchworkModule.Patchwork;
-
 class IntroPresenter extends Presenter {
 
 	constructor() {
 		super();
-
-		this._reset();
 	}
 
-	private _reset() : void {
-		Patchwork.build();
+	onStart() : void {
+		var t : Timer;
+
+		DOMTree.findSingle('.intro-strap').centerize();
+
+		t = new Timer((o) => {
+			NodeWindow.moveTo('tour.html');
+		}, 3000);
 	}
 }

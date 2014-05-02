@@ -45,7 +45,7 @@ module PatchworkModule {
 				.append(' ')
 				.append(this._e3.toString());
 
-			sbf.append('" style="stroke: black; stroke-width: 1; fill: white;" />');
+			sbf.append('" />');
 
 			return sbf.toString();
 		}
@@ -93,11 +93,6 @@ module PatchworkModule {
 
 
 			Patchwork._target = DOMTree.findSingle('.' + className);
-
-			Patchwork._target.setCss({
-				'width': Patchwork._target.getWidth() + Patchwork._length,
-				'left': Patchwork._target.getLeft() - Patchwork._length / 2
-			});
 
 			while (y < Patchwork._target.getHeight()) {
 				while (x < Patchwork._target.getWidth()) {
@@ -148,13 +143,16 @@ module PatchworkModule {
 			Patchwork._canvas = Patchwork._target.findSingle('svg');
 			
 			Patchwork._canvas.setCss({
-				'width' : '100%',
-				'height' : '100%'
+				position: 'absolute',
+				top: 0,
+				width: Patchwork._target.getWidth() + Patchwork._length,
+				left: Patchwork._target.getLeft() - Patchwork._length / 2,
+				height: '100%'
 			});
 		}
 
 		private static _target: DOMElement;
 		private static _canvas: DOMElement;
-		private static _length : number = 40;
+		private static _length : number = 50;
 	}
 }

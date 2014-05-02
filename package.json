@@ -1,5 +1,14 @@
 {
-	"name" : "yimello",
+	"name": "yimello",
+	"main": "intro.html",
+	"window": {
+		"toolbar": true,
+		"frame": true,
+		"width": 800,
+		"height": 500,
+		"resizable": false,
+		"position": "center"
+	},
 	"devDependencies" : {
 		"grunt" : "~0.4.1",
 	    "grunt-ts" : "~1.9.2",

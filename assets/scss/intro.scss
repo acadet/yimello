@@ -6,4 +6,31 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
+	background: url($imgFolder + 'patchwork_bg.jpg');
+	background-position: center;
+
+	polygon {
+		fill: transparent;
+		stroke-width: 1px;
+		stroke: rgba(44, 46, 81, 0.1);
+	}
+}
+
+.intro-strap {
+	position: absolute;
+
+	h1, img {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	h1 {
+		font: {
+			family: 'Modern Sans';
+			size: 3em;
+		}
+		margin: 10px 0px 0px 10px;
+		color: white;
+		text-transform: uppercase;
+	}
 }

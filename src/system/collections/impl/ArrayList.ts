@@ -4,20 +4,26 @@ class ArrayList<T> extends TSObject implements IList<T> {
 	constructor() {
 		super();
 
-		this.content = new Array();
+		this._content = new Array();
 	}
 
 	add(t: T) : void {
-		this.content.push(t);
+		this._content.push(t);
 	}
 
 	getAt(index: number) : T {
-		return this.content[index];
+		return this._content[index];
 	}
 
 	getLength() : number {
-		return this.content.length;
+		return this._content.length;
 	}
 
-	private content : Array<T>;
+	map(f: Action<T>) : void {
+		for(var i = 0; i < this._content.length; i++) {
+			f(this._content[i]);
+		}
+	}
+
+	private _content : Array<T>;
 }

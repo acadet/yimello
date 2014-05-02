@@ -6,4 +6,6 @@ interface IList<T> {
 	getAt(index: number) : T;
 
 	getLength() : number;
+
+	map(f : Action<T>) : void;
 }

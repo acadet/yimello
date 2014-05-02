@@ -4,7 +4,14 @@
         <title></title>
 
         <link rel="stylesheet" type="text/css" href="assets/css/intro.css">
-        
+        <script type="text/javascript">
+            var gui = require('nw.gui');
+            
+            if (typeof(window.require) !== "undefined") {
+                window.requireNode = window.require;
+                window.require = undefined;
+            }       
+        </script>
         <script type="text/javascript">
             var _mainClass = 'IntroPresenter';
             var _libs = ['jquery'];
@@ -13,5 +20,10 @@
     </head>
     <body>
         <div class="patchwork"></div>
+
+        <div class="intro-strap">
+           <img src="assets/img/logo.png" />
+           <h1>Yimello</h1>
+        </div>
     </body>
 </html>

@@ -13,8 +13,25 @@ class DOMElement extends TSObject {
 		return this;
 	}
 
-	setCss(properties : Object) : void {
-		this._element.css(properties);
+	centerize(reference = new DOMElement($('body'))) : void {
+		this.horizontalCenterize(reference);
+		this.verticalCenterize(reference);
+	}
+
+	centerizeWithMargin(reference = new DOMElement($('body'))) : void {
+		this.horizontalCenterizeWithMargin(reference);
+		this.verticalCenterizeWithMargin(reference);
+	}
+
+	find(criterion: string) : IList<DOMElement> {
+		var results : any = this._element.find(criterion);
+		var list : IList<DOMElement> = new ArrayList<DOMElement>();
+		
+		results.each((i, e) => {
+			list.add(DOMElement.fromJS(e));
+		});
+
+		return list;
 	}
 
 	findSingle(criterion : string) : DOMElement {
@@ -53,8 +70,36 @@ class DOMElement extends TSObject {
 		return this._element.outerWidth(actual);
 	}
 
+	horizontalCenterize(reference = new DOMElement($('body'))) : void {
+		this.setCss({
+			left: (reference.getWidth() - this.getWidth()) / 2
+		});
+	}
+
+	horizontalCenterizeWithMargin(reference = new DOMElement($('body'))) : void {
+		this.setCss({
+			marginLeft: (reference.getWidth() - this.getWidth()) / 2
+		});
+	}
+
+	setCss(properties : Object) : void {
+		this._element.css(properties);
+	}
+
 	toString() : string {
 		return this._element.html();
+	}
+
+	verticalCenterize(reference = new DOMElement($('body'))) : void {
+		this.setCss({
+			top: (reference.getHeight() - this.getHeight()) / 2
+		});
+	}
+
+	verticalCenterizeWithMargin(reference = new DOMElement($('body'))) : void {
+		this.setCss({
+			marginTop: (reference.getHeight() - this.getHeight()) / 2
+		});
 	}
 
 	private _element : any;
