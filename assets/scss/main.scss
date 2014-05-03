@@ -1,0 +1,123 @@
+@import "common";
+
+.random-background {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background: url($imgFolder + 'patchwork_bg.jpg');
+	background-position: center;
+}
+
+.panel-wrapper, .bookmark-wrapper, .search-wrapper {
+	z-index: 2;
+}
+
+.panel-wrapper {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 25%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+
+	.icon-wrapper, .tag-list {
+		display: inline-block;
+	}
+
+	.icon-wrapper {
+		width: 100%;
+		border-bottom: 3px solid rgba(0, 0, 0, 0.5);
+		padding: 10px 0px;
+	}
+
+	.tag-list {
+		width: 100%;
+		margin: 30px 0px 0px 0px;
+	}
+}
+
+.panel-wrapper .icon-wrapper .icons {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	text-align: center;
+
+	.icon {
+		display: inline-block;
+		vertical-align: middle;
+		padding: 5px 10px;
+		cursor: pointer;
+	}
+}
+
+.panel-wrapper .tag-list .tags {
+	list-style-type: none;
+	margin: 0;
+	padding: 0px 0px 0px 15px;
+
+	li {
+		font: {
+			family: 'Montserrat';
+			size: 1em;
+		}
+
+		margin: 10px 0px;
+
+		color: white;
+		cursor: pointer;
+	}
+}
+
+.bookmark-wrapper {
+	position: absolute;
+	top: 0px;
+	left: 25%;
+	width: 75%;
+	height: 90%;
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.search-wrapper {
+	position: absolute;
+	top: 90%;
+	left: 25%;
+	width: 75%;
+	height: 10%;
+	background-color : rgba(255, 255, 255, 0.5);
+
+	img, form {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	img {
+		margin: 10px 20px;
+	}
+
+	form {
+		height: 100%;
+		width: $appWidth * 0.75 - 95px;
+
+		@include placeholder-color(white);
+	}
+}
+
+.search-wrapper form input {
+	outline: none;
+	width: 100%;
+	height: 100%;
+	padding: 5px 10px;
+	@include box-sizing(border-box);
+	border : none;
+	background: none;
+
+	font: {
+		family: 'Montserrat';
+		size: 1em;
+	}
+
+	color: white;
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html class="no-js">
+    <head>
+        <title></title>
+
+        <link rel="stylesheet" type="text/css" href="assets/css/main.css">
+        <script type="text/javascript">
+            var gui = require('nw.gui');
+            
+            if (typeof(window.require) !== "undefined") {
+                window.requireNode = window.require;
+                window.require = undefined;
+            }       
+        </script>
+        <script type="text/javascript">
+            var _mainClass = 'MainPresenter';
+            var _libs = ['jquery'];
+        </script>
+        <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
+    </head>
+    <body>
+        <div class="random-background"></div>
+
+        <div class="panel-wrapper">
+            <div class="icon-wrapper">
+                <ul class="icons">
+                    <li class="icon">
+                        <img src="assets/img/menu-icon.png" />
+                    </li>
+                    <li class="icon">
+                        <img src="assets/img/menu-icon.png" />
+                    </li>
+                    <li class="icon">
+                        <img src="assets/img/menu-icon.png" />
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tag-list">
+                <ul class="tags">
+                    <li>Most popular</li>
+                    <li>Al Pacino</li>
+                    <li>Bruce Willis</li>
+                    <li>Johnny Depp</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bookmark-wrapper"></div>
+
+        <div class="search-wrapper">
+            <img src="assets/img/search-icon.png" />
+            <form action="#" method="post">
+                <input type="text" name="search" placeholder="Type something to search" />
+            </form>
+        </div>
+    </body>
+</html>

@@ -6,6 +6,16 @@ interface NodeWindowEventHandler {
 	() : void;
 }
 
+class NodeWindowEvents {
+	static Blur : string = "blur";
+	
+	static Focus : string = "focus";
+
+	static Close : string = "close";
+
+	static Move : string = "move";
+}
+
 class NodeWindow {
 
 	constructor() {
@@ -17,10 +27,22 @@ class NodeWindow {
 	}
 
 	static on(event : NodeWindowEvents, callback : NodeWindowEventHandler) : void {
-		NodeWindow.getInstance().on(event, callback);	
+		if (event != NodeWindowEvents.Move) {
+			NodeWindow.getInstance().on(event, callback);
+		} else {
+			if (NodeWindow._moveListeners == null) {
+				NodeWindow._moveListeners = new ArrayList<NodeWindowEventHandler>();
+			}
+			NodeWindow._moveListeners.add(callback);
+		}
 	}
 
 	static moveTo(page : string) : void {
+		NodeWindow._moveListeners.map((l) => {
+			l();
+		});
 		NodeWindow.getInstance().window.location = page;
 	}
+
+	private static _moveListeners : IList<NodeWindowEventHandler>;
 }

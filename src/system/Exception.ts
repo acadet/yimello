@@ -15,5 +15,9 @@ class Exception extends TSObject {
 		return this._error.stack;
 	}
 
+	toError() : any {
+		return this._error;
+	}
+
 	private _error : any;
 }

@@ -29,3 +29,21 @@
   -o-transition : $property $duration $easing $delay;
   transition : $property $duration $easing $delay;
 }
+
+@mixin placeholder-color($color) {
+	input::-webkit-input-placeholder {
+		color: $color;
+	}
+
+	input::-moz-placeholder {
+		color: $color;
+	}
+
+	input:-moz-placeholder {
+		color: $color;
+	}
+
+	input:-ms-placeholder {
+		color: $color;
+	}
+}

@@ -138,7 +138,7 @@ module PatchworkModule {
 				y += 2 * h;
 			}
 
-			Patchwork._target.append('<svg>' + content.toString() + '</svg>');
+			Patchwork._target.append(DOMElement.fromString('<svg>' + content.toString() + '</svg>'));
 
 			Patchwork._canvas = Patchwork._target.findSingle('svg');
 			

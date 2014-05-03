@@ -1,5 +1,40 @@
 @import "common";
 
+$black : #333333;
+$blue : #22A8E8;
+
+.flat-button {
+	text-align : center;
+	background: #ccc;
+	padding: 10px 15px;
+	border: 1px solid black;
+	min-height: 30px;
+	min-width: 200px;
+	color: white;
+	cursor : pointer;
+	outline: none;
+
+	font : {
+		family : 'Montserrat';
+		size: 1.2em;
+	}
+
+	&:active {
+		background: black;
+	}
+}
+
+.red-flat-button {
+	@extend .flat-button;
+
+	background: #DD381D;
+	border-color: #B52C17;
+
+	&:active {
+		background: #B52C17;
+	}
+}
+
 .slide-wrapper, .slide-cursor-wrapper {
 	position: absolute;
 	width: 100%;
@@ -15,14 +50,21 @@
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	height: 100%;
 	overflow: hidden;
 	list-style-type: none;
 }
 
+.slides {
+	height: 100%;
+}
+
 .slide-wrapper .slides .slide {
 	display : block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
 	padding: 20px 50px;
+	width: 100%;
 	@include box-sizing(border-box);
 	text-align: center;
 
@@ -33,7 +75,7 @@
 	}
 
 	h1, h2, a {
-		color: #333333;
+		color: $black;
 	}
 
 	h1 {
@@ -48,7 +90,79 @@
 		@include transition(border-color, 1s, ease);
 
 		&:hover {
-			border-color: #1CAFF6;
+			border-color: $blue;
+		}
+	}
+}
+
+.slide form {
+	p {
+		margin: 2em 0;
+	}
+
+	input {
+		padding: 5px 10px;
+		color: $black;
+		border: 1px solid #eee;
+		font: {
+			family: 'Montserrat';
+			size: 1.2em;
+		}
+		width: 350px;
+		height: 30px;
+		outline: none;
+
+		&:focus {
+			border-color: $blue;
+		}
+	}
+
+	button {
+		@extend .flat-button;
+
+		background: $blue;
+		border-color: #237de8;
+
+		font : {
+			family : 'Montserrat';
+			size: 1.2em;
+		}
+
+		&:active {
+			background: #237de8;
+		}
+	}
+}
+
+.slide .tags {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+
+	.tag {
+		display: inline-block;
+		vertical-align: middle;
+		margin: 2px 5px;
+		background-color: #E9EAEF;
+		padding: 5px 10px;
+
+		p, img {
+			display: inline-block;
+			vertical-align: middle;
+		}
+
+		p {
+			font: {
+				family: 'Montserrat';
+				size: 1em;
+			}
+			color: $black;	
+			margin: 2px 5px;
+		}
+
+		img {
+			margin-left: 5px;
+			cursor: pointer;
 		}
 	}
 }
@@ -59,6 +173,8 @@
 
 	.slide-cursors {
 		text-align: center;
+		padding: 20px 50px;
+		@include box-sizing(border-box);
 	}
 }
 
@@ -66,7 +182,7 @@
 	display: inline-block;
 	width: 15px;
 	height: 15px;
-	background-color: black;
+	background-color: $black;
 	@include border-radius(50%);
 	margin: 0px 5px;
 	cursor: pointer;
