@@ -31,19 +31,11 @@
 }
 
 @mixin placeholder-color($color) {
-	input::-webkit-input-placeholder {
-		color: $color;
-	}
+	input::-webkit-input-placeholder { color: $color; }
 
-	input::-moz-placeholder {
-		color: $color;
-	}
+	input::-moz-placeholder { color: $color; }
 
-	input:-moz-placeholder {
-		color: $color;
-	}
+	input:-moz-placeholder { color: $color; }
 
-	input:-ms-placeholder {
-		color: $color;
-	}
+	input:-ms-placeholder { color: $color; }
 }

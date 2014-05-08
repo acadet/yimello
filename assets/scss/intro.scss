@@ -1,11 +1,13 @@
 @import "common";
 
 .patchwork {
-	width: 100%;
-	height: 100%;
-	position: absolute;
 	top: 0px;
 	left: 0px;
+	position: absolute;
+
+	width: 100%;
+	height: 100%;
+
 	background: url($imgFolder + 'patchwork_bg.jpg');
 	background-position: center;
 
@@ -19,17 +21,21 @@
 .intro-strap {
 	position: absolute;
 
-	h1, img {
-		display: inline-block;
+	h1, 
+	img {
 		vertical-align: middle;
+
+		display: inline-block;
 	}
 
 	h1 {
+		margin: 10px 0px 0px 10px;
+
 		font: {
-			family: 'Modern Sans';
+			family: $modernSans;
 			size: 3em;
 		}
-		margin: 10px 0px 0px 10px;
+		
 		color: white;
 		text-transform: uppercase;
 	}

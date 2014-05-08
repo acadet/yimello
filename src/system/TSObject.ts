@@ -1,7 +1,7 @@
 class TSObject {
 
 	equals(obj: TSObject) : boolean {
-		return false;
+		return this === obj;
 	}
 
 	toString() : string {

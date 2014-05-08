@@ -2,7 +2,7 @@ var TSObject = (function () {
     function TSObject() {
     }
     TSObject.prototype.equals = function (obj) {
-        return false;
+        return this === obj;
     };
 
     TSObject.prototype.toString = function () {
@@ -681,121 +681,171 @@ var MainPresenter = (function (_super) {
     }
     return MainPresenter;
 })(Presenter);
-var PatchworkModule;
-(function (PatchworkModule) {
-    var Point = (function (_super) {
-        __extends(Point, _super);
-        function Point(x, y) {
-            _super.call(this);
+var ActiveRecordConfig = (function (_super) {
+    __extends(ActiveRecordConfig, _super);
+    function ActiveRecordConfig(databaseName, databaseVersion, databaseSize) {
+        if (typeof databaseVersion === "undefined") { databaseVersion = '1.0'; }
+        if (typeof databaseSize === "undefined") { databaseSize = 5 * 1024 * 1024; }
+        _super.call(this);
 
-            this._x = x;
-            this._y = y;
-        }
-        Point.prototype.getX = function () {
-            return this._x;
-        };
+        this.setDatabaseName(databaseName);
+        this.setDatabaseVersion(databaseVersion);
+        this.setDatabaseSize(databaseSize);
+    }
+    ActiveRecordConfig.prototype.getDatabaseName = function () {
+        return this._dbName;
+    };
 
-        Point.prototype.getY = function () {
-            return this._y;
-        };
+    ActiveRecordConfig.prototype.setDatabaseName = function (name) {
+        this._dbName = name;
+    };
 
-        Point.prototype.toString = function () {
-            return this._x + ',' + this._y;
-        };
-        return Point;
-    })(TSObject);
+    ActiveRecordConfig.prototype.getDatabaseVersion = function () {
+        return this._dbVersion;
+    };
 
-    var Triangle = (function (_super) {
-        __extends(Triangle, _super);
-        function Triangle(e1, e2, e3) {
-            _super.call(this);
+    ActiveRecordConfig.prototype.setDatabaseVersion = function (version) {
+        this._dbVersion = version;
+    };
 
-            this._e1 = e1;
-            this._e2 = e2;
-            this._e3 = e3;
-        }
-        Triangle.prototype.build = function () {
-            var sbf = new StringBuffer('<polygon points="');
+    ActiveRecordConfig.prototype.getDatabaseSize = function () {
+        return this._dbSize;
+    };
 
-            sbf.append(this._e1.toString()).append(' ').append(this._e2.toString()).append(' ').append(this._e3.toString());
+    ActiveRecordConfig.prototype.setDatabaseSize = function (size) {
+        this._dbSize = size;
+    };
+    return ActiveRecordConfig;
+})(TSObject);
+var ActiveRecordHelper = (function (_super) {
+    __extends(ActiveRecordHelper, _super);
+    function ActiveRecordHelper() {
+        _super.apply(this, arguments);
+    }
+    ActiveRecordHelper.getListFromSQLResultSet = function (set, converter) {
+        if (typeof converter === "undefined") { converter = null; }
+        var s = set.getRows();
+        var outcome = new ArrayList();
 
-            sbf.append('" />');
-
-            return sbf.toString();
-        };
-        return Triangle;
-    })(TSObject);
-
-    var Line = (function (_super) {
-        __extends(Line, _super);
-        function Line(e1, e2) {
-            _super.call(this);
-
-            this._e1 = e1;
-            this._e2 = e2;
-        }
-        Line.prototype.build = function () {
-            var sbf = new StringBuffer('<line style="stroke-width: 1; stroke: black;" ');
-
-            sbf.append('x1="' + this._e1.getX() + '" ').append('y1="' + this._e1.getY() + '" ').append('x2="' + this._e2.getX() + '" ').append('y2="' + this._e2.getY() + '" ');
-
-            return sbf.append(' />').toString();
-        };
-        return Line;
-    })(TSObject);
-
-    var Patchwork = (function (_super) {
-        __extends(Patchwork, _super);
-        function Patchwork() {
-            _super.apply(this, arguments);
-        }
-        Patchwork.setLength = function (value) {
-            Patchwork._length = value;
-        };
-
-        Patchwork.build = function (className) {
-            if (typeof className === "undefined") { className = 'patchwork'; }
-            var x = 0;
-            var y = 0;
-            var h = Patchwork._length / 2 * Math.sqrt(3);
-            var content = new StringBuffer();
-
-            Patchwork._target = DOMTree.findSingle('.' + className);
-
-            while (y < Patchwork._target.getHeight()) {
-                while (x < Patchwork._target.getWidth()) {
-                    var t1 = new Triangle(new Point(x, y + h), new Point(x + Patchwork._length / 2, y), new Point(x + Patchwork._length, y + h));
-
-                    var t2 = new Triangle(new Point(x + Patchwork._length / 2, y), new Point(x + Patchwork._length * 3 / 2, y), new Point(x + Patchwork._length, y + h));
-
-                    var t3 = new Triangle(new Point(x, y + h), new Point(x + Patchwork._length, y + h), new Point(x + Patchwork._length / 2, y + 2 * h));
-
-                    var t4 = new Triangle(new Point(x + Patchwork._length / 2, y + 2 * h), new Point(x + Patchwork._length, y + h), new Point(x + Patchwork._length * 3 / 2, y + 2 * h));
-
-                    content.append(t1.build()).append(t2.build()).append(t3.build()).append(t4.build());
-
-                    x += Patchwork._length;
-                }
-
-                x = 0;
-                y += 2 * h;
+        for (var i = 0; i < s.getLength(); i++) {
+            if (converter !== null) {
+                outcome.add(converter(s.item(i)));
+            } else {
+                outcome.add(s.item(i));
             }
+        }
 
-            Patchwork._target.append(DOMElement.fromString('<svg>' + content.toString() + '</svg>'));
+        return outcome;
+    };
+    return ActiveRecordHelper;
+})(TSObject);
+var ActiveRecordObject = (function (_super) {
+    __extends(ActiveRecordObject, _super);
+    function ActiveRecordObject() {
+        _super.apply(this, arguments);
+    }
+    ActiveRecordObject._init = function () {
+        if (ActiveRecordObject._currentDB !== null) {
+            ActiveRecordObject._currentDB = SQLDatabase.open(ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseVersion(), ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseSize());
+        }
+    };
 
-            Patchwork._canvas = Patchwork._target.findSingle('svg');
+    ActiveRecordObject.init = function (config) {
+        ActiveRecordObject._currentConfig = config;
+    };
 
-            Patchwork._canvas.setCss({
-                position: 'absolute',
-                top: 0,
-                width: Patchwork._target.getWidth() + Patchwork._length,
-                left: Patchwork._target.getLeft() - Patchwork._length / 2,
-                height: '100%'
-            });
-        };
+    ActiveRecordObject.get = function (table, callback, converter) {
+        if (typeof converter === "undefined") { converter = null; }
+        ActiveRecordObject._init();
+        ActiveRecordObject._currentDB.transaction(function (tx) {
+            tx.execute('SELECT * FROM ?', [table], function (tx, outcome) {
+                callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, converter));
+            }, null);
+        });
+    };
+    return ActiveRecordObject;
+})(TSObject);
 
-        Patchwork._length = 50;
-        return Patchwork;
-    })(TSObject);
-    PatchworkModule.Patchwork = Patchwork;
-})(PatchworkModule || (PatchworkModule = {}));
+var SQLRowSet = (function () {
+    function SQLRowSet(rowSet) {
+        this._rows = rowSet;
+    }
+    SQLRowSet.prototype.getLength = function () {
+        return this._rows.length;
+    };
+
+    SQLRowSet.prototype.item = function (i) {
+        return this._rows.item(i);
+    };
+    return SQLRowSet;
+})();
+
+var SQLResultSet = (function () {
+    function SQLResultSet(set) {
+        this._set = set;
+    }
+    SQLResultSet.prototype.getInsertId = function () {
+        return this._set.insertId;
+    };
+
+    SQLResultSet.prototype.getRowsAffected = function () {
+        return this._set.rowsAffected;
+    };
+
+    SQLResultSet.prototype.getRows = function () {
+        return new SQLRowSet(this._set.rows);
+    };
+    return SQLResultSet;
+})();
+
+var SQLTransaction = (function () {
+    function SQLTransaction(transaction) {
+        this._tx = transaction;
+    }
+    SQLTransaction.prototype.execute = function (statement, arguments, success, error) {
+        this._tx.executeSql(statement, arguments, function (o, results) {
+            success(new SQLTransaction(o), new SQLResultSet(results));
+        }, function (tx, e) {
+            error(new SQLTransaction(tx), new SQLError(e));
+        });
+    };
+    return SQLTransaction;
+})();
+
+var SQLError = (function () {
+    function SQLError(error) {
+        this._error = error;
+    }
+    SQLError.prototype.getCode = function () {
+        return this._error.code;
+    };
+
+    SQLError.prototype.getMessage = function () {
+        return this._error.message;
+    };
+    return SQLError;
+})();
+
+var SQLDatabase = (function () {
+    function SQLDatabase(dbObj) {
+        this._db = dbObj;
+    }
+    SQLDatabase.open = function (name, version, displayName, size, callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        var db = window.openDatabase(name, version, displayName, size, function (o) {
+            callback(new SQLDatabase(o));
+        });
+
+        return new SQLDatabase(db);
+    };
+
+    SQLDatabase.prototype.transaction = function (success, error) {
+        if (typeof error === "undefined") { error = null; }
+        this._db.transaction(function (o) {
+            success(new SQLTransaction(o));
+        }, function (o) {
+            error(new SQLError(o));
+        });
+    };
+    return SQLDatabase;
+})();

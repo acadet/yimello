@@ -7,14 +7,21 @@ $appWidth : 800px;
 $appHeight: 500px;
 
 body {
-	width: 100%;
-	height: 100%;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	overflow: hidden;
+
+	width: 100%;
+	height: 100%;
 	margin: 0;
+	
+	overflow: hidden;
 	opacity: 0;
+
+	* {
+		font-weight: normal;
+		font-style: normal;
+	}
 }
 
 a {

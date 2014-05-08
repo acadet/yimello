@@ -24,5 +24,8 @@
 /// <reference path="presenters/MainPresenter.ts" />
 
 //grunt-start
-/// <reference path="helpers/Patchwork.ts" />
+/// <reference path="system/storage/ActiveRecord/ActiveRecordConfig.ts" />
+/// <reference path="system/storage/ActiveRecord/ActiveRecordHelper.ts" />
+/// <reference path="system/storage/ActiveRecord/ActiveRecordObject.ts" />
+/// <reference path="system/storage/SQLAPI.ts" />
 //grunt-end

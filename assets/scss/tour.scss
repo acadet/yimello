@@ -4,20 +4,21 @@ $black : #333333;
 $blue : #22A8E8;
 
 .flat-button {
-	text-align : center;
-	background: #ccc;
 	padding: 10px 15px;
-	border: 1px solid black;
 	min-height: 30px;
 	min-width: 200px;
+
+	font : {
+		family : $montserrat;
+		size: 1.2em;
+	}
+	text-align : center;
+
+	background: #ccc;
+	border: 1px solid black;
 	color: white;
 	cursor : pointer;
 	outline: none;
-
-	font : {
-		family : 'Montserrat';
-		size: 1.2em;
-	}
 
 	&:active {
 		background: black;
@@ -35,55 +36,54 @@ $blue : #22A8E8;
 	}
 }
 
-.slide-wrapper, .slide-cursor-wrapper {
+.slide-wrapper,
+.slide-cursor-wrapper {
 	position: absolute;
-	width: 100%;
 	left: 0px;
+
+	width: 100%;
 }
 
 .slide-wrapper {
 	top : 0px;
+
 	height: 75%;
 }
 
-.slides, .slide-cursors {
+.slides, 
+.slide-cursors {
 	margin: 0;
 	padding: 0;
 	width: 100%;
+
 	overflow: hidden;
 	list-style-type: none;
 }
 
-.slides {
-	height: 100%;
-}
+.slides { height: 100%; }
 
 .slide-wrapper .slides .slide {
-	display : block;
 	position: absolute;
 	top: 0px;
 	left: 0px;
+
+	display : block;
 	padding: 20px 50px;
 	width: 100%;
 	@include box-sizing(border-box);
+
 	text-align: center;
 
-	h1, h2 {
+	h1, 
+	h2 {
 		font: {
-			family: 'Montserrat';
+			family: $montserrat;
 		}
 	}
 
-	h1, h2, a {
-		color: $black;
-	}
+	h1, h2, a { color: $black; }
 
-	h1 {
-		font-size: 3em;
-	}
-
-	h2 {
-	}
+	h1 { font-size: 3em; }
 
 	a {
 		border-bottom : 2px dashed #eee;
@@ -96,21 +96,21 @@ $blue : #22A8E8;
 }
 
 .slide form {
-	p {
-		margin: 2em 0;
-	}
+	p { margin: 2em 0; }
 
 	input {
 		padding: 5px 10px;
-		color: $black;
-		border: 1px solid #eee;
-		font: {
-			family: 'Montserrat';
-			size: 1.2em;
-		}
 		width: 350px;
 		height: 30px;
+
+		font: {
+			family: $montserrat;
+			size: 1.2em;
+		}
+		
 		outline: none;
+		color: $black;
+		border: 1px solid #eee;
 
 		&:focus {
 			border-color: $blue;
@@ -120,13 +120,13 @@ $blue : #22A8E8;
 	button {
 		@extend .flat-button;
 
-		background: $blue;
-		border-color: #237de8;
-
 		font : {
-			family : 'Montserrat';
+			family : $montserrat;
 			size: 1.2em;
 		}
+
+		background: $blue;
+		border-color: #237de8;
 
 		&:active {
 			background: #237de8;
@@ -135,33 +135,43 @@ $blue : #22A8E8;
 }
 
 .slide .tags {
-	list-style-type: none;
 	margin: 0;
 	padding: 0;
 
-	.tag {
-		display: inline-block;
-		vertical-align: middle;
-		margin: 2px 5px;
-		background-color: #E9EAEF;
-		padding: 5px 10px;
+	list-style-type: none;
 
-		p, img {
-			display: inline-block;
+	.tag {
+		vertical-align: middle;
+
+		display: inline-block;
+		padding: 5px 10px;
+		margin: 2px 5px;
+		
+		background-color: #E9EAEF;
+		
+
+		p, 
+		img {
 			vertical-align: middle;
+
+			display: inline-block;
 		}
 
 		p {
+			margin: 2px 5px;
+
 			font: {
-				family: 'Montserrat';
+				family: $montserrat;
 				size: 1em;
 			}
+
 			color: $black;	
-			margin: 2px 5px;
+			
 		}
 
 		img {
 			margin-left: 5px;
+
 			cursor: pointer;
 		}
 	}
@@ -172,9 +182,10 @@ $blue : #22A8E8;
 	height: 25%;
 
 	.slide-cursors {
-		text-align: center;
 		padding: 20px 50px;
 		@include box-sizing(border-box);
+
+		text-align: center;
 	}
 }
 
@@ -182,9 +193,10 @@ $blue : #22A8E8;
 	display: inline-block;
 	width: 15px;
 	height: 15px;
+	margin: 0 5px;
+
 	background-color: $black;
 	@include border-radius(50%);
-	margin: 0px 5px;
 	cursor: pointer;
 
 	&.active-cursor {
