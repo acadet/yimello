@@ -1,6 +1,7 @@
 /// <reference path="../dependencies.ts" />
 
 class Exception extends TSObject {
+	private _error : any;
 
 	constructor(msg: string) {
 		super();
@@ -19,5 +20,7 @@ class Exception extends TSObject {
 		return this._error;
 	}
 
-	private _error : any;
+	toString() : string {
+		return this._error;
+	}
 }

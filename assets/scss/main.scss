@@ -3,6 +3,15 @@
 $black: #333333;
 $blue: #0c7cbb;
 
+.main-view-wrapper {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+
+	width: 100%;
+	height: 100%;
+}
+
 .panel-wrapper {
 	position: absolute;
 	top: 0px;
@@ -21,7 +30,7 @@ $blue: #0c7cbb;
 		width: 100%;
 		padding: 10px 0px;
 
-		border-bottom: 3px solid rgba(0, 0, 0, 0.5);
+		border-bottom: 3px solid rgba(0, 0, 0, 0.2);
 	}
 
 	.tag-list {
@@ -114,5 +123,66 @@ $blue: #0c7cbb;
 	outline: none;
 	border : none;
 	background: none;
+	color: white;
+}
+
+.bookmark-form-wrapper {
+	position: absolute;
+	top: 0;
+	left: 100%;
+
+	width: 100%;
+	height: 100%;
+
+	form {
+		margin: 15px auto;
+		padding: 0 25px;
+		width: 400px;
+		text-align: center;
+
+		p {
+			margin: 1em 0;
+		}
+	}
+}
+
+.bookmark-form-wrapper form input {
+	width: 300px;
+	height: 20px;
+	padding: 5px 10px;
+
+	outline: none;
+}
+
+.bookmark-form-wrapper form textarea {
+	width: 300px;
+	height: 50px;
+	padding: 5px 10px;
+
+	outline: none;
+}
+
+.bookmark-form-wrapper form .tags {
+	margin: 0;
+	padding: 0;
+
+	list-style-type: none;
+
+	li {
+		vertical-align: middle;
+		padding: 0;
+		margin: 0;
+
+		display: inline-block;
+	}
+}
+
+.bookmark-form-wrapper form .save-buton {
+	width: 200px;
+	height: 20px;
+	padding: 5px 10px;
+
+	outline: none;
+	background-color: #22a8e8;
 	color: white;
 }

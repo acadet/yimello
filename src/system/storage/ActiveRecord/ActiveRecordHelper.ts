@@ -2,6 +2,15 @@
 
 class ActiveRecordHelper extends TSObject {
 
+	static transactionErrorHandler(e : SQLError) : void {
+		ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+	}
+
+	static executeErrorHandler(tx : SQLTransaction, e : SQLError) : boolean {
+		ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+		return true;
+	}
+
 	static getListFromSQLResultSet<T>(set : SQLResultSet, converter : Func<any, T> = null) : IList<T> {
 		var s : SQLRowSet = set.getRows();
 		var outcome : IList<T> = new ArrayList<T>();

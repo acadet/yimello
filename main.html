@@ -19,38 +19,65 @@
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
     <body>
+        <div id="js-main-view-wrapper" class="main-view-wrapper">
 
-        <div class="panel-wrapper">
-            <div class="icon-wrapper">
-                <ul class="icons">
-                    <li class="icon">
-                        <img src="assets/img/menu-icon.png" />
-                    </li>
-                    <li class="icon">
-                        <img src="assets/img/menu-icon.png" />
-                    </li>
-                    <li class="icon">
-                        <img src="assets/img/menu-icon.png" />
-                    </li>
-                </ul>
+            <div class="panel-wrapper">
+                <div class="icon-wrapper">
+                    <ul class="icons">
+                        <li class="icon">
+                            <img src="assets/img/menu-icon.png" />
+                        </li>
+                        <li id="js-bookmark-add-trigger" class="icon">
+                            <img src="assets/img/bookmark-icon.png" />
+                        </li>
+                        <li class="icon">
+                            <img src="assets/img/tag-icon.png" />
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tag-list">
+                    <ul class="tags">
+                        <li>Most popular</li>
+                        <li>Al Pacino</li>
+                        <li>Bruce Willis</li>
+                        <li>Johnny Depp</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="tag-list">
-                <ul class="tags">
-                    <li>Most popular</li>
-                    <li>Al Pacino</li>
-                    <li>Bruce Willis</li>
-                    <li>Johnny Depp</li>
-                </ul>
+            <div class="bookmark-wrapper"></div>
+
+            <div class="search-wrapper">
+                <img src="assets/img/search-icon.png" />
+                <form action="#" method="post">
+                    <input type="text" name="search" placeholder="Type something to search" />
+                </form>
             </div>
         </div>
 
-        <div class="bookmark-wrapper"></div>
-
-        <div class="search-wrapper">
-            <img src="assets/img/search-icon.png" />
+        <div id="js-bookmark-form-wrapper" class="bookmark-form-wrapper">
             <form action="#" method="post">
-                <input type="text" name="search" placeholder="Type something to search" />
+                <p>
+                    <input type="text" name="url" placeholder="http://" />
+                </p>
+                <p>
+                    <input type="text" name="title" placeholder="An awesome title" />
+                </p>
+                <p>
+                    <textarea name="description" placeholder="Write something good about your bookmark"></textarea>
+                </p>
+                <p>
+                    <ul class="tags">
+                        
+                    </ul>
+                </p>
+                <p>
+                    <input type="text" name="tags" placeholder="Press Enter to end a tag" />
+                </p>
+                <p>
+                    <button type="button" class="save-button">Save</button>
+                </p>
             </form>
         </div>
     </body>

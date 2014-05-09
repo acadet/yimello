@@ -1,10 +1,9 @@
 /// <reference path="../dependencies.ts" />
 
 class DOMElementEvents {
+	static Blur : string = 'blur';
 	static Click : string = 'click';
-
 	static KeyDown : string = 'keydown';
-
 	static Submit : string = 'submit';
 }
 

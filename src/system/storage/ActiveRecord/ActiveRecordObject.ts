@@ -46,9 +46,11 @@ class ActiveRecordObject extends TSObject {
 					(tx, outcome) => {
 						callback(ActiveRecordHelper.getListFromSQLResultSet<T>(outcome, converter));
 					},
-					null
+					ActiveRecordHelper.executeErrorHandler
 				);
-			});
+			},
+			ActiveRecordHelper.transactionErrorHandler
+		);
 	}
 
 	//endregion Public Methods

@@ -14,7 +14,7 @@ class ActiveRecordConfig extends TSObject {
 	constructor(
 		databaseName : string,
 		databaseVersion : string = '1.0',
-		databaseSize : number = 5 * 1024 * 1024) {
+		databaseSize : number = 10 * 1024 * 1024) {
 		super();
 
 		this.setDatabaseName(databaseName);

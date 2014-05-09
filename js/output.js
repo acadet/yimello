@@ -79,6 +79,10 @@ var Exception = (function (_super) {
     Exception.prototype.toError = function () {
         return this._error;
     };
+
+    Exception.prototype.toString = function () {
+        return this._error;
+    };
     return Exception;
 })(TSObject);
 var ExceptionHandler = (function (_super) {
@@ -94,10 +98,9 @@ var ExceptionHandler = (function (_super) {
 var DOMElementEvents = (function () {
     function DOMElementEvents() {
     }
+    DOMElementEvents.Blur = 'blur';
     DOMElementEvents.Click = 'click';
-
     DOMElementEvents.KeyDown = 'keydown';
-
     DOMElementEvents.Submit = 'submit';
     return DOMElementEvents;
 })();
@@ -421,6 +424,90 @@ var NodeWindow = (function () {
     };
     return NodeWindow;
 })();
+
+var SQLRowSet = (function () {
+    function SQLRowSet(rowSet) {
+        this._rows = rowSet;
+    }
+    SQLRowSet.prototype.getLength = function () {
+        return this._rows.length;
+    };
+
+    SQLRowSet.prototype.item = function (i) {
+        return this._rows.item(i);
+    };
+    return SQLRowSet;
+})();
+
+var SQLResultSet = (function () {
+    function SQLResultSet(set) {
+        this._set = set;
+    }
+    SQLResultSet.prototype.getInsertId = function () {
+        return this._set.insertId;
+    };
+
+    SQLResultSet.prototype.getRowsAffected = function () {
+        return this._set.rowsAffected;
+    };
+
+    SQLResultSet.prototype.getRows = function () {
+        return new SQLRowSet(this._set.rows);
+    };
+    return SQLResultSet;
+})();
+
+var SQLTransaction = (function () {
+    function SQLTransaction(transaction) {
+        this._tx = transaction;
+    }
+    SQLTransaction.prototype.execute = function (statement, arguments, success, error) {
+        this._tx.executeSql(statement, arguments, function (o, results) {
+            success(new SQLTransaction(o), new SQLResultSet(results));
+        }, function (tx, e) {
+            error(new SQLTransaction(tx), new SQLError(e));
+        });
+    };
+    return SQLTransaction;
+})();
+
+var SQLError = (function () {
+    function SQLError(error) {
+        this._error = error;
+    }
+    SQLError.prototype.getCode = function () {
+        return this._error.code;
+    };
+
+    SQLError.prototype.getMessage = function () {
+        return this._error.message;
+    };
+    return SQLError;
+})();
+
+var SQLDatabase = (function () {
+    function SQLDatabase(dbObj) {
+        this._db = dbObj;
+    }
+    SQLDatabase.open = function (name, version, displayName, size, callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        var db = window.openDatabase(name, version, displayName, size, function (o) {
+            callback(new SQLDatabase(o));
+        });
+
+        return new SQLDatabase(db);
+    };
+
+    SQLDatabase.prototype.transaction = function (success, error) {
+        if (typeof error === "undefined") { error = null; }
+        this._db.transaction(function (o) {
+            success(new SQLTransaction(o));
+        }, function (o) {
+            error(new SQLError(o));
+        });
+    };
+    return SQLDatabase;
+})();
 var ArrayList = (function (_super) {
     __extends(ArrayList, _super);
     function ArrayList() {
@@ -447,6 +534,186 @@ var ArrayList = (function (_super) {
     };
     return ArrayList;
 })(TSObject);
+var ActiveRecordConfig = (function (_super) {
+    __extends(ActiveRecordConfig, _super);
+    function ActiveRecordConfig(databaseName, databaseVersion, databaseSize) {
+        if (typeof databaseVersion === "undefined") { databaseVersion = '1.0'; }
+        if (typeof databaseSize === "undefined") { databaseSize = 10 * 1024 * 1024; }
+        _super.call(this);
+
+        this.setDatabaseName(databaseName);
+        this.setDatabaseVersion(databaseVersion);
+        this.setDatabaseSize(databaseSize);
+    }
+    ActiveRecordConfig.prototype.getDatabaseName = function () {
+        return this._dbName;
+    };
+
+    ActiveRecordConfig.prototype.setDatabaseName = function (name) {
+        this._dbName = name;
+    };
+
+    ActiveRecordConfig.prototype.getDatabaseVersion = function () {
+        return this._dbVersion;
+    };
+
+    ActiveRecordConfig.prototype.setDatabaseVersion = function (version) {
+        this._dbVersion = version;
+    };
+
+    ActiveRecordConfig.prototype.getDatabaseSize = function () {
+        return this._dbSize;
+    };
+
+    ActiveRecordConfig.prototype.setDatabaseSize = function (size) {
+        this._dbSize = size;
+    };
+    return ActiveRecordConfig;
+})(TSObject);
+var ActiveRecordException = (function (_super) {
+    __extends(ActiveRecordException, _super);
+    function ActiveRecordException() {
+        _super.apply(this, arguments);
+    }
+    return ActiveRecordException;
+})(Exception);
+var ActiveRecordHelper = (function (_super) {
+    __extends(ActiveRecordHelper, _super);
+    function ActiveRecordHelper() {
+        _super.apply(this, arguments);
+    }
+    ActiveRecordHelper.transactionErrorHandler = function (e) {
+        ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+    };
+
+    ActiveRecordHelper.executeErrorHandler = function (tx, e) {
+        ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+        return true;
+    };
+
+    ActiveRecordHelper.getListFromSQLResultSet = function (set, converter) {
+        if (typeof converter === "undefined") { converter = null; }
+        var s = set.getRows();
+        var outcome = new ArrayList();
+
+        for (var i = 0; i < s.getLength(); i++) {
+            if (converter !== null) {
+                outcome.add(converter(s.item(i)));
+            } else {
+                outcome.add(s.item(i));
+            }
+        }
+
+        return outcome;
+    };
+    return ActiveRecordHelper;
+})(TSObject);
+var ActiveRecordObject = (function (_super) {
+    __extends(ActiveRecordObject, _super);
+    function ActiveRecordObject() {
+        _super.apply(this, arguments);
+    }
+    ActiveRecordObject._init = function () {
+        if (ActiveRecordObject._currentDB !== null) {
+            ActiveRecordObject._currentDB = SQLDatabase.open(ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseVersion(), ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseSize());
+        }
+    };
+
+    ActiveRecordObject.init = function (config) {
+        ActiveRecordObject._currentConfig = config;
+    };
+
+    ActiveRecordObject.get = function (table, callback, converter) {
+        if (typeof converter === "undefined") { converter = null; }
+        ActiveRecordObject._init();
+        ActiveRecordObject._currentDB.transaction(function (tx) {
+            tx.execute('SELECT * FROM ?', [table], function (tx, outcome) {
+                callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, converter));
+            }, ActiveRecordHelper.executeErrorHandler);
+        }, ActiveRecordHelper.transactionErrorHandler);
+    };
+    return ActiveRecordObject;
+})(TSObject);
+var DataAccessObject = (function (_super) {
+    __extends(DataAccessObject, _super);
+    function DataAccessObject() {
+        _super.call(this);
+
+        var config = new ActiveRecordConfig('yimello');
+
+        ActiveRecordObject.init(config);
+    }
+    DataAccessObject.prototype.getId = function () {
+        return this._id;
+    };
+
+    DataAccessObject.prototype.setId = function (id) {
+        this._id = id;
+        return this;
+    };
+    return DataAccessObject;
+})(TSObject);
+var BookmarkDAO = (function (_super) {
+    __extends(BookmarkDAO, _super);
+    function BookmarkDAO() {
+        _super.apply(this, arguments);
+    }
+    BookmarkDAO.prototype.getURL = function () {
+        return this._url;
+    };
+
+    BookmarkDAO.prototype.setURL = function (u) {
+        this._url = u;
+        return this;
+    };
+
+    BookmarkDAO.prototype.getTitle = function () {
+        return this._title;
+    };
+
+    BookmarkDAO.prototype.setTitle = function (t) {
+        this._title = t;
+        return this;
+    };
+
+    BookmarkDAO.prototype.getDescription = function () {
+        return this._description;
+    };
+
+    BookmarkDAO.prototype.setDescription = function (d) {
+        this._description = d;
+        return this;
+    };
+    return BookmarkDAO;
+})(DataAccessObject);
+var TagDAO = (function (_super) {
+    __extends(TagDAO, _super);
+    function TagDAO() {
+        _super.apply(this, arguments);
+    }
+    TagDAO._fromObject = function (obj) {
+        var t = new TagDAO();
+        t.setId(obj.id);
+        t.setLabel(obj.label);
+
+        return t;
+    };
+
+    TagDAO.prototype.getLabel = function () {
+        return this._label;
+    };
+
+    TagDAO.prototype.setLabel = function (l) {
+        this._label = l;
+        return this;
+    };
+
+    TagDAO.get = function (callback) {
+        ActiveRecordObject.get(TagDAO.TABLE, callback, TagDAO._fromObject);
+    };
+    TagDAO.TABLE = 'tag';
+    return TagDAO;
+})(DataAccessObject);
 var Presenter = (function (_super) {
     __extends(Presenter, _super);
     function Presenter() {
@@ -679,173 +946,204 @@ var MainPresenter = (function (_super) {
     function MainPresenter() {
         _super.apply(this, arguments);
     }
+    MainPresenter.prototype._switchToBookmarkForm = function () {
+        this._mainViewWrapper.animate({
+            left: '-100%'
+        }, 500);
+
+        this._bookmarkFormWrapper.animate({
+            left: 0
+        }, 500);
+    };
+
+    MainPresenter.prototype.onStart = function () {
+        var _this = this;
+        this._mainViewWrapper = DOMTree.findSingle('#js-main-view-wrapper');
+        this._bookmarkFormWrapper = DOMTree.findSingle('#js-bookmark-form-wrapper');
+        this._bookmarkAddTrigger = DOMTree.findSingle('#js-bookmark-add-trigger');
+        this._urlInput = this._bookmarkFormWrapper.findSingle('input[name="url"]');
+
+        this._bookmarkAddTrigger.on(DOMElementEvents.Click, function (arg) {
+            _this._switchToBookmarkForm();
+        });
+
+        this._urlInput.on(DOMElementEvents.Blur, function (arg) {
+            URLDetailsProvider.getDetails(_this._urlInput.getValue(), null, function (e) {
+                throw e.toError();
+            });
+        });
+    };
+
+    MainPresenter.prototype.onDestroy = function () {
+        this._bookmarkAddTrigger.off(DOMElementEvents.Click);
+    };
     return MainPresenter;
 })(Presenter);
-var ActiveRecordConfig = (function (_super) {
-    __extends(ActiveRecordConfig, _super);
-    function ActiveRecordConfig(databaseName, databaseVersion, databaseSize) {
-        if (typeof databaseVersion === "undefined") { databaseVersion = '1.0'; }
-        if (typeof databaseSize === "undefined") { databaseSize = 5 * 1024 * 1024; }
-        _super.call(this);
 
-        this.setDatabaseName(databaseName);
-        this.setDatabaseVersion(databaseVersion);
-        this.setDatabaseSize(databaseSize);
-    }
-    ActiveRecordConfig.prototype.getDatabaseName = function () {
-        return this._dbName;
-    };
-
-    ActiveRecordConfig.prototype.setDatabaseName = function (name) {
-        this._dbName = name;
-    };
-
-    ActiveRecordConfig.prototype.getDatabaseVersion = function () {
-        return this._dbVersion;
-    };
-
-    ActiveRecordConfig.prototype.setDatabaseVersion = function (version) {
-        this._dbVersion = version;
-    };
-
-    ActiveRecordConfig.prototype.getDatabaseSize = function () {
-        return this._dbSize;
-    };
-
-    ActiveRecordConfig.prototype.setDatabaseSize = function (size) {
-        this._dbSize = size;
-    };
-    return ActiveRecordConfig;
-})(TSObject);
-var ActiveRecordHelper = (function (_super) {
-    __extends(ActiveRecordHelper, _super);
-    function ActiveRecordHelper() {
+var URLDetailsProvider = (function (_super) {
+    __extends(URLDetailsProvider, _super);
+    function URLDetailsProvider() {
         _super.apply(this, arguments);
     }
-    ActiveRecordHelper.getListFromSQLResultSet = function (set, converter) {
-        if (typeof converter === "undefined") { converter = null; }
-        var s = set.getRows();
-        var outcome = new ArrayList();
+    URLDetailsProvider.getDetails = function (url, success, errorHandler) {
+        if (URLHelper.isValid(url)) {
+            var request;
 
-        for (var i = 0; i < s.getLength(); i++) {
-            if (converter !== null) {
-                outcome.add(converter(s.item(i)));
-            } else {
-                outcome.add(s.item(i));
+            request = new GetRequest(url);
+            request.setDataType(AjaxRequestDataType.Html);
+            request.setErrorHandler(function (xhr, status, error) {
+                errorHandler(new Exception(error));
+            });
+            request.execute(function (data, status, xhr) {
+                var title;
+                var description;
+
+                console.log($(data).get());
+            });
+        } else {
+            errorHandler(new Exception('URL is bad formatted'));
+        }
+    };
+    return URLDetailsProvider;
+})(TSObject);
+var URLHelper = (function (_super) {
+    __extends(URLHelper, _super);
+    function URLHelper() {
+        _super.apply(this, arguments);
+    }
+    URLHelper.isValid = function (url) {
+        var e;
+
+        e = new Regex('http\:\/\/.*\..*', [RegexFlags.Insensitive]);
+
+        return e.test(url);
+    };
+    return URLHelper;
+})(TSObject);
+var RegexFlags = (function () {
+    function RegexFlags() {
+    }
+    RegexFlags.Insensitive = 'i';
+    RegexFlags.Global = 'g';
+    RegexFlags.Multi = 'm';
+    return RegexFlags;
+})();
+
+var Regex = (function (_super) {
+    __extends(Regex, _super);
+    function Regex(pattern, flags) {
+        if (typeof flags === "undefined") { flags = null; }
+        _super.call(this);
+
+        this._regex = new RegExp(pattern, this._buildFlags(flags));
+    }
+    Regex.prototype._buildFlags = function (flags) {
+        var s = '';
+
+        if (flags !== null) {
+            for (var i = 0; i < flags.length; i++) {
+                s += flags[0];
             }
         }
 
-        return outcome;
+        return s;
     };
-    return ActiveRecordHelper;
+
+    Regex.prototype.execute = function (s) {
+        return this._regex.exec(s);
+    };
+
+    Regex.prototype.test = function (s) {
+        return this._regex.test(s);
+    };
+    return Regex;
 })(TSObject);
-var ActiveRecordObject = (function (_super) {
-    __extends(ActiveRecordObject, _super);
-    function ActiveRecordObject() {
+
+var AjaxRequest = (function (_super) {
+    __extends(AjaxRequest, _super);
+    function AjaxRequest(url) {
+        _super.call(this);
+
+        this._errorHandler = function (xhr, status, error) {
+            ExceptionHandler.throw(new AjaxRequestException(error));
+        };
+
+        this._url = url;
+    }
+    AjaxRequest.prototype.setURL = function (url) {
+        this._url = url;
+        return this;
+    };
+
+    AjaxRequest.prototype.setType = function (type) {
+        this._type = type;
+        return this;
+    };
+
+    AjaxRequest.prototype.setDataType = function (dataType) {
+        this._dataType = dataType;
+        return this;
+    };
+
+    AjaxRequest.prototype.setData = function (obj) {
+        this._data = obj;
+        return this;
+    };
+
+    AjaxRequest.prototype.setErrorHandler = function (h) {
+        this._errorHandler = h;
+        return this;
+    };
+
+    AjaxRequest.prototype.execute = function (success) {
+        jQuery.ajax({
+            type: this._type,
+            dataType: this._dataType,
+            url: this._url,
+            data: this._data,
+            success: success,
+            error: this._errorHandler
+        });
+    };
+    return AjaxRequest;
+})(TSObject);
+var AjaxRequestDataType = (function () {
+    function AjaxRequestDataType() {
+    }
+    AjaxRequestDataType.Xml = 'xml';
+
+    AjaxRequestDataType.Html = 'html';
+
+    AjaxRequestDataType.Json = 'json';
+
+    AjaxRequestDataType.Text = 'text';
+    return AjaxRequestDataType;
+})();
+var AjaxRequestException = (function (_super) {
+    __extends(AjaxRequestException, _super);
+    function AjaxRequestException() {
         _super.apply(this, arguments);
     }
-    ActiveRecordObject._init = function () {
-        if (ActiveRecordObject._currentDB !== null) {
-            ActiveRecordObject._currentDB = SQLDatabase.open(ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseVersion(), ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseSize());
-        }
-    };
-
-    ActiveRecordObject.init = function (config) {
-        ActiveRecordObject._currentConfig = config;
-    };
-
-    ActiveRecordObject.get = function (table, callback, converter) {
-        if (typeof converter === "undefined") { converter = null; }
-        ActiveRecordObject._init();
-        ActiveRecordObject._currentDB.transaction(function (tx) {
-            tx.execute('SELECT * FROM ?', [table], function (tx, outcome) {
-                callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, converter));
-            }, null);
-        });
-    };
-    return ActiveRecordObject;
-})(TSObject);
-
-var SQLRowSet = (function () {
-    function SQLRowSet(rowSet) {
-        this._rows = rowSet;
+    return AjaxRequestException;
+})(Exception);
+var AjaxRequestType = (function () {
+    function AjaxRequestType() {
     }
-    SQLRowSet.prototype.getLength = function () {
-        return this._rows.length;
-    };
+    AjaxRequestType.Get = 'GET';
 
-    SQLRowSet.prototype.item = function (i) {
-        return this._rows.item(i);
-    };
-    return SQLRowSet;
+    AjaxRequestType.Post = 'POST';
+
+    AjaxRequestType.Put = 'PUT';
+
+    AjaxRequestType.Delete = 'DELETE';
+    return AjaxRequestType;
 })();
+var GetRequest = (function (_super) {
+    __extends(GetRequest, _super);
+    function GetRequest(url) {
+        _super.call(this, url);
 
-var SQLResultSet = (function () {
-    function SQLResultSet(set) {
-        this._set = set;
+        this.setType(AjaxRequestType.Get);
     }
-    SQLResultSet.prototype.getInsertId = function () {
-        return this._set.insertId;
-    };
-
-    SQLResultSet.prototype.getRowsAffected = function () {
-        return this._set.rowsAffected;
-    };
-
-    SQLResultSet.prototype.getRows = function () {
-        return new SQLRowSet(this._set.rows);
-    };
-    return SQLResultSet;
-})();
-
-var SQLTransaction = (function () {
-    function SQLTransaction(transaction) {
-        this._tx = transaction;
-    }
-    SQLTransaction.prototype.execute = function (statement, arguments, success, error) {
-        this._tx.executeSql(statement, arguments, function (o, results) {
-            success(new SQLTransaction(o), new SQLResultSet(results));
-        }, function (tx, e) {
-            error(new SQLTransaction(tx), new SQLError(e));
-        });
-    };
-    return SQLTransaction;
-})();
-
-var SQLError = (function () {
-    function SQLError(error) {
-        this._error = error;
-    }
-    SQLError.prototype.getCode = function () {
-        return this._error.code;
-    };
-
-    SQLError.prototype.getMessage = function () {
-        return this._error.message;
-    };
-    return SQLError;
-})();
-
-var SQLDatabase = (function () {
-    function SQLDatabase(dbObj) {
-        this._db = dbObj;
-    }
-    SQLDatabase.open = function (name, version, displayName, size, callback) {
-        if (typeof callback === "undefined") { callback = null; }
-        var db = window.openDatabase(name, version, displayName, size, function (o) {
-            callback(new SQLDatabase(o));
-        });
-
-        return new SQLDatabase(db);
-    };
-
-    SQLDatabase.prototype.transaction = function (success, error) {
-        if (typeof error === "undefined") { error = null; }
-        this._db.transaction(function (o) {
-            success(new SQLTransaction(o));
-        }, function (o) {
-            error(new SQLError(o));
-        });
-    };
-    return SQLDatabase;
-})();
+    return GetRequest;
+})(AjaxRequest);
