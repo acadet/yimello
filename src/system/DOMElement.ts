@@ -31,7 +31,7 @@ class DOMElementEventObject extends TSObject {
 		return this._pageY;
 	}
 
-	getWhich() : string {
+	getWhich() : number {
 		return this._which;
 	}
 
@@ -43,7 +43,7 @@ class DOMElementEventObject extends TSObject {
 	private _target : DOMElement;
 	private _pageX : number;
 	private _pageY : number;
-	private _which : string;
+	private _which : number;
 }
 
 interface DOMElementEventHandler {
@@ -132,6 +132,10 @@ class DOMElement extends TSObject {
 		return DOMElement.fromJS(o);
 	}
 
+	getAttribute(key : string) : string {
+		return this._element.attr(key);
+	}
+
 	getData(key : string) : string {
 		return this._element.attr('data-' + key);
 	}
@@ -146,6 +150,14 @@ class DOMElement extends TSObject {
 		} else {
 			return this._element.offset().left;
 		}
+	}
+
+	getTagName() : string {
+		return this._element.get(0).localName;
+	}
+
+	getText() : string {
+		return this._element.text();
 	}
 
 	getTop(relative = false) : number {

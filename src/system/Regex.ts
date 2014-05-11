@@ -44,7 +44,13 @@ class Regex extends TSObject {
 	//region Public Methods
 
 	execute(s : string) : string {
-		return this._regex.exec(s);
+		var r : any = this._regex.exec(s);
+
+		if (r === null) {
+			return null;
+		} else {
+			return r[1];
+		}
 	}
 
 	test(s : string) : boolean {

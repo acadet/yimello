@@ -51,7 +51,7 @@ class TourPresenter extends Presenter {
 
 		DOMTree.findSingle('.slide form.tag-form input[name="tags"]')
 			.on(DOMElementEvents.KeyDown, (e) => {
-				if (e.getWhich() == '13') {
+				if (e.getWhich() === 13) {
 					this._createTag(e.getTarget().getValue());
 					e.getTarget().setValue('');
 				}
@@ -87,7 +87,7 @@ class TourPresenter extends Presenter {
 
 		newSlide = this._slides.findSingle('.slide[data-id="' + id + '"]');
 
-		if (id > currentId) {	
+		if (id > currentId) {
 			newSlide
 				.setCss({
 					left: this._slides.getWidth()

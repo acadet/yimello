@@ -17,7 +17,7 @@ class ActiveRecordObject extends TSObject {
 	//region Private Methods
 	
 	private static _init() : void {
-		if (ActiveRecordObject._currentDB !== null) {
+		if (!TSObject.exists(ActiveRecordObject._currentDB)) {
 			ActiveRecordObject._currentDB =
 			SQLDatabase.open(
 				ActiveRecordObject._currentConfig.getDatabaseName(),
@@ -37,6 +37,8 @@ class ActiveRecordObject extends TSObject {
 	}
 
 	static get<T>(table : string, callback : Action<IList<T>>, converter : Func<any, T> = null) : void {
+		//TODO : check entries
+
 		ActiveRecordObject._init();
 		ActiveRecordObject._currentDB.transaction(
 			(tx) => {
@@ -48,6 +50,87 @@ class ActiveRecordObject extends TSObject {
 					},
 					ActiveRecordHelper.executeErrorHandler
 				);
+			},
+			ActiveRecordHelper.transactionErrorHandler
+		);
+	}
+
+	static insert(table : string, data : IList<any>, callback : Action<boolean> = null) : void {
+
+		if (!TSObject.exists(data)) {
+			Log.error(new ActiveRecordException('insert(): Provided data are undefined'));
+			if (callback !== null) {
+				callback(false);
+			}			
+			return;
+		}
+
+		ActiveRecordObject._init();
+		ActiveRecordObject._currentDB.transaction(
+			(tx) => {
+				var args : IList<any>;
+				var s : StringBuffer = new StringBuffer();
+				s.append('(');
+
+				for (var i = 0; i < data.getLength(); i++) {
+					if (i === 0) {
+						s.append('?');
+					} else {
+						s.append(', ?');
+					}
+				}
+
+				s.append(')');
+				args = data.clone();
+				args.insertAt(0, table);
+
+				tx.execute(
+					'INSERT INTO ? VALUES ' + s.toString(),
+					args.toArray(),
+					(tx, outcome) => {
+						if (callback !== null) {
+							callback(true);
+						}
+					},
+					ActiveRecordHelper.executeErrorHandler
+				);
+			},
+			ActiveRecordHelper.transactionErrorHandler
+		);
+	}
+
+	static couple(table : string, pairs : IList<Pair<any, any>>, callback : Action<boolean> = null) : void {
+		
+		if (!TSObject.exists(pairs)) {
+			Log.error(new ActiveRecordException('couple(): Provided pairs are undefined'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+		
+		ActiveRecordObject._init();
+		ActiveRecordObject._currentDB.transaction(
+			(tx) => {
+				for(var i = 0; i < pairs.getLength(); i++) {
+					var p : Pair<any, any> = pairs.getAt(i);
+					var args : IList<any> = new ArrayList<any>();
+
+					args.add(table);
+					args.add(p.getFirst());
+					args.add(p.getSecond());
+
+					tx.execute(
+						'INSERT INTO ? VALUES (?, ?)',
+						args.toArray(),
+						(tx, outcome) => {
+							if (callback !== null) {
+								callback(true);
+							}
+						},
+						ActiveRecordHelper.executeErrorHandler
+					);
+				}
 			},
 			ActiveRecordHelper.transactionErrorHandler
 		);

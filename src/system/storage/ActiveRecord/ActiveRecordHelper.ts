@@ -3,11 +3,11 @@
 class ActiveRecordHelper extends TSObject {
 
 	static transactionErrorHandler(e : SQLError) : void {
-		ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+		Log.error(new ActiveRecordException(e.getMessage()));
 	}
 
 	static executeErrorHandler(tx : SQLTransaction, e : SQLError) : boolean {
-		ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+		Log.error(new ActiveRecordException(e.getMessage()));
 		return true;
 	}
 

@@ -4,6 +4,22 @@ interface Window {
 	openDatabase(name : string, version : string, displayName : string, size : number, callback : Action<any>) : any;
 }
 
+class SQLError {
+	private _error : any;
+
+	constructor(error : any) {
+		this._error = error;
+	}
+
+	getCode() : number {
+		return this._error.code;
+	}
+
+	getMessage() : string {
+		return this._error.message;
+	}
+}
+
 class SQLRowSet {
 	private _rows : any;
 
@@ -71,22 +87,6 @@ class SQLTransaction {
 				error(new SQLTransaction(tx), new SQLError(e));
 			}
 		);
-	}
-}
-
-class SQLError {
-	private _error : any;
-
-	constructor(error : any) {
-		this._error = error;
-	}
-
-	getCode() : number {
-		return this._error.code;
-	}
-
-	getMessage() : string {
-		return this._error.message;
 	}
 }
 

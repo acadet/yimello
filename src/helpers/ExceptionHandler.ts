@@ -3,6 +3,6 @@
 class ExceptionHandler extends TSObject {
 
 	static throw(e : Exception) : void {
-		throw e.toError();
+		throw e;
 	}
 }

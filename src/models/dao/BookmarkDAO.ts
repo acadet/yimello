@@ -48,6 +48,29 @@ class BookmarkDAO extends DataAccessObject {
 		return this;
 	}
 
+	add(callback : Action<boolean> = null) : void {
+		var l : IList<any> = new ArrayList<any>();
+
+		l.add(this.getId());
+		l.add(this.getURL());
+		l.add(this.getTitle());
+		l.add(this.getDescription());
+
+		ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
+	}
+
+	bindToTags(tags : IList<TagDAO>) : void {
+		var l : IList<Pair<string, string>> = new ArrayList<Pair<string, string>>();
+
+		tags.forEach((t) => {
+			var p : Pair<string, string>;
+			p = new Pair<string, string>(this.getId(), t.getId());
+			l.add(p);
+		});
+
+		ActiveRecordObject.couple(DAOTables.Bookmarks, l);
+	}
+
 	//endregion Public Methods
 	
 	//endregion Methods

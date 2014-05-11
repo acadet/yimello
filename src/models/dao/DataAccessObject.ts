@@ -27,7 +27,7 @@ class DataAccessObject extends TSObject {
 	//region Private Methods
 	
 	//endregion Private Methods
-	
+
 	//region Public Methods
 	
 	getId() : string {

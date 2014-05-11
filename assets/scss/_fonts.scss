@@ -13,7 +13,7 @@ $ptSans: 'pt_sans_regular';
        url($fontFolder + 'MODERNE SANS.svg#bcb65e5f871894c6b949303cede8fd32') format('svg'); /* Legacy iOS */
        
   font-style:   normal;
-  font-weight:  normal;
+  font-weight:  400;
 }
 
 @font-face {
@@ -25,7 +25,7 @@ $ptSans: 'pt_sans_regular';
        url($fontFolder + 'Montserrat-Regular.svg#95d90f2cd2aa64bdfee0e9f34c516e71') format('svg'); /* Legacy iOS */
        
   font-style:   normal;
-  font-weight:  normal;
+  font-weight:  400;
 }
 
 @font-face {
@@ -37,5 +37,5 @@ $ptSans: 'pt_sans_regular';
        url($fontFolder + 'PTS55F.svg#f39585f1b656e5f9297b79e526233403') format('svg'); /* Legacy iOS */
        
   font-style:   normal;
-  font-weight:  normal;
+  font-weight:  400;
 }

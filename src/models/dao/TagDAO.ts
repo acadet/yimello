@@ -5,8 +5,6 @@ class TagDAO extends DataAccessObject {
 	
 	private _label : string;
 
-	private static TABLE : string = 'tag';
-
 	//endregion Fields
 	
 	//region Constructors
@@ -39,7 +37,7 @@ class TagDAO extends DataAccessObject {
 	}
 
 	static get(callback : Action<IList<TagDAO>>) : void {
-		ActiveRecordObject.get<TagDAO>(TagDAO.TABLE, callback, TagDAO._fromObject);
+		ActiveRecordObject.get<TagDAO>(DAOTables.Tags, callback, TagDAO._fromObject);
 	}
 
 	//endregion Public Methods

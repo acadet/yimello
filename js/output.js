@@ -5,6 +5,10 @@ var TSObject = (function () {
         return this === obj;
     };
 
+    TSObject.exists = function (obj) {
+        return (obj !== null && obj !== undefined);
+    };
+
     TSObject.prototype.toString = function () {
         return '';
     };
@@ -64,36 +68,29 @@ var Timer = (function (_super) {
 })(TSObject);
 var Exception = (function (_super) {
     __extends(Exception, _super);
-    function Exception(msg) {
+    function Exception(msg, name) {
+        if (typeof name === "undefined") { name = 'Exception'; }
         _super.call(this);
+
         this._error = new Error(msg);
+        this._error.name = name;
     }
     Exception.prototype.getMessage = function () {
         return this._error.message;
+    };
+
+    Exception.prototype.getName = function () {
+        return this._error.name;
     };
 
     Exception.prototype.getStackTrace = function () {
         return this._error.stack;
     };
 
-    Exception.prototype.toError = function () {
-        return this._error;
-    };
-
     Exception.prototype.toString = function () {
-        return this._error;
+        return this._error.name + ': ' + this._error.message;
     };
     return Exception;
-})(TSObject);
-var ExceptionHandler = (function (_super) {
-    __extends(ExceptionHandler, _super);
-    function ExceptionHandler() {
-        _super.apply(this, arguments);
-    }
-    ExceptionHandler.throw = function (e) {
-        throw e.toError();
-    };
-    return ExceptionHandler;
 })(TSObject);
 var DOMElementEvents = (function () {
     function DOMElementEvents() {
@@ -220,6 +217,10 @@ var DOMElement = (function (_super) {
         return DOMElement.fromJS(o);
     };
 
+    DOMElement.prototype.getAttribute = function (key) {
+        return this._element.attr(key);
+    };
+
     DOMElement.prototype.getData = function (key) {
         return this._element.attr('data-' + key);
     };
@@ -236,6 +237,14 @@ var DOMElement = (function (_super) {
         } else {
             return this._element.offset().left;
         }
+    };
+
+    DOMElement.prototype.getTagName = function () {
+        return this._element.get(0).localName;
+    };
+
+    DOMElement.prototype.getText = function () {
+        return this._element.text();
     };
 
     DOMElement.prototype.getTop = function (relative) {
@@ -337,6 +346,14 @@ var DOMElement = (function (_super) {
     };
     return DOMElement;
 })(TSObject);
+var DOMTreeException = (function (_super) {
+    __extends(DOMTreeException, _super);
+    function DOMTreeException() {
+        _super.apply(this, arguments);
+    }
+    return DOMTreeException;
+})(Exception);
+
 var DOMTree = (function (_super) {
     __extends(DOMTree, _super);
     function DOMTree() {
@@ -355,6 +372,26 @@ var DOMTree = (function (_super) {
 
     DOMTree.findSingle = function (criterion) {
         return new DOMElement(jQuery(document).find(criterion).first());
+    };
+
+    DOMTree.fromString = function (s) {
+        var a;
+        var l;
+
+        a = jQuery.parseHTML(s);
+
+        if (a === null) {
+            return null;
+        }
+
+        l = new ArrayList();
+
+        for (var i = 0; i < a.length; i++) {
+            var d = DOMElement.fromJS(a[i]);
+            l.add(d);
+        }
+
+        return l;
     };
     return DOMTree;
 })(TSObject);
@@ -424,6 +461,123 @@ var NodeWindow = (function () {
     };
     return NodeWindow;
 })();
+var RegexFlags = (function () {
+    function RegexFlags() {
+    }
+    RegexFlags.Insensitive = 'i';
+    RegexFlags.Global = 'g';
+    RegexFlags.Multi = 'm';
+    return RegexFlags;
+})();
+
+var Regex = (function (_super) {
+    __extends(Regex, _super);
+    function Regex(pattern, flags) {
+        if (typeof flags === "undefined") { flags = null; }
+        _super.call(this);
+
+        this._regex = new RegExp(pattern, this._buildFlags(flags));
+    }
+    Regex.prototype._buildFlags = function (flags) {
+        var s = '';
+
+        if (flags !== null) {
+            for (var i = 0; i < flags.length; i++) {
+                s += flags[0];
+            }
+        }
+
+        return s;
+    };
+
+    Regex.prototype.execute = function (s) {
+        var r = this._regex.exec(s);
+
+        if (r === null) {
+            return null;
+        } else {
+            return r[1];
+        }
+    };
+
+    Regex.prototype.test = function (s) {
+        return this._regex.test(s);
+    };
+    return Regex;
+})(TSObject);
+var ArrayList = (function (_super) {
+    __extends(ArrayList, _super);
+    function ArrayList() {
+        _super.call(this);
+
+        this._content = new Array();
+    }
+    ArrayList.prototype.add = function (t) {
+        this._content.push(t);
+    };
+
+    ArrayList.prototype.clone = function () {
+        var l = new ArrayList();
+
+        for (var i = 0; i < this.getLength(); i++) {
+            l.add(this.getAt(i));
+        }
+
+        return l;
+    };
+
+    ArrayList.prototype.forEach = function (f) {
+        for (var i = 0; i < this.getLength(); i++) {
+            f(this.getAt(i));
+        }
+    };
+
+    ArrayList.prototype.getAt = function (index) {
+        return this._content[index];
+    };
+
+    ArrayList.prototype.getLength = function () {
+        return this._content.length;
+    };
+
+    ArrayList.prototype.insertAt = function (index, t) {
+        if (index > this.getLength() || index < 0) {
+            throw new Exception('Unbound index');
+        }
+
+        if (index === this.getLength() || this.getLength() === 0) {
+            this.add(t);
+            return;
+        }
+
+        this._content.splice(index, 0, t);
+    };
+
+    ArrayList.prototype.map = function (f) {
+        for (var i = 0; i < this._content.length; i++) {
+            f(this._content[i]);
+        }
+    };
+
+    ArrayList.prototype.toArray = function () {
+        return this._content;
+    };
+    return ArrayList;
+})(TSObject);
+
+var SQLError = (function () {
+    function SQLError(error) {
+        this._error = error;
+    }
+    SQLError.prototype.getCode = function () {
+        return this._error.code;
+    };
+
+    SQLError.prototype.getMessage = function () {
+        return this._error.message;
+    };
+    return SQLError;
+})();
 
 var SQLRowSet = (function () {
     function SQLRowSet(rowSet) {
@@ -471,20 +625,6 @@ var SQLTransaction = (function () {
     return SQLTransaction;
 })();
 
-var SQLError = (function () {
-    function SQLError(error) {
-        this._error = error;
-    }
-    SQLError.prototype.getCode = function () {
-        return this._error.code;
-    };
-
-    SQLError.prototype.getMessage = function () {
-        return this._error.message;
-    };
-    return SQLError;
-})();
-
 var SQLDatabase = (function () {
     function SQLDatabase(dbObj) {
         this._db = dbObj;
@@ -508,32 +648,6 @@ var SQLDatabase = (function () {
     };
     return SQLDatabase;
 })();
-var ArrayList = (function (_super) {
-    __extends(ArrayList, _super);
-    function ArrayList() {
-        _super.call(this);
-
-        this._content = new Array();
-    }
-    ArrayList.prototype.add = function (t) {
-        this._content.push(t);
-    };
-
-    ArrayList.prototype.getAt = function (index) {
-        return this._content[index];
-    };
-
-    ArrayList.prototype.getLength = function () {
-        return this._content.length;
-    };
-
-    ArrayList.prototype.map = function (f) {
-        for (var i = 0; i < this._content.length; i++) {
-            f(this._content[i]);
-        }
-    };
-    return ArrayList;
-})(TSObject);
 var ActiveRecordConfig = (function (_super) {
     __extends(ActiveRecordConfig, _super);
     function ActiveRecordConfig(databaseName, databaseVersion, databaseSize) {
@@ -572,8 +686,8 @@ var ActiveRecordConfig = (function (_super) {
 })(TSObject);
 var ActiveRecordException = (function (_super) {
     __extends(ActiveRecordException, _super);
-    function ActiveRecordException() {
-        _super.apply(this, arguments);
+    function ActiveRecordException(msg) {
+        _super.call(this, msg, 'ActiveRecordException');
     }
     return ActiveRecordException;
 })(Exception);
@@ -583,11 +697,11 @@ var ActiveRecordHelper = (function (_super) {
         _super.apply(this, arguments);
     }
     ActiveRecordHelper.transactionErrorHandler = function (e) {
-        ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+        Log.error(new ActiveRecordException(e.getMessage()));
     };
 
     ActiveRecordHelper.executeErrorHandler = function (tx, e) {
-        ExceptionHandler.throw(new ActiveRecordException(e.getMessage()));
+        Log.error(new ActiveRecordException(e.getMessage()));
         return true;
     };
 
@@ -614,7 +728,7 @@ var ActiveRecordObject = (function (_super) {
         _super.apply(this, arguments);
     }
     ActiveRecordObject._init = function () {
-        if (ActiveRecordObject._currentDB !== null) {
+        if (!TSObject.exists(ActiveRecordObject._currentDB)) {
             ActiveRecordObject._currentDB = SQLDatabase.open(ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseVersion(), ActiveRecordObject._currentConfig.getDatabaseName(), ActiveRecordObject._currentConfig.getDatabaseSize());
         }
     };
@@ -632,7 +746,225 @@ var ActiveRecordObject = (function (_super) {
             }, ActiveRecordHelper.executeErrorHandler);
         }, ActiveRecordHelper.transactionErrorHandler);
     };
+
+    ActiveRecordObject.insert = function (table, data, callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        if (!TSObject.exists(data)) {
+            Log.error(new ActiveRecordException('insert(): Provided data are undefined'));
+            if (callback !== null) {
+                callback(false);
+            }
+            return;
+        }
+
+        ActiveRecordObject._init();
+        ActiveRecordObject._currentDB.transaction(function (tx) {
+            var args;
+            var s = new StringBuffer();
+            s.append('(');
+
+            for (var i = 0; i < data.getLength(); i++) {
+                if (i === 0) {
+                    s.append('?');
+                } else {
+                    s.append(', ?');
+                }
+            }
+
+            s.append(')');
+            args = data.clone();
+            args.insertAt(0, table);
+
+            tx.execute('INSERT INTO ? VALUES ' + s.toString(), args.toArray(), function (tx, outcome) {
+                if (callback !== null) {
+                    callback(true);
+                }
+            }, ActiveRecordHelper.executeErrorHandler);
+        }, ActiveRecordHelper.transactionErrorHandler);
+    };
+
+    ActiveRecordObject.couple = function (table, pairs, callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        if (!TSObject.exists(pairs)) {
+            Log.error(new ActiveRecordException('couple(): Provided pairs are undefined'));
+            if (callback !== null) {
+                callback(false);
+            }
+            return;
+        }
+
+        ActiveRecordObject._init();
+        ActiveRecordObject._currentDB.transaction(function (tx) {
+            for (var i = 0; i < pairs.getLength(); i++) {
+                var p = pairs.getAt(i);
+                var args = new ArrayList();
+
+                args.add(table);
+                args.add(p.getFirst());
+                args.add(p.getSecond());
+
+                tx.execute('INSERT INTO ? VALUES (?, ?)', args.toArray(), function (tx, outcome) {
+                    if (callback !== null) {
+                        callback(true);
+                    }
+                }, ActiveRecordHelper.executeErrorHandler);
+            }
+        }, ActiveRecordHelper.transactionErrorHandler);
+    };
     return ActiveRecordObject;
+})(TSObject);
+
+var AjaxRequest = (function (_super) {
+    __extends(AjaxRequest, _super);
+    function AjaxRequest(url) {
+        _super.call(this);
+
+        this._errorHandler = function (xhr, status, error) {
+            ExceptionHandler.throw(new AjaxRequestException(error));
+        };
+
+        this._url = url;
+    }
+    AjaxRequest.prototype.setURL = function (url) {
+        this._url = url;
+        return this;
+    };
+
+    AjaxRequest.prototype.setType = function (type) {
+        this._type = type;
+        return this;
+    };
+
+    AjaxRequest.prototype.setDataType = function (dataType) {
+        this._dataType = dataType;
+        return this;
+    };
+
+    AjaxRequest.prototype.setData = function (obj) {
+        this._data = obj;
+        return this;
+    };
+
+    AjaxRequest.prototype.setErrorHandler = function (h) {
+        this._errorHandler = h;
+        return this;
+    };
+
+    AjaxRequest.prototype.execute = function (success) {
+        jQuery.ajax({
+            type: this._type,
+            dataType: this._dataType,
+            url: this._url,
+            data: this._data,
+            success: success,
+            error: this._errorHandler
+        });
+    };
+    return AjaxRequest;
+})(TSObject);
+var AjaxRequestDataType = (function () {
+    function AjaxRequestDataType() {
+    }
+    AjaxRequestDataType.Xml = 'xml';
+
+    AjaxRequestDataType.Html = 'html';
+
+    AjaxRequestDataType.Json = 'json';
+
+    AjaxRequestDataType.Text = 'text';
+    return AjaxRequestDataType;
+})();
+var AjaxRequestException = (function (_super) {
+    __extends(AjaxRequestException, _super);
+    function AjaxRequestException() {
+        _super.apply(this, arguments);
+    }
+    return AjaxRequestException;
+})(Exception);
+var AjaxRequestType = (function () {
+    function AjaxRequestType() {
+    }
+    AjaxRequestType.Get = 'GET';
+
+    AjaxRequestType.Post = 'POST';
+
+    AjaxRequestType.Put = 'PUT';
+
+    AjaxRequestType.Delete = 'DELETE';
+    return AjaxRequestType;
+})();
+var GetRequest = (function (_super) {
+    __extends(GetRequest, _super);
+    function GetRequest(url) {
+        _super.call(this, url);
+
+        this.setType(AjaxRequestType.Get);
+    }
+    return GetRequest;
+})(AjaxRequest);
+var ExceptionHandler = (function (_super) {
+    __extends(ExceptionHandler, _super);
+    function ExceptionHandler() {
+        _super.apply(this, arguments);
+    }
+    ExceptionHandler.throw = function (e) {
+        throw e;
+    };
+    return ExceptionHandler;
+})(TSObject);
+var URLHelper = (function (_super) {
+    __extends(URLHelper, _super);
+    function URLHelper() {
+        _super.apply(this, arguments);
+    }
+    URLHelper.isValid = function (url) {
+        var e;
+
+        e = new Regex('http\:\/\/.*\..*', [RegexFlags.Insensitive]);
+
+        return e.test(url);
+    };
+    return URLHelper;
+})(TSObject);
+var URLDetailsProviderError;
+(function (URLDetailsProviderError) {
+    URLDetailsProviderError[URLDetailsProviderError["BadURL"] = 0] = "BadURL";
+    URLDetailsProviderError[URLDetailsProviderError["NoMedata"] = 1] = "NoMedata";
+    URLDetailsProviderError[URLDetailsProviderError["Ajax"] = 2] = "Ajax";
+})(URLDetailsProviderError || (URLDetailsProviderError = {}));
+
+var URLDetailsProvider = (function (_super) {
+    __extends(URLDetailsProvider, _super);
+    function URLDetailsProvider() {
+        _super.apply(this, arguments);
+    }
+    URLDetailsProvider.getDetails = function (url, success, errorHandler) {
+        if (URLHelper.isValid(url)) {
+            var request;
+
+            request = new GetRequest(url);
+            request.setDataType(AjaxRequestDataType.Html);
+            request.setErrorHandler(function (xhr, status, error) {
+                errorHandler(2 /* Ajax */, error);
+            });
+            request.execute(function (data, status, xhr) {
+                var title;
+                var description;
+                var r1, r2;
+
+                r1 = new Regex('\<title\>(.*)\<\/title\>', [RegexFlags.Insensitive]);
+                title = r1.execute(data);
+
+                r2 = new Regex('\<meta name\=\"description\" content\=\"(.*)\"', [RegexFlags.Insensitive]);
+                description = r2.execute(data);
+
+                success(title, description);
+            });
+        } else {
+            errorHandler(0 /* BadURL */, 'URL is bad formatted');
+        }
+    };
+    return URLDetailsProvider;
 })(TSObject);
 var DataAccessObject = (function (_super) {
     __extends(DataAccessObject, _super);
@@ -684,6 +1016,31 @@ var BookmarkDAO = (function (_super) {
         this._description = d;
         return this;
     };
+
+    BookmarkDAO.prototype.add = function (callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        var l = new ArrayList();
+
+        l.add(this.getId());
+        l.add(this.getURL());
+        l.add(this.getTitle());
+        l.add(this.getDescription());
+
+        ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
+    };
+
+    BookmarkDAO.prototype.bindToTags = function (tags) {
+        var _this = this;
+        var l = new ArrayList();
+
+        tags.forEach(function (t) {
+            var p;
+            p = new Pair(_this.getId(), t.getId());
+            l.add(p);
+        });
+
+        ActiveRecordObject.couple(DAOTables.Bookmarks, l);
+    };
     return BookmarkDAO;
 })(DataAccessObject);
 var TagDAO = (function (_super) {
@@ -709,9 +1066,8 @@ var TagDAO = (function (_super) {
     };
 
     TagDAO.get = function (callback) {
-        ActiveRecordObject.get(TagDAO.TABLE, callback, TagDAO._fromObject);
+        ActiveRecordObject.get(DAOTables.Tags, callback, TagDAO._fromObject);
     };
-    TagDAO.TABLE = 'tag';
     return TagDAO;
 })(DataAccessObject);
 var Presenter = (function (_super) {
@@ -860,7 +1216,7 @@ var TourPresenter = (function (_super) {
         }
 
         DOMTree.findSingle('.slide form.tag-form input[name="tags"]').on(DOMElementEvents.KeyDown, function (e) {
-            if (e.getWhich() == '13') {
+            if (e.getWhich() === 13) {
                 _this._createTag(e.getTarget().getValue());
                 e.getTarget().setValue('');
             }
@@ -956,21 +1312,56 @@ var MainPresenter = (function (_super) {
         }, 500);
     };
 
+    MainPresenter.prototype._addTag = function (value) {
+        var e;
+
+        console.log('here :' + value);
+
+        if (!TSObject.exists(this._tagList)) {
+            this._tagList = this._bookmarkFormWrapper.findSingle('.tags');
+        }
+
+        e = DOMElement.fromString('<li>' + value + '</li>');
+        this._tagList.append(e);
+    };
+
     MainPresenter.prototype.onStart = function () {
         var _this = this;
         this._mainViewWrapper = DOMTree.findSingle('#js-main-view-wrapper');
         this._bookmarkFormWrapper = DOMTree.findSingle('#js-bookmark-form-wrapper');
         this._bookmarkAddTrigger = DOMTree.findSingle('#js-bookmark-add-trigger');
         this._urlInput = this._bookmarkFormWrapper.findSingle('input[name="url"]');
+        this._titleInput = this._bookmarkFormWrapper.findSingle('input[name="title"]');
+        this._descriptionInput = this._bookmarkFormWrapper.findSingle('textarea[name="description"]');
+        this._tagsInput = this._bookmarkFormWrapper.findSingle('input[name="tags"]');
 
         this._bookmarkAddTrigger.on(DOMElementEvents.Click, function (arg) {
             _this._switchToBookmarkForm();
         });
 
+        this._bookmarkFormWrapper.findSingle('form').on(DOMElementEvents.Submit, function (arg) {
+            arg.preventDefault();
+        });
+
         this._urlInput.on(DOMElementEvents.Blur, function (arg) {
-            URLDetailsProvider.getDetails(_this._urlInput.getValue(), null, function (e) {
-                throw e.toError();
+            URLDetailsProvider.getDetails(_this._urlInput.getValue(), function (title, description) {
+                if (TSObject.exists(title)) {
+                    _this._titleInput.setValue(title);
+                }
+
+                if (TSObject.exists(description)) {
+                    _this._descriptionInput.setValue(description);
+                }
+            }, function (type, msg) {
+                ExceptionHandler.throw(new Exception('An error has occured with type ' + type + ' and following message: ' + msg));
             });
+        });
+
+        this._tagsInput.on(DOMElementEvents.KeyDown, function (arg) {
+            if (arg.getWhich() === 13) {
+                _this._addTag(arg.getTarget().getValue());
+                _this._tagsInput.setValue('');
+            }
         });
     };
 
@@ -979,171 +1370,77 @@ var MainPresenter = (function (_super) {
     };
     return MainPresenter;
 })(Presenter);
-
-var URLDetailsProvider = (function (_super) {
-    __extends(URLDetailsProvider, _super);
-    function URLDetailsProvider() {
-        _super.apply(this, arguments);
+var DAOTables = (function () {
+    function DAOTables() {
     }
-    URLDetailsProvider.getDetails = function (url, success, errorHandler) {
-        if (URLHelper.isValid(url)) {
-            var request;
+    DAOTables.Tags = 'tags';
+    DAOTables.Bookmarks = 'bookmarks';
 
-            request = new GetRequest(url);
-            request.setDataType(AjaxRequestDataType.Html);
-            request.setErrorHandler(function (xhr, status, error) {
-                errorHandler(new Exception(error));
-            });
-            request.execute(function (data, status, xhr) {
-                var title;
-                var description;
+    DAOTables.TagBookmark = 'tag_bookmark';
+    return DAOTables;
+})();
+var LogLevel;
+(function (LogLevel) {
+    LogLevel[LogLevel["Debug"] = 0] = "Debug";
+    LogLevel[LogLevel["Test"] = 1] = "Test";
+    LogLevel[LogLevel["Production"] = 2] = "Production";
+})(LogLevel || (LogLevel = {}));
 
-                console.log($(data).get());
-            });
-        } else {
-            errorHandler(new Exception('URL is bad formatted'));
+var Log = (function () {
+    function Log() {
+    }
+    Log.setLevel = function (l) {
+        Log._currentLevel = l;
+    };
+
+    Log.debug = function (msg) {
+        if (this._currentLevel <= 0 /* Debug */) {
+            console.log('DEBUG: ' + msg);
         }
     };
-    return URLDetailsProvider;
-})(TSObject);
-var URLHelper = (function (_super) {
-    __extends(URLHelper, _super);
-    function URLHelper() {
-        _super.apply(this, arguments);
-    }
-    URLHelper.isValid = function (url) {
-        var e;
 
-        e = new Regex('http\:\/\/.*\..*', [RegexFlags.Insensitive]);
-
-        return e.test(url);
-    };
-    return URLHelper;
-})(TSObject);
-var RegexFlags = (function () {
-    function RegexFlags() {
-    }
-    RegexFlags.Insensitive = 'i';
-    RegexFlags.Global = 'g';
-    RegexFlags.Multi = 'm';
-    return RegexFlags;
-})();
-
-var Regex = (function (_super) {
-    __extends(Regex, _super);
-    function Regex(pattern, flags) {
-        if (typeof flags === "undefined") { flags = null; }
-        _super.call(this);
-
-        this._regex = new RegExp(pattern, this._buildFlags(flags));
-    }
-    Regex.prototype._buildFlags = function (flags) {
-        var s = '';
-
-        if (flags !== null) {
-            for (var i = 0; i < flags.length; i++) {
-                s += flags[0];
-            }
+    Log.inform = function (msg) {
+        if (this._currentLevel <= 1 /* Test */) {
+            console.log('%cINFORM: ' + msg, 'color: LightSkyBlue;');
         }
-
-        return s;
     };
 
-    Regex.prototype.execute = function (s) {
-        return this._regex.exec(s);
+    Log.warn = function (msg) {
+        if (this._currentLevel <= 2 /* Production */) {
+            console.log('%cWARN: ' + msg, 'color: orange;');
+        }
     };
 
-    Regex.prototype.test = function (s) {
-        return this._regex.test(s);
+    Log.error = function (e) {
+        console.error('Error: ' + e.toString());
     };
-    return Regex;
-})(TSObject);
-
-var AjaxRequest = (function (_super) {
-    __extends(AjaxRequest, _super);
-    function AjaxRequest(url) {
+    Log._currentLevel = 0 /* Debug */;
+    return Log;
+})();
+var Pair = (function (_super) {
+    __extends(Pair, _super);
+    function Pair(first, second) {
+        if (typeof first === "undefined") { first = null; }
+        if (typeof second === "undefined") { second = null; }
         _super.call(this);
 
-        this._errorHandler = function (xhr, status, error) {
-            ExceptionHandler.throw(new AjaxRequestException(error));
-        };
-
-        this._url = url;
+        this._first = first;
+        this._second = second;
     }
-    AjaxRequest.prototype.setURL = function (url) {
-        this._url = url;
-        return this;
+    Pair.prototype.getFirst = function () {
+        return this._first;
     };
 
-    AjaxRequest.prototype.setType = function (type) {
-        this._type = type;
-        return this;
+    Pair.prototype.setFirst = function (first) {
+        this._first = first;
     };
 
-    AjaxRequest.prototype.setDataType = function (dataType) {
-        this._dataType = dataType;
-        return this;
+    Pair.prototype.getSecond = function () {
+        return this._second;
     };
 
-    AjaxRequest.prototype.setData = function (obj) {
-        this._data = obj;
-        return this;
+    Pair.prototype.setSecond = function (second) {
+        this._second = second;
     };
-
-    AjaxRequest.prototype.setErrorHandler = function (h) {
-        this._errorHandler = h;
-        return this;
-    };
-
-    AjaxRequest.prototype.execute = function (success) {
-        jQuery.ajax({
-            type: this._type,
-            dataType: this._dataType,
-            url: this._url,
-            data: this._data,
-            success: success,
-            error: this._errorHandler
-        });
-    };
-    return AjaxRequest;
+    return Pair;
 })(TSObject);
-var AjaxRequestDataType = (function () {
-    function AjaxRequestDataType() {
-    }
-    AjaxRequestDataType.Xml = 'xml';
-
-    AjaxRequestDataType.Html = 'html';
-
-    AjaxRequestDataType.Json = 'json';
-
-    AjaxRequestDataType.Text = 'text';
-    return AjaxRequestDataType;
-})();
-var AjaxRequestException = (function (_super) {
-    __extends(AjaxRequestException, _super);
-    function AjaxRequestException() {
-        _super.apply(this, arguments);
-    }
-    return AjaxRequestException;
-})(Exception);
-var AjaxRequestType = (function () {
-    function AjaxRequestType() {
-    }
-    AjaxRequestType.Get = 'GET';
-
-    AjaxRequestType.Post = 'POST';
-
-    AjaxRequestType.Put = 'PUT';
-
-    AjaxRequestType.Delete = 'DELETE';
-    return AjaxRequestType;
-})();
-var GetRequest = (function (_super) {
-    __extends(GetRequest, _super);
-    function GetRequest(url) {
-        _super.call(this, url);
-
-        this.setType(AjaxRequestType.Get);
-    }
-    return GetRequest;
-})(AjaxRequest);
