@@ -11,6 +11,10 @@ class ActiveRecordHelper extends TSObject {
 		return true;
 	}
 
+	/**
+	 * Builds a list from sql set using
+	 * specified converter
+	 */
 	static getListFromSQLResultSet<T>(set : SQLResultSet, converter : Func<any, T> = null) : IList<T> {
 		var s : SQLRowSet = set.getRows();
 		var outcome : IList<T> = new ArrayList<T>();

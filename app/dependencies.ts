@@ -11,13 +11,17 @@
 /// <reference path="system/DOMElement.ts" />
 /// <reference path="system/DOMTree.ts" />
 /// <reference path="system/strings/StringBuffer.ts" />
-/// <reference path="system/NodeWindow.ts" />
+/// <reference path="system/node-webkit/NodeWindow.ts" />
 /// <reference path="system/Regex.ts" />
+/// <reference path="system/Log.ts" />
+/// <reference path="system/Pair.ts" />
 
 // Collections parts
 
 /// <reference path="system/collections/IList.ts" />
 /// <reference path="system/collections/impl/ArrayList.ts" />
+/// <reference path="system/collections/IDictionary.ts" />
+/// <reference path="system/collections/impl/Dictionary.ts" />
 
 // Storage part
 
@@ -44,6 +48,7 @@
 
 // DAO part
 
+/// <reference path="models/dao/DAOTables.ts" />
 /// <reference path="models/dao/DataAccessObject.ts" />
 /// <reference path="models/dao/BookmarkDAO.ts" />
 /// <reference path="models/dao/TagDAO.ts" />
@@ -57,9 +62,4 @@
 /// <reference path="presenters/MainPresenter.ts" />
 
 //grunt-start
-/// <reference path="models/dao/DAOTables.ts" />
-/// <reference path="system/Log.ts" />
-/// <reference path="system/Pair.ts" />
-/// <reference path="system/collections/IDictionary.ts" />
-/// <reference path="system/collections/impl/Dictionary.ts" />
 //grunt-end

@@ -2,6 +2,7 @@ module.exports = function (grunt) {
 
     // load the task 
     grunt.loadNpmTasks("grunt-ts");
+    grunt.loadNpmTasks("grunt-contrib-copy");
 
     // Configure grunt here
     grunt.initConfig({
@@ -41,9 +42,9 @@ module.exports = function (grunt) {
 	            // The source html files, https://github.com/grunt-ts/grunt-ts#html-2-typescript-support   
 	            html: false, 
 	            // If specified, generate this file that to can use for reference management
-	            reference: false,  
+	            reference: 'testing/test_dependencies.ts',  
 	            // If specified, generate an out.js file which is the merged js file
-	            out: false,
+	            out: 'testing/output/test_output.js',
 	            // If specified, the generate JavaScript files are placed here. Only works if out is not specified
 	            outDir: false,
 	            // If specified, watches this directory for changes, and re-runs the current target
@@ -64,14 +65,18 @@ module.exports = function (grunt) {
 	        },
 	    },
 	    copy : {
-	    	appDepsToTesting : {
-	    		files : [
-	    			{src : 'app/dependencies.ts', dest : 'testing/app_dependencies.ts'}
-	    		]
-	    	}
+	    	appDependencies : {
+	    		src : 'app/dependencies.ts',
+	    		dest : 'testing/app_dependencies.ts',
+	    		options : {
+					process : function(content, srcpath) {
+						return content.replace(/\<reference path=\"(.+\.ts)\" \/\>/gi, '<reference path="../app/$1" />');
+					}
+				}
+			}
 	    }
 	});
 
 	grunt.registerTask('build', ['ts:build']);
-	grunt.registerTask('testing', ['copy:appDepsToTesting', 'ts:testing']);
+	grunt.registerTask('testing', ['copy:appDependencies', 'ts:testing']);
 };

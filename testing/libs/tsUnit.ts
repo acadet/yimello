@@ -1,3 +1,5 @@
+/// <reference path="../test_dependencies.ts" />
+
 module tsUnit {
     export interface ITestClass {
 

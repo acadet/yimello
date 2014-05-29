@@ -36,9 +36,24 @@ class ActiveRecordObject extends TSObject {
 		ActiveRecordObject._currentConfig = config;
 	}
 
-	static get<T>(table : string, callback : Action<IList<T>>, converter : Func<any, T> = null) : void {
-		//TODO : check entries
+	/**
+	 * Execute a raw sql request
+	 */
+	static executeSQL(request : string, callback : Action<any>) : void {
+		ActiveRecordObject._init();
+		ActiveRecordObject._currentDB.transaction(
+			(tx) => {
+				tx.execute(request, [], (tx, outcome) => callback(outcome), ActiveRecordHelper.executeErrorHandler);
+			}
+		);
+	}
 
+	/**
+	 * Gets all entries from specified tables.
+	 * Returns a list of items built with given 
+	 * converter
+	 */
+	static get<T>(table : string, callback : Action<IList<T>>, converter : Func<any, T> = null) : void {
 		ActiveRecordObject._init();
 		ActiveRecordObject._currentDB.transaction(
 			(tx) => {
@@ -55,6 +70,9 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
+	/**
+	 * Execute an insert request
+	 */
 	static insert(table : string, data : IList<any>, callback : Action<boolean> = null) : void {
 
 		if (!TSObject.exists(data)) {
