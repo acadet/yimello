@@ -3,6 +3,8 @@
 class UnitTestClass extends tsUnit.TestClass {
 	//region Fields
 
+	private static _classes : IList<UnitTestClass>;
+
 	//endregion Fields
 	
 	//region Constructors
@@ -18,9 +20,21 @@ class UnitTestClass extends tsUnit.TestClass {
 	//region Public Methods
 	
 	static handle(u : UnitTestClass) : void {
+		if (!TSObject.exists(UnitTestClass._classes)) {
+			UnitTestClass._classes = new ArrayList<UnitTestClass>();
+		}
+		UnitTestClass._classes.add(u);
+	}
+
+	static run() : void {
 		var test : tsUnit.Test = new tsUnit.Test();
 
-		test.addTestClass(u);
+		if (TSObject.exists(UnitTestClass._classes)) {
+			UnitTestClass._classes.forEach((e) => {
+				test.addTestClass(e);
+			});
+		}
+		
 		test.showResults(document.getElementById('outcome'), test.run());
 	}
 

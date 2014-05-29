@@ -34,7 +34,6 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-
 var Timer = (function (_super) {
     __extends(Timer, _super);
     function Timer(handler, delay, argument, frequency) {
@@ -454,7 +453,7 @@ var NodeWindow = (function () {
     };
 
     NodeWindow.moveTo = function (page) {
-        NodeWindow._moveListeners.map(function (l) {
+        NodeWindow._moveListeners.forEach(function (l) {
             l();
         });
         NodeWindow.getInstance().window.location = page;
@@ -833,7 +832,8 @@ var ActiveRecordHelper = (function (_super) {
 
     ActiveRecordHelper.executeErrorHandler = function (tx, e) {
         Log.error(new ActiveRecordException(e.getMessage()));
-        return true;
+
+        return false;
     };
 
     ActiveRecordHelper.getListFromSQLResultSet = function (set, converter) {
@@ -869,11 +869,20 @@ var ActiveRecordObject = (function (_super) {
     };
 
     ActiveRecordObject.executeSQL = function (request, callback) {
+        if (typeof callback === "undefined") { callback = null; }
         ActiveRecordObject._init();
         ActiveRecordObject._currentDB.transaction(function (tx) {
             tx.execute(request, [], function (tx, outcome) {
-                return callback(outcome);
-            }, ActiveRecordHelper.executeErrorHandler);
+                if (callback !== null) {
+                    callback(outcome);
+                }
+            }, function (tx, e) {
+                ActiveRecordHelper.executeErrorHandler(tx, e);
+                if (callback !== null) {
+                    callback(null);
+                }
+                return false;
+            });
         });
     };
 
@@ -881,9 +890,14 @@ var ActiveRecordObject = (function (_super) {
         if (typeof converter === "undefined") { converter = null; }
         ActiveRecordObject._init();
         ActiveRecordObject._currentDB.transaction(function (tx) {
-            tx.execute('SELECT * FROM ?', [table], function (tx, outcome) {
+            tx.execute('SELECT * FROM ' + table, [], function (tx, outcome) {
                 callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, converter));
-            }, ActiveRecordHelper.executeErrorHandler);
+            }, function (tx, e) {
+                ActiveRecordHelper.executeErrorHandler(tx, e);
+                callback(null);
+
+                return false;
+            });
         }, ActiveRecordHelper.transactionErrorHandler);
     };
 
@@ -899,7 +913,6 @@ var ActiveRecordObject = (function (_super) {
 
         ActiveRecordObject._init();
         ActiveRecordObject._currentDB.transaction(function (tx) {
-            var args;
             var s = new StringBuffer();
             s.append('(');
 
@@ -912,10 +925,8 @@ var ActiveRecordObject = (function (_super) {
             }
 
             s.append(')');
-            args = data.clone();
-            args.insertAt(0, table);
 
-            tx.execute('INSERT INTO ? VALUES ' + s.toString(), args.toArray(), function (tx, outcome) {
+            tx.execute('INSERT INTO ' + table + ' VALUES ' + s.toString(), data.toArray(), function (tx, outcome) {
                 if (callback !== null) {
                     callback(true);
                 }
@@ -1381,7 +1392,7 @@ var TourPresenter = (function (_super) {
         this._slides = DOMTree.findSingle('.slides');
         this._slideCursors = DOMTree.findSingle('.slide-cursors');
 
-        this._slides.find('.slide').map(function (e) {
+        this._slides.find('.slide').forEach(function (e) {
             e.verticalCenterizeWithMargin(_this._slides);
             e.setData('id', NumberHelper.toString(i));
 
@@ -1393,7 +1404,7 @@ var TourPresenter = (function (_super) {
                 _this._currentSlide = e;
             }
 
-            e.find('form').map(function (e) {
+            e.find('form').forEach(function (e) {
                 e.on(DOMElementEvents.Submit, function (arg) {
                     arg.preventDefault();
                 });
@@ -1433,7 +1444,7 @@ var TourPresenter = (function (_super) {
     };
 
     TourPresenter.prototype.onDestroy = function () {
-        this._slideCursors.find('.slide-cursor').map(function (e) {
+        this._slideCursors.find('.slide-cursor').forEach(function (e) {
             e.off(DOMElementEvents.Click);
         });
     };

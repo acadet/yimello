@@ -13,8 +13,6 @@ interface IList<T> {
 
 	insertAt(index : number, t : T) : void;
 
-	map(f : Action<T>) : void;
-
 	toArray() : Array<T>;
 }
 

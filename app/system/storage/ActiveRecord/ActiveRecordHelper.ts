@@ -8,7 +8,8 @@ class ActiveRecordHelper extends TSObject {
 
 	static executeErrorHandler(tx : SQLTransaction, e : SQLError) : boolean {
 		Log.error(new ActiveRecordException(e.getMessage()));
-		return true;
+
+		return false;
 	}
 
 	/**

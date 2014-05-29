@@ -39,11 +39,26 @@ class ActiveRecordObject extends TSObject {
 	/**
 	 * Execute a raw sql request
 	 */
-	static executeSQL(request : string, callback : Action<any>) : void {
+	static executeSQL(request : string, callback : Action<any> = null) : void {
 		ActiveRecordObject._init();
 		ActiveRecordObject._currentDB.transaction(
 			(tx) => {
-				tx.execute(request, [], (tx, outcome) => callback(outcome), ActiveRecordHelper.executeErrorHandler);
+				tx.execute(
+					request,
+					[],
+					(tx, outcome) => {
+						if (callback !== null) {
+							callback(outcome);
+						}
+					},
+					(tx, e) => {
+						ActiveRecordHelper.executeErrorHandler(tx, e);
+						if (callback !== null) {
+							callback(null);
+						}
+						return false;
+					}
+				);
 			}
 		);
 	}
@@ -58,12 +73,17 @@ class ActiveRecordObject extends TSObject {
 		ActiveRecordObject._currentDB.transaction(
 			(tx) => {
 				tx.execute(
-					'SELECT * FROM ?',
-					[table],
+					'SELECT * FROM ' + table,
+					[],
 					(tx, outcome) => {
 						callback(ActiveRecordHelper.getListFromSQLResultSet<T>(outcome, converter));
 					},
-					ActiveRecordHelper.executeErrorHandler
+					(tx, e) => {
+						ActiveRecordHelper.executeErrorHandler(tx, e);
+						callback(null);
+
+						return false;
+					}
 				);
 			},
 			ActiveRecordHelper.transactionErrorHandler
@@ -71,7 +91,7 @@ class ActiveRecordObject extends TSObject {
 	}
 
 	/**
-	 * Execute an insert request
+	 * Execute an insert request with a single object
 	 */
 	static insert(table : string, data : IList<any>, callback : Action<boolean> = null) : void {
 
@@ -86,7 +106,6 @@ class ActiveRecordObject extends TSObject {
 		ActiveRecordObject._init();
 		ActiveRecordObject._currentDB.transaction(
 			(tx) => {
-				var args : IList<any>;
 				var s : StringBuffer = new StringBuffer();
 				s.append('(');
 
@@ -99,12 +118,10 @@ class ActiveRecordObject extends TSObject {
 				}
 
 				s.append(')');
-				args = data.clone();
-				args.insertAt(0, table);
 
 				tx.execute(
-					'INSERT INTO ? VALUES ' + s.toString(),
-					args.toArray(),
+					'INSERT INTO ' + table + ' VALUES ' + s.toString(),
+					data.toArray(),
 					(tx, outcome) => {
 						if (callback !== null) {
 							callback(true);

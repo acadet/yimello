@@ -38,7 +38,7 @@ class NodeWindow {
 	}
 
 	static moveTo(page : string) : void {
-		NodeWindow._moveListeners.map((l) => {
+		NodeWindow._moveListeners.forEach((l) => {
 			l();
 		});
 		NodeWindow.getInstance().window.location = page;

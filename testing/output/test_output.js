@@ -259,7 +259,6 @@ var TSObject = (function () {
     };
     return TSObject;
 })();
-
 var Timer = (function (_super) {
     __extends(Timer, _super);
     function Timer(handler, delay, argument, frequency) {
@@ -679,7 +678,7 @@ var NodeWindow = (function () {
     };
 
     NodeWindow.moveTo = function (page) {
-        NodeWindow._moveListeners.map(function (l) {
+        NodeWindow._moveListeners.forEach(function (l) {
             l();
         });
         NodeWindow.getInstance().window.location = page;
@@ -1058,7 +1057,8 @@ var ActiveRecordHelper = (function (_super) {
 
     ActiveRecordHelper.executeErrorHandler = function (tx, e) {
         Log.error(new ActiveRecordException(e.getMessage()));
-        return true;
+
+        return false;
     };
 
     ActiveRecordHelper.getListFromSQLResultSet = function (set, converter) {
@@ -1094,11 +1094,20 @@ var ActiveRecordObject = (function (_super) {
     };
 
     ActiveRecordObject.executeSQL = function (request, callback) {
+        if (typeof callback === "undefined") { callback = null; }
         ActiveRecordObject._init();
         ActiveRecordObject._currentDB.transaction(function (tx) {
             tx.execute(request, [], function (tx, outcome) {
-                return callback(outcome);
-            }, ActiveRecordHelper.executeErrorHandler);
+                if (callback !== null) {
+                    callback(outcome);
+                }
+            }, function (tx, e) {
+                ActiveRecordHelper.executeErrorHandler(tx, e);
+                if (callback !== null) {
+                    callback(null);
+                }
+                return false;
+            });
         });
     };
 
@@ -1106,9 +1115,14 @@ var ActiveRecordObject = (function (_super) {
         if (typeof converter === "undefined") { converter = null; }
         ActiveRecordObject._init();
         ActiveRecordObject._currentDB.transaction(function (tx) {
-            tx.execute('SELECT * FROM ?', [table], function (tx, outcome) {
+            tx.execute('SELECT * FROM ' + table, [], function (tx, outcome) {
                 callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, converter));
-            }, ActiveRecordHelper.executeErrorHandler);
+            }, function (tx, e) {
+                ActiveRecordHelper.executeErrorHandler(tx, e);
+                callback(null);
+
+                return false;
+            });
         }, ActiveRecordHelper.transactionErrorHandler);
     };
 
@@ -1124,7 +1138,6 @@ var ActiveRecordObject = (function (_super) {
 
         ActiveRecordObject._init();
         ActiveRecordObject._currentDB.transaction(function (tx) {
-            var args;
             var s = new StringBuffer();
             s.append('(');
 
@@ -1137,10 +1150,8 @@ var ActiveRecordObject = (function (_super) {
             }
 
             s.append(')');
-            args = data.clone();
-            args.insertAt(0, table);
 
-            tx.execute('INSERT INTO ? VALUES ' + s.toString(), args.toArray(), function (tx, outcome) {
+            tx.execute('INSERT INTO ' + table + ' VALUES ' + s.toString(), data.toArray(), function (tx, outcome) {
                 if (callback !== null) {
                     callback(true);
                 }
@@ -1606,7 +1617,7 @@ var TourPresenter = (function (_super) {
         this._slides = DOMTree.findSingle('.slides');
         this._slideCursors = DOMTree.findSingle('.slide-cursors');
 
-        this._slides.find('.slide').map(function (e) {
+        this._slides.find('.slide').forEach(function (e) {
             e.verticalCenterizeWithMargin(_this._slides);
             e.setData('id', NumberHelper.toString(i));
 
@@ -1618,7 +1629,7 @@ var TourPresenter = (function (_super) {
                 _this._currentSlide = e;
             }
 
-            e.find('form').map(function (e) {
+            e.find('form').forEach(function (e) {
                 e.on(DOMElementEvents.Submit, function (arg) {
                     arg.preventDefault();
                 });
@@ -1658,7 +1669,7 @@ var TourPresenter = (function (_super) {
     };
 
     TourPresenter.prototype.onDestroy = function () {
-        this._slideCursors.find('.slide-cursor').map(function (e) {
+        this._slideCursors.find('.slide-cursor').forEach(function (e) {
             e.off(DOMElementEvents.Click);
         });
     };
@@ -1819,22 +1830,309 @@ var UnitTestClass = (function (_super) {
         _super.apply(this, arguments);
     }
     UnitTestClass.handle = function (u) {
+        if (!TSObject.exists(UnitTestClass._classes)) {
+            UnitTestClass._classes = new ArrayList();
+        }
+        UnitTestClass._classes.add(u);
+    };
+
+    UnitTestClass.run = function () {
         var test = new tsUnit.Test();
 
-        test.addTestClass(u);
+        if (TSObject.exists(UnitTestClass._classes)) {
+            UnitTestClass._classes.forEach(function (e) {
+                test.addTestClass(e);
+            });
+        }
+
         test.showResults(document.getElementById('outcome'), test.run());
     };
     return UnitTestClass;
 })(tsUnit.TestClass);
+var ActiveRecordHelperTestMocks;
+(function (ActiveRecordHelperTestMocks) {
+    var SetMock = (function () {
+        function SetMock() {
+            this._content = new Array();
+            this.length = 0;
+        }
+        SetMock.prototype.addItem = function (item) {
+            this._content.push(item);
+            this.length++;
+        };
+
+        SetMock.prototype.item = function (i) {
+            return this._content[i];
+        };
+        return SetMock;
+    })();
+    ActiveRecordHelperTestMocks.SetMock = SetMock;
+
+    var ResultSetMock = (function () {
+        function ResultSetMock() {
+        }
+        return ResultSetMock;
+    })();
+    ActiveRecordHelperTestMocks.ResultSetMock = ResultSetMock;
+})(ActiveRecordHelperTestMocks || (ActiveRecordHelperTestMocks = {}));
+
 var ActiveRecordHelperTest = (function (_super) {
     __extends(ActiveRecordHelperTest, _super);
     function ActiveRecordHelperTest() {
         _super.apply(this, arguments);
     }
-    ActiveRecordHelperTest.prototype.myMethodTest = function () {
-        this.areIdentical(true, false);
+    ActiveRecordHelperTest.prototype.setUp = function () {
+    };
+
+    ActiveRecordHelperTest.prototype.tearDown = function () {
+    };
+
+    ActiveRecordHelperTest.prototype.ActiveRecordHelperGetListFromSQLResultSetWithConverterTest = function () {
+        var set;
+        var resultSet;
+        var sqlSet;
+        var outcome;
+        var converter;
+
+        converter = function (e) {
+            if (e < 0) {
+                return -e;
+            } else {
+                return e;
+            }
+        };
+
+        set = new ActiveRecordHelperTestMocks.SetMock();
+        set.addItem(-3);
+        set.addItem(5);
+        set.addItem(-2);
+        set.addItem(0);
+
+        resultSet = new ActiveRecordHelperTestMocks.ResultSetMock();
+        resultSet.rows = set;
+
+        sqlSet = new SQLResultSet(resultSet);
+
+        outcome = ActiveRecordHelper.getListFromSQLResultSet(sqlSet, converter);
+
+        this.areIdentical(3, outcome.getAt(0));
+        this.areIdentical(5, outcome.getAt(1));
+        this.areIdentical(2, outcome.getAt(2));
+        this.areIdentical(0, outcome.getAt(3));
+    };
+
+    ActiveRecordHelperTest.prototype.ActiveRecordHelperGetListFromSQLResultSetWithoutConverterTest = function () {
+        var set;
+        var resultSet;
+        var sqlSet;
+        var outcome;
+
+        set = new ActiveRecordHelperTestMocks.SetMock();
+        set.addItem(-3);
+        set.addItem(5);
+        set.addItem(-2);
+        set.addItem(0);
+
+        resultSet = new ActiveRecordHelperTestMocks.ResultSetMock();
+        resultSet.rows = set;
+
+        sqlSet = new SQLResultSet(resultSet);
+
+        outcome = ActiveRecordHelper.getListFromSQLResultSet(sqlSet);
+
+        this.areIdentical(-3, outcome.getAt(0));
+        this.areIdentical(5, outcome.getAt(1));
+        this.areIdentical(-2, outcome.getAt(2));
+        this.areIdentical(0, outcome.getAt(3));
     };
     return ActiveRecordHelperTest;
 })(UnitTestClass);
 
 UnitTestClass.handle(new ActiveRecordHelperTest());
+var ActiveRecordObjectTestUtils;
+(function (ActiveRecordObjectTestUtils) {
+    var Person = (function (_super) {
+        __extends(Person, _super);
+        function Person() {
+            _super.apply(this, arguments);
+        }
+        Person.toPerson = function (o) {
+            var p = new Person();
+            p.id = o.id;
+            p.firstName = o.firstName;
+            p.lastName = o.lastName;
+
+            return p;
+        };
+
+        Person.prototype.fromPerson = function () {
+            var o = {};
+
+            o.id = this.id;
+            o.firstName = this.firstName;
+            o.lastName = this.lastName;
+
+            return o;
+        };
+
+        Person.prototype.equals = function (obj) {
+            var p;
+
+            if (obj instanceof Person) {
+                p = obj;
+
+                if (this.id !== p.id) {
+                    return false;
+                }
+
+                if (this.firstName !== p.firstName) {
+                    return false;
+                }
+
+                if (this.lastName !== p.lastName) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
+        };
+        return Person;
+    })(TSObject);
+    ActiveRecordObjectTestUtils.Person = Person;
+})(ActiveRecordObjectTestUtils || (ActiveRecordObjectTestUtils = {}));
+
+var ActiveRecordObjectTest = (function (_super) {
+    __extends(ActiveRecordObjectTest, _super);
+    function ActiveRecordObjectTest() {
+        _super.call(this);
+
+        this._period = 2000;
+        this._delay = 0;
+    }
+    ActiveRecordObjectTest.prototype.setUp = function () {
+        if (!TSObject.exists(this._config)) {
+            this._config = new ActiveRecordConfig('yimello-test', '1.0', 1 * 1024);
+
+            ActiveRecordObject.init(this._config);
+        }
+    };
+
+    ActiveRecordObjectTest.prototype.tearDown = function () {
+    };
+
+    ActiveRecordObjectTest.prototype.ActiveRecordObjectGetWithConverterTest = function () {
+        var _this = this;
+        var timer;
+
+        timer = new Timer(function (o) {
+            var createRequest;
+            var insertRequest1, insertRequest2;
+
+            createRequest = new StringBuffer('CREATE TABLE people (');
+            createRequest.append('id INT PRIMARY KEY NOT NULL, ');
+            createRequest.append('firstName VARCHAR(255), ');
+            createRequest.append('lastName VARCHAR(255))');
+
+            insertRequest1 = new StringBuffer('INSERT INTO people VALUES(');
+            insertRequest1.append('1, "Al", "Pacino")');
+
+            insertRequest2 = new StringBuffer('INSERT INTO people VALUES(');
+            insertRequest2.append('2, "Sean", "Connery")');
+
+            ActiveRecordObject.executeSQL('DROP TABLE IF EXISTS people', function (r) {
+                ActiveRecordObject.executeSQL(createRequest.toString(), function (r) {
+                    ActiveRecordObject.executeSQL(insertRequest1.toString(), function (r) {
+                        ActiveRecordObject.executeSQL(insertRequest2.toString(), function (r) {
+                            ActiveRecordObject.get('people', function (outcome) {
+                                var p1;
+                                var p2;
+
+                                _this.isTrue(TSObject.exists(outcome));
+                                _this.areIdentical(2, outcome.getLength());
+
+                                p1 = new ActiveRecordObjectTestUtils.Person();
+                                p1.id = 1;
+                                p1.firstName = 'Al';
+                                p1.lastName = 'Pacino';
+                                _this.isTrue(p1.equals(outcome.getAt(0)));
+
+                                p2 = new ActiveRecordObjectTestUtils.Person();
+                                p2.id = 2;
+                                p2.firstName = 'Sean';
+                                p2.lastName = 'Connery';
+                                _this.isTrue(p2.equals(outcome.getAt(1)));
+
+                                ActiveRecordObject.executeSQL('DELETE FROM people', function (r) {
+                                    ActiveRecordObject.executeSQL('DROP TABLE people');
+                                });
+                            }, ActiveRecordObjectTestUtils.Person.toPerson);
+                        });
+                    });
+                });
+            });
+        }, this._delay);
+
+        this._delay += this._period;
+    };
+
+    ActiveRecordObjectTest.prototype.ActiveRecordObjectGetWithoutConverterTest = function () {
+        this.fail();
+    };
+
+    ActiveRecordObjectTest.prototype.ActiveRecordObjectInsertTest = function () {
+        var _this = this;
+        var timer;
+
+        timer = new Timer(function (o) {
+            var data;
+            var createRequest;
+            var expectedPerson;
+
+            expectedPerson = new ActiveRecordObjectTestUtils.Person();
+            expectedPerson.id = 1;
+            expectedPerson.firstName = 'Timothy';
+            expectedPerson.lastName = 'Dalton';
+
+            data = new ArrayList();
+            data.add(expectedPerson.id);
+            data.add(expectedPerson.firstName);
+            data.add(expectedPerson.lastName);
+
+            createRequest = new StringBuffer('CREATE TABLE people (');
+            createRequest.append('id INT PRIMARY KEY NOT NULL, ');
+            createRequest.append('firstName VARCHAR(255), ');
+            createRequest.append('lastName VARCHAR(255))');
+
+            ActiveRecordObject.executeSQL('DROP TABLE IF EXISTS people', function (r) {
+                ActiveRecordObject.executeSQL(createRequest.toString(), function (r) {
+                    ActiveRecordObject.insert('people', data, function (outcome) {
+                        _this.isTrue(outcome);
+
+                        ActiveRecordObject.executeSQL('SELECT * FROM people', function (outcome) {
+                            var set;
+
+                            _this.isTrue(TSObject.exists(outcome));
+
+                            set = outcome.getRows();
+                            _this.isTrue(TSObject.exists(set));
+                            _this.areIdentical(1, set.getLength());
+
+                            _this.isTrue(expectedPerson.equals(ActiveRecordObjectTestUtils.Person.toPerson(set.item(0))));
+
+                            ActiveRecordObject.executeSQL('DELETE FROM people', function (r) {
+                                ActiveRecordObject.executeSQL('DROP TABLE people');
+                            });
+                        });
+                    });
+                });
+            });
+        }, this._delay);
+
+        this._delay += this._period;
+    };
+    return ActiveRecordObjectTest;
+})(UnitTestClass);
+
+UnitTestClass.handle(new ActiveRecordObjectTest());

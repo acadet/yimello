@@ -11,7 +11,7 @@ class TourPresenter extends Presenter {
 		this._slides = DOMTree.findSingle('.slides');
 		this._slideCursors = DOMTree.findSingle('.slide-cursors');
 
-		this._slides.find('.slide').map((e) => {
+		this._slides.find('.slide').forEach((e) => {
 			e.verticalCenterizeWithMargin(this._slides);
 			e.setData('id', NumberHelper.toString(i));
 
@@ -23,7 +23,7 @@ class TourPresenter extends Presenter {
 				this._currentSlide = e;
 			}
 
-			e.find('form').map((e) => {
+			e.find('form').forEach((e) => {
 				e.on(DOMElementEvents.Submit, (arg) => {
 					arg.preventDefault();
 				});
@@ -64,7 +64,7 @@ class TourPresenter extends Presenter {
 	}
 
 	onDestroy() : void {
-		this._slideCursors.find('.slide-cursor').map((e) => {
+		this._slideCursors.find('.slide-cursor').forEach((e) => {
 			e.off(DOMElementEvents.Click);
 		});
 	}

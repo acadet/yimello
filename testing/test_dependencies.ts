@@ -4,4 +4,5 @@
 
 //grunt-start
 /// <reference path="system/storage/ActiveRecord/ActiveRecordHelperTest.ts" />
+/// <reference path="system/storage/ActiveRecord/ActiveRecordObjectTest.ts" />
 //grunt-end

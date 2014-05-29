@@ -48,7 +48,7 @@ module.exports = function (grunt) {
 	            // If specified, the generate JavaScript files are placed here. Only works if out is not specified
 	            outDir: false,
 	            // If specified, watches this directory for changes, and re-runs the current target
-	            watch: 'testing',                     
+	            watch: '.',                     
 	            // Use to override the default options, http://gruntjs.com/configuring-tasks#options
 	            options: {     
 	                // 'es3' (default) | 'es5'

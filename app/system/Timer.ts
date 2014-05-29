@@ -1,12 +1,16 @@
 /// <reference path="../dependencies.ts" />
 
-interface TimerHandler {
-	(obj: TSObject) : void;
-}
-
 class Timer extends TSObject {
+	//region Fields
 	
-	constructor(handler: TimerHandler, delay : number, argument = null, frequency = -1) {
+	private _timer : any;
+	private _hasIntervals : boolean;
+
+	//endregion Fields
+	
+	//region Constructors
+	
+	constructor(handler: Action<any>, delay : number, argument : any = null, frequency : number = -1) {
 		super();
 
 		if (frequency > 0) {
@@ -24,6 +28,16 @@ class Timer extends TSObject {
 		}
 	}
 
+	//endregion Constructors
+	
+	//region Methods
+	
+	//region Private Methods
+	
+	//endregion Private Methods
+	
+	//region Public Methods
+	
 	clear() : void {
 		if (this._hasIntervals) {
 			clearInterval(this._timer);
@@ -32,6 +46,7 @@ class Timer extends TSObject {
 		}
 	}
 
-	private _timer : any;
-	private _hasIntervals : boolean;
+	//endregion Public Methods
+	
+	//endregion Methods
 }

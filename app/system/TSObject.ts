@@ -1,6 +1,5 @@
 class TSObject {
-
-	equals(obj: TSObject) : boolean {
+	equals(obj: any) : boolean {
 		return this === obj;
 	}
 
