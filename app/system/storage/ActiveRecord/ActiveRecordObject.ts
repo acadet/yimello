@@ -99,6 +99,58 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
+	static update(
+		table : string,
+		selector : Pair<string, any>,
+		data : IDictionary<string, any>,
+		callback : Action<boolean> = null) : void {
+
+		if (!TSObject.exists(data)) {
+			Log.error(new ActiveRecordException('update(): Provided data are undefined'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+
+		ActiveRecordObject._init();
+		ActiveRecordObject._currentDB.transaction(
+			(tx) => {
+				var args : IList<any>;
+				var marks : StringBuffer = new StringBuffer();
+
+				for (var i = 0; i < data.getLength(); i++) {
+					if (i === 0) {
+						marks.append('? = ?');
+					} else {
+						marks.append(', ? = ?');
+					}
+				}
+
+				data.forEach((k, v) => {
+					args.add(k);
+					args.add(v);
+				});
+
+				args.insertAt(0, table);
+				args.add(selector.getFirst());
+				args.add(selector.getSecond());
+
+				tx.execute(
+					'UPDATE INTO ? SET ' + marks.toString() + ' WHERE ? = ?',
+					args.toArray(),
+					(tx, outcome) => {
+						if (callback !== null) {
+							callback(true);
+						}
+					},
+					ActiveRecordHelper.executeErrorHandler
+				);
+			},
+			ActiveRecordHelper.transactionErrorHandler
+		);
+	}
+
 	static couple(table : string, pairs : IList<Pair<any, any>>, callback : Action<boolean> = null) : void {
 		
 		if (!TSObject.exists(pairs)) {

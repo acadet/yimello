@@ -783,6 +783,46 @@ var ActiveRecordObject = (function (_super) {
         }, ActiveRecordHelper.transactionErrorHandler);
     };
 
+    ActiveRecordObject.update = function (table, selector, data, callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        if (!TSObject.exists(data)) {
+            Log.error(new ActiveRecordException('update(): Provided data are undefined'));
+            if (callback !== null) {
+                callback(false);
+            }
+            return;
+        }
+
+        ActiveRecordObject._init();
+        ActiveRecordObject._currentDB.transaction(function (tx) {
+            var args;
+            var marks = new StringBuffer();
+
+            for (var i = 0; i < data.getLength(); i++) {
+                if (i === 0) {
+                    marks.append('? = ?');
+                } else {
+                    marks.append(', ? = ?');
+                }
+            }
+
+            data.forEach(function (k, v) {
+                args.add(k);
+                args.add(v);
+            });
+
+            args.insertAt(0, table);
+            args.add(selector.getFirst());
+            args.add(selector.getSecond());
+
+            tx.execute('UPDATE INTO ? SET ' + marks.toString() + ' WHERE ? = ?', args.toArray(), function (tx, outcome) {
+                if (callback !== null) {
+                    callback(true);
+                }
+            }, ActiveRecordHelper.executeErrorHandler);
+        }, ActiveRecordHelper.transactionErrorHandler);
+    };
+
     ActiveRecordObject.couple = function (table, pairs, callback) {
         if (typeof callback === "undefined") { callback = null; }
         if (!TSObject.exists(pairs)) {
@@ -1027,6 +1067,21 @@ var BookmarkDAO = (function (_super) {
         l.add(this.getDescription());
 
         ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
+    };
+
+    BookmarkDAO.prototype.update = function (callback) {
+        if (typeof callback === "undefined") { callback = null; }
+        var dict;
+        var selector;
+
+        dict = new Dictionary();
+        selector = new Pair('id', this.getId());
+
+        dict.add('title', this.getTitle());
+        dict.add('url', this.getURL());
+        dict.add('description', this.getDescription());
+
+        ActiveRecordObject.update(DAOTables.Bookmarks, selector, dict, callback);
     };
 
     BookmarkDAO.prototype.bindToTags = function (tags) {
@@ -1443,4 +1498,70 @@ var Pair = (function (_super) {
         this._second = second;
     };
     return Pair;
+})(TSObject);
+var DictionaryException = (function (_super) {
+    __extends(DictionaryException, _super);
+    function DictionaryException() {
+        _super.apply(this, arguments);
+    }
+    return DictionaryException;
+})(Exception);
+
+var Dictionary = (function (_super) {
+    __extends(Dictionary, _super);
+    function Dictionary() {
+        _super.call(this);
+
+        this._keys = new Array();
+        this._values = new Array();
+    }
+    Dictionary.prototype.add = function (key, value) {
+        if (this.containsKey(key)) {
+            throw new DictionaryException('Unable to add couple: key is already existing');
+        }
+
+        this._keys.push(key);
+        this._values.push(value);
+    };
+
+    Dictionary.prototype.clone = function () {
+        var d = new Dictionary();
+
+        this.forEach(function (k, v) {
+            d.add(k, v);
+        });
+
+        return d;
+    };
+
+    Dictionary.prototype.containsKey = function (key) {
+        for (var i = 0; i < this._keys.length; i++) {
+            if (this._keys[i] === key) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    Dictionary.prototype.forEach = function (f) {
+        for (var i = 0; i < this._keys.length; i++) {
+            f(this._keys[i], this._values[i]);
+        }
+    };
+
+    Dictionary.prototype.get = function (key) {
+        for (var i = 0; i < this._keys.length; i++) {
+            if (this._keys[i] === key) {
+                return this._values[i];
+            }
+        }
+
+        return null;
+    };
+
+    Dictionary.prototype.getLength = function () {
+        return this._keys.length;
+    };
+    return Dictionary;
 })(TSObject);

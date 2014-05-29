@@ -59,6 +59,20 @@ class BookmarkDAO extends DataAccessObject {
 		ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
 	}
 
+	update(callback : Action<boolean> = null) : void {
+		var dict : IDictionary<string, any>;
+		var selector : Pair<string, string>;
+
+		dict = new Dictionary<string, any>();
+		selector = new Pair<string, string>('id', this.getId());
+
+		dict.add('title', this.getTitle());
+		dict.add('url', this.getURL());
+		dict.add('description', this.getDescription());
+
+		ActiveRecordObject.update(DAOTables.Bookmarks, selector, dict, callback);
+	}
+
 	bindToTags(tags : IList<TagDAO>) : void {
 		var l : IList<Pair<string, string>> = new ArrayList<Pair<string, string>>();
 
@@ -66,7 +80,7 @@ class BookmarkDAO extends DataAccessObject {
 			var p : Pair<string, string>;
 			p = new Pair<string, string>(this.getId(), t.getId());
 			l.add(p);
-		});
+			});
 
 		ActiveRecordObject.couple(DAOTables.Bookmarks, l);
 	}

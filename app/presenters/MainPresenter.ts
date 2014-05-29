@@ -25,18 +25,18 @@ class MainPresenter extends Presenter {
 	
 	private _switchToBookmarkForm() : void {
 		this._mainViewWrapper.animate(
-			{
-				left: '-100%'
+		{
+			left: '-100%'
 			},
 			500
-		);
+			);
 
 		this._bookmarkFormWrapper.animate(
-			{
-				left: 0
+		{
+			left: 0
 			},
 			500
-		);
+			);
 	}
 
 	private _addTag(value : string) : void {
@@ -67,12 +67,12 @@ class MainPresenter extends Presenter {
 
 		this._bookmarkAddTrigger.on(DOMElementEvents.Click, (arg) => {
 			this._switchToBookmarkForm();
-		});
+			});
 
 		this._bookmarkFormWrapper
-			.findSingle('form')
-			.on(DOMElementEvents.Submit, (arg) => {
-				arg.preventDefault();
+		.findSingle('form')
+		.on(DOMElementEvents.Submit, (arg) => {
+			arg.preventDefault();
 			});
 
 		this._urlInput.on(DOMElementEvents.Blur, (arg) => {
@@ -86,21 +86,21 @@ class MainPresenter extends Presenter {
 					if (TSObject.exists(description)) {
 						this._descriptionInput.setValue(description);
 					}
-				},
-				(type, msg) => {
-					ExceptionHandler.throw(
-						new Exception('An error has occured with type ' + type + ' and following message: ' + msg)
+					},
+					(type, msg) => {
+						ExceptionHandler.throw(
+							new Exception('An error has occured with type ' + type + ' and following message: ' + msg)
+							);
+					}
 					);
-				}
-			);
-		});
+			});
 
 		this._tagsInput.on(DOMElementEvents.KeyDown, (arg) => {
 			if (arg.getWhich() === 13) {
 				this._addTag(arg.getTarget().getValue());
 				this._tagsInput.setValue('');
 			}
-		});
+			});
 	}
 
 	onDestroy() : void {

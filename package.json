@@ -1,6 +1,6 @@
 {
 	"name": "yimello",
-	"main": "intro.html",
+	"main": "app/ui/intro.html",
 	"window": {
 		"toolbar": true,
 		"frame": true,
@@ -12,6 +12,7 @@
 	"devDependencies" : {
 		"grunt" : "~0.4.1",
 	    "grunt-ts" : "~1.9.2",
-	    "typescript" : "0.9.7"
+	    "typescript" : "0.9.7",
+	    "grunt-contrib-copy" : "0.5.0"
 	}
 }

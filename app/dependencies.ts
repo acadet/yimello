@@ -60,4 +60,6 @@
 /// <reference path="models/dao/DAOTables.ts" />
 /// <reference path="system/Log.ts" />
 /// <reference path="system/Pair.ts" />
+/// <reference path="system/collections/IDictionary.ts" />
+/// <reference path="system/collections/impl/Dictionary.ts" />
 //grunt-end
