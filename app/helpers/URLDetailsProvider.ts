@@ -31,7 +31,11 @@ class URLDetailsProvider extends TSObject {
 	
 	//region Public Methods
 	
-	static getDetails(url : string, success : URLDetailsProviderCallback, errorHandler : URLDetailsProviderErrorHandler) : void {
+	static getDetails(
+		url : string,
+		success : URLDetailsProviderCallback,
+		errorHandler : URLDetailsProviderErrorHandler) : void {
+
 		if (URLHelper.isValid(url)) {
 			var request : GetRequest;
 

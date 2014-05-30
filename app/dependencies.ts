@@ -62,4 +62,10 @@
 /// <reference path="presenters/MainPresenter.ts" />
 
 //grunt-start
+/// <reference path="helpers/SecurityHelper.ts" />
+/// <reference path="models/business/BusinessException.ts" />
+/// <reference path="models/business/IBookmarkBusiness.ts" />
+/// <reference path="models/business/impl/BookmarkBusiness.ts" />
+/// <reference path="system/Guid.ts" />
+/// <reference path="system/MathHelper.ts" />
 //grunt-end

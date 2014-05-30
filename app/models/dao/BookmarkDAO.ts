@@ -56,7 +56,17 @@ class BookmarkDAO extends DataAccessObject {
 		l.add(this.getTitle());
 		l.add(this.getDescription());
 
-		ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
+		this.initialize(
+			(b) => {
+				if (callback !== null && !b) {
+					callback(false);
+					return;
+				}
+
+				ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
+			}
+		);
+		
 	}
 
 	update(callback : Action<boolean> = null) : void {

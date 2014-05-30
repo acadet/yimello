@@ -59,7 +59,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 	constructor() {
 		super();
 
-		this._period = 2000;
+		this._period = 1000;
 		this._delay = 0;
 	}
 
@@ -76,7 +76,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 	}
 
 	tearDown(): void {
-
+		this._delay += this._period;
 	}
 
 	ActiveRecordObjectGetWithConverterTest() : void {
@@ -135,12 +135,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 														p2.lastName = 'Connery';
 														this.isTrue(p2.equals(outcome.getAt(1)));
 
-														ActiveRecordObject.executeSQL(
-															'DELETE FROM people',
-															(r) => {
-																ActiveRecordObject.executeSQL('DROP TABLE people');
-															}
-														);
+														ActiveRecordObject.executeSQL('DROP TABLE people');
 													},
 													ActiveRecordObjectTestUtils.Person.toPerson
 												);
@@ -155,8 +150,6 @@ class ActiveRecordObjectTest extends UnitTestClass {
 			},
 			this._delay
 		);
-
-		this._delay += this._period;
 	}
 
 	ActiveRecordObjectGetWithoutConverterTest() : void {
@@ -216,9 +209,86 @@ class ActiveRecordObjectTest extends UnitTestClass {
 												this.isTrue(
 													expectedPerson.equals(ActiveRecordObjectTestUtils.Person.toPerson(set.item(0))));
 
+												ActiveRecordObject.executeSQL('DROP TABLE people');
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			},
+			this._delay
+		);
+	}
+
+	ActiveRecordObjectUpdateTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				// Arrange
+				var createRequest : StringBuffer;
+				var insertRequest : StringBuffer;
+				var selector : Pair<string, any>;
+				var data : IDictionary<string, any>;
+				var expectedPerson : ActiveRecordObjectTestUtils.Person;
+
+				createRequest = new StringBuffer('CREATE TABLE people (');
+				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
+				createRequest.append('firstName VARCHAR(255), ');
+				createRequest.append('lastName VARCHAR(255))');
+
+				insertRequest = new StringBuffer('INSERT INTO people VALUES ');
+				insertRequest.append('(1, "Sam", "Neill")');
+
+				selector = new Pair<string, any>('id', 1);
+
+				data = new Dictionary<string, any>();
+				data.add('firstName', 'Harvey');
+				data.add('lastName', 'Keitel');
+
+				expectedPerson = new ActiveRecordObjectTestUtils.Person();
+				expectedPerson.id = 1;
+				expectedPerson.firstName = 'Harvey';
+				expectedPerson.lastName = 'Keitel';
+
+				ActiveRecordObject.executeSQL(
+					'DROP TABLE IF EXISTS people',
+					(r) => {
+						ActiveRecordObject.executeSQL(
+							createRequest.toString(),
+							(r) => {
+								ActiveRecordObject.executeSQL(
+									insertRequest.toString(),
+									(r) => {
+										// Act
+										ActiveRecordObject.update(
+											'people',
+											selector,
+											data,
+											(outcome) => {
+												// Assert
+												this.isTrue(outcome);
+
 												ActiveRecordObject.executeSQL(
-													'DELETE FROM people',
-													(r) => {
+													'SELECT * FROM people',
+													(outcome) => {
+														var set : SQLRowSet;
+
+														this.isTrue(TSObject.exists(outcome));
+
+														set = outcome.getRows();
+														this.isTrue(TSObject.exists(set));
+														this.areIdentical(1, set.getLength());
+
+														this.isTrue(
+															expectedPerson.equals(
+																ActiveRecordObjectTestUtils.Person.toPerson(set.item(0))
+															)
+														);
+
 														ActiveRecordObject.executeSQL('DROP TABLE people');
 													}
 												);
@@ -233,8 +303,6 @@ class ActiveRecordObjectTest extends UnitTestClass {
 			},
 			this._delay
 		);
-
-		this._delay += this._period;
 	}
 }
 

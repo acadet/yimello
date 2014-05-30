@@ -66,8 +66,9 @@ class DOMElement extends TSObject {
 		this._element = jQueryObject;
 	}
 
-	addClass(value : string) : void {
+	addClass(value : string) : DOMElement {
 		this._element.addClass(value);
+		return this;
 	}
 
 	animate(prop : Object, duration : number, callback : DOMElementAnimationCallback = null) : void {
@@ -206,8 +207,9 @@ class DOMElement extends TSObject {
 		this._element.remove();
 	}
 
-	removeClass(value : string) : void {
+	removeClass(value : string) : DOMElement {
 		this._element.removeClass(value);
+		return this;
 	}
 
 	setAttribute(key : string, value : string) : void {

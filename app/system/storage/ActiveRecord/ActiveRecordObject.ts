@@ -127,7 +127,13 @@ class ActiveRecordObject extends TSObject {
 							callback(true);
 						}
 					},
-					ActiveRecordHelper.executeErrorHandler
+					(tx, error) => {
+						ActiveRecordHelper.executeErrorHandler(tx, error);
+						if (callback !== null) {
+							callback(false);
+						}
+						return false;
+					}
 				);
 			},
 			ActiveRecordHelper.transactionErrorHandler
@@ -153,33 +159,37 @@ class ActiveRecordObject extends TSObject {
 			(tx) => {
 				var args : IList<any>;
 				var marks : StringBuffer = new StringBuffer();
+				var i : number = 0;
 
-				for (var i = 0; i < data.getLength(); i++) {
-					if (i === 0) {
-						marks.append('? = ?');
-					} else {
-						marks.append(', ? = ?');
-					}
-				}
+				args = new ArrayList<any>();
 
 				data.forEach((k, v) => {
-					args.add(k);
+					if (i !== 0) {
+						marks.append(', ');
+					}
+
+					marks.append(k + ' = ?');
 					args.add(v);
+					i++;
 				});
 
-				args.insertAt(0, table);
-				args.add(selector.getFirst());
 				args.add(selector.getSecond());
 
 				tx.execute(
-					'UPDATE INTO ? SET ' + marks.toString() + ' WHERE ? = ?',
+					'UPDATE ' + table + ' SET ' + marks.toString() + ' WHERE ' + selector.getFirst() + ' = ?',
 					args.toArray(),
 					(tx, outcome) => {
 						if (callback !== null) {
 							callback(true);
 						}
 					},
-					ActiveRecordHelper.executeErrorHandler
+					(tx, error) => {
+						ActiveRecordHelper.executeErrorHandler(tx, error);
+						if (callback !== null) {
+							callback(false);
+						}
+						return false;
+					}
 				);
 			},
 			ActiveRecordHelper.transactionErrorHandler

@@ -7,3 +7,7 @@
 node_modules/
 tscommand*.txt
 
+# Transpiled files
+app/ui/js/output.js
+testing/output/test_output.js
+

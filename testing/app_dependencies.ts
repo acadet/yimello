@@ -62,4 +62,6 @@
 /// <reference path="../app/presenters/MainPresenter.ts" />
 
 //grunt-start
+/// <reference path="../app/system/Guid.ts" />
+/// <reference path="../app/system/MathHelper.ts" />
 //grunt-end
