@@ -39,3 +39,31 @@
 
 	input:-ms-placeholder { color: $color; }
 }
+
+@mixin bubbleTop($color, $borderRadius) {
+	position: relative;
+
+	width: 250px;
+	height: 120px;
+	padding: 0px;
+
+	background: $color;
+	@include border-radius($borderRadius);
+
+	&:after 
+	{
+		position: absolute;
+		top: -15px;
+		left: 110px;
+
+		width: 0;
+		display: block;
+		
+		border-style: solid;
+		border-width: 15px 15px 0;
+		border-color: $color transparent;
+		z-index: 1;
+		
+		content: '';
+	}
+}

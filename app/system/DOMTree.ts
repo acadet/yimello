@@ -6,6 +6,10 @@ class DOMTreeException extends Exception {
 
 class DOMTree extends TSObject {
 
+	static append(e : DOMElement) : void {
+		DOMTree.findSingle('body').append(e);
+	}
+
 	static find(criterion: string) : IList<DOMElement> {
 		var results : any = jQuery(document).find(criterion);
 		var list : IList<DOMElement> = new ArrayList<DOMElement>();

@@ -15,6 +15,8 @@
 /// <reference path="system/Regex.ts" />
 /// <reference path="system/Log.ts" />
 /// <reference path="system/Pair.ts" />
+/// <reference path="system/Guid.ts" />
+/// <reference path="system/MathHelper.ts" />
 
 // Collections parts
 
@@ -45,6 +47,7 @@
 /// <reference path="helpers/ExceptionHandler.ts" />
 /// <reference path="helpers/URLHelper.ts" />
 /// <reference path="helpers/URLDetailsProvider.ts" />
+/// <reference path="helpers/SecurityHelper.ts" />
 
 // DAO part
 
@@ -53,19 +56,19 @@
 /// <reference path="models/dao/BookmarkDAO.ts" />
 /// <reference path="models/dao/TagDAO.ts" />
 
+// Business part
+/// <reference path="models/business/BusinessException.ts" />
+/// <reference path="models/business/IBookmarkBusiness.ts" />
+/// <reference path="models/business/impl/BookmarkBusiness.ts" />
+
 // Presenters part
 
 /// <reference path="presenters/Presenter.ts" />
+/// <reference path="presenters/YimelloPresenter.ts" />
 /// <reference path="presenters/utils/PresenterMediator.ts" />
 /// <reference path="presenters/IntroPresenter.ts" />
 /// <reference path="presenters/TourPresenter.ts" />
 /// <reference path="presenters/MainPresenter.ts" />
 
 //grunt-start
-/// <reference path="helpers/SecurityHelper.ts" />
-/// <reference path="models/business/BusinessException.ts" />
-/// <reference path="models/business/IBookmarkBusiness.ts" />
-/// <reference path="models/business/impl/BookmarkBusiness.ts" />
-/// <reference path="system/Guid.ts" />
-/// <reference path="system/MathHelper.ts" />
 //grunt-end

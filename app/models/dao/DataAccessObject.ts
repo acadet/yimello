@@ -5,13 +5,16 @@ class DataAccessObject extends TSObject {
 	
 	private _id : string;
 	private static _initialized : boolean = false;
+	private _dbName : string;
 
 	//endregion Fields
 	
 	//region Constructors
 	
-	constructor() {
+	constructor(dbName : string = 'yimello') {
 		super();
+
+		this._dbName = dbName;
 	}
 
 	//endregion Constructors
@@ -40,7 +43,7 @@ class DataAccessObject extends TSObject {
 			var tagBookmarkRequest : StringBuffer;
 			var config : ActiveRecordConfig =
 			new ActiveRecordConfig(
-				'yimello'
+				this._dbName
 			);
 
 			ActiveRecordObject.init(config);
@@ -59,8 +62,9 @@ class DataAccessObject extends TSObject {
 
 			tagBookmarkRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');
 			tagBookmarkRequest.append(DAOTables.TagBookmark + ' (');
-			tagBookmarkRequest.append('tag_id VARCHAR(36) PRIMARY KEY NOT NULL, ');
-			tagBookmarkRequest.append('bookmark_id VARCHAR(36) PRIMARY KEY NOT NULL)');
+			tagBookmarkRequest.append('tag_id VARCHAR(36) NOT NULL, ');
+			tagBookmarkRequest.append('bookmark_id VARCHAR(36) NOT NULL, ');
+			tagBookmarkRequest.append('PRIMARY KEY (tag_id, bookmark_id))');
 
 			ActiveRecordObject.executeSQL(
 				tagRequest.toString(),

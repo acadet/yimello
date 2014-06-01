@@ -24,9 +24,16 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				var bookmark : BookmarkDAO;
 
 				bookmark = new BookmarkDAO();
+				bookmark.setURL(url);
 				bookmark.setTitle(SecurityHelper.disarm(title));
 				bookmark.setDescription(SecurityHelper.disarm(description));
-				// TODO
+				bookmark.add(
+					(outcome) => {
+						if (callback !== null) {
+							callback(outcome);
+						}
+					}
+				);
 			},
 			(type, error) => {
 				var msg : StringBuffer;

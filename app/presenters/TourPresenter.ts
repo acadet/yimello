@@ -1,6 +1,6 @@
 /// <reference path="../dependencies.ts" />
 
-class TourPresenter extends Presenter {
+class TourPresenter extends YimelloPresenter {
 	//region Fields
 	
 	/**
@@ -20,7 +20,6 @@ class TourPresenter extends Presenter {
 
 	/**
 	 * Wraps all tags
-	 * @type {DOMElement}
 	 */
 	private _tags : DOMElement;
 
@@ -211,7 +210,71 @@ class TourPresenter extends Presenter {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					// TODO
+					var url : string;
+
+					url = urlInput.getValue();
+
+					urlInput.removeClass('success');
+					urlInput.removeClass('error');
+
+					if (url !== '') {
+						this
+							.getBookmarkBusiness()
+							.createFromURL(
+								url,
+								(bookmark) => {
+									if (bookmark === null) {
+										var e : DOMElement;
+										var timer : Timer;
+
+										e = DOMElement.fromString('<div>Provided url is wrong</div>');
+										e.addClass('error-bubble');
+										e.setCss({
+											top : urlInput.getBottom(),
+											left : (urlInput.getWidth() - e.getWidth()) / 2,
+											opacity : 0
+										});
+
+										DOMTree.append(e);
+										e.animate(
+											{
+												opacity : 1
+											},
+											500
+										);
+
+										timer = new Timer(
+											(o) => {
+												e.animate(
+													{
+														opacity : 0
+													},
+													500,
+													(e) => {
+														e.remove();
+													}
+												);
+											},
+											2000
+										);
+
+										urlInput.addClass('error');
+									} else {
+										var timer : Timer;
+										urlInput.addClass('success');
+
+										timer = new Timer(
+											(o) => {
+												this._swapSlide(3);
+											},
+											2000
+										);
+									}
+								}
+							);
+					} else {
+						urlInput.addClass('error');
+					}
 				}
 			);
 	}

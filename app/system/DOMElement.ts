@@ -137,6 +137,10 @@ class DOMElement extends TSObject {
 		return this._element.attr(key);
 	}
 
+	getBottom(relative = false) : number {
+		return this.getTop(relative) + this.getHeight();
+	}
+
 	getData(key : string) : string {
 		return this._element.attr('data-' + key);
 	}
@@ -151,6 +155,10 @@ class DOMElement extends TSObject {
 		} else {
 			return this._element.offset().left;
 		}
+	}
+
+	getRight(relative = false) : number {
+		return this.getLeft(relative) + this.getWidth();
 	}
 
 	getTagName() : string {

@@ -48,22 +48,40 @@ class BookmarkDAO extends DataAccessObject {
 		return this;
 	}
 
-	add(callback : Action<boolean> = null) : void {
+	add(callback : Action<BookmarkDAO> = null) : void {
 		var l : IList<any> = new ArrayList<any>();
+		var id : string = Guid.newGuid();
 
-		l.add(this.getId());
+		l.add(id);
 		l.add(this.getURL());
 		l.add(this.getTitle());
 		l.add(this.getDescription());
 
 		this.initialize(
 			(b) => {
+				var f : Action<boolean>;
+				var bookmark : BookmarkDAO;
+
 				if (callback !== null && !b) {
-					callback(false);
+					callback(null);
 					return;
 				}
 
-				ActiveRecordObject.insert(DAOTables.Bookmarks, l, callback);
+				bookmark = new BookmarkDAO();
+				bookmark.setId(id);
+				bookmark.setURL(this.getURL());
+				bookmark.setTitle(this.getTitle());
+				bookmark.setDescription(this.getDescription());
+
+				f = (b) => {
+					if (b) {
+						callback(bookmark);
+					} else {
+						callback(null);
+					}
+				};
+
+				ActiveRecordObject.insert(DAOTables.Bookmarks, l, f);
 			}
 		);
 		

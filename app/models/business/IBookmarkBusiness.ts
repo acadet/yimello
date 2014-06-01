@@ -1,5 +1,5 @@
 /// <reference path="../../dependencies.ts" />
 
 interface IBookmarkBusiness {
-	createFromURL(url : string) : void;
+	createFromURL(url : string, callback : Action<BookmarkDAO>) : void;
 }

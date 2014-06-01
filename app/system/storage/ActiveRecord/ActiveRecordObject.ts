@@ -196,6 +196,40 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
+	static delete(table : string, selector : Pair<string, any>, callback : Action<boolean> = null) : void {
+		ActiveRecordObject._init();
+
+		ActiveRecordObject._currentDB.transaction(
+			(tx) => {
+				var request : StringBuffer;
+
+				request = new StringBuffer('DELETE FROM ' + table);
+				request.append(' WHERE ' + selector.getFirst());
+				request.append(' = ?');
+
+				tx.execute(
+					request.toString(),
+					[selector.getSecond()],
+					(tx, outcome) => {
+						if (callback !== null) {
+							callback(true);
+						}
+					},
+					(tx, error) => {
+						ActiveRecordHelper.executeErrorHandler(tx, error);
+
+						if (callback !== null) {
+							callback(false);
+						}
+
+						return false;
+					}
+				);
+			},
+			ActiveRecordHelper.transactionErrorHandler
+		);
+	}
+
 	static couple(table : string, pairs : IList<Pair<any, any>>, callback : Action<boolean> = null) : void {
 		
 		if (!TSObject.exists(pairs)) {

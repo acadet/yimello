@@ -304,6 +304,54 @@ class ActiveRecordObjectTest extends UnitTestClass {
 			this._delay
 		);
 	}
+
+	ActiveRecordObjectDeleteTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				// Arrange
+				ActiveRecordObject.executeSQL(
+					'DROP TABLE IF EXISTS people',
+					(r) => {
+						var createRequest : StringBuffer;
+
+						createRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS people ');
+						createRequest.append('(id INTEGER PRIMARY KEY NOT NULL, ');
+						createRequest.append('name VARCHAR(255) NOT NULL)');
+
+						ActiveRecordObject.executeSQL(
+							createRequest.toString(),
+							(r) => {
+								var insertRequest : StringBuffer;
+
+								insertRequest = new StringBuffer('INSERT INTO people VALUES ');
+								insertRequest.append('(1, "Bruce Willis")');
+
+								ActiveRecordObject.executeSQL(
+									insertRequest.toString(),
+									(r) => {
+										// Act
+										ActiveRecordObject.delete(
+											'people',
+											new Pair<string, any>('id', 1),
+											(outcome) => {
+												// Assert
+												this.isTrue(outcome);
+
+												ActiveRecordObject.executeSQL('DROP TABLE people');
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			},
+			this._delay
+		);
+	}
 }
 
 UnitTestClass.handle(new ActiveRecordObjectTest());

@@ -2,6 +2,8 @@
 
 $black : #333333;
 $blue : #22A8E8;
+$green : #7EB530;
+$red : #DD381D; 
 
 .flat-button {
 	padding: 10px 15px;
@@ -28,7 +30,7 @@ $blue : #22A8E8;
 .red-flat-button {
 	@extend .flat-button;
 
-	background: #DD381D;
+	background: $red;
 	border-color: #B52C17;
 
 	&:active {
@@ -99,6 +101,8 @@ $blue : #22A8E8;
 	p { margin: 2em 0; }
 
 	input {
+		@include transition(border-color, 0.5s, ease);
+
 		padding: 5px 10px;
 		width: 350px;
 		height: 30px;
@@ -114,6 +118,14 @@ $blue : #22A8E8;
 
 		&:focus {
 			border-color: $blue;
+		}
+
+		&.error {
+			border-color : $red;
+		}
+
+		&.success {
+			border-color : $green;
 		}
 	}
 
@@ -200,8 +212,16 @@ $blue : #22A8E8;
 	cursor: pointer;
 
 	&.active-cursor {
-		background-color: #7EB530;
+		background-color: $green;
 		cursor: default;
 	}
 }
 
+.error-bubble {
+	@include bubbleTop($red, 5px);
+
+	width: 150px;
+	height: 30px;
+
+	color: white;
+}
