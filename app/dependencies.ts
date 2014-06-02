@@ -71,4 +71,5 @@
 /// <reference path="presenters/MainPresenter.ts" />
 
 //grunt-start
+/// <reference path="models/dao/DAOException.ts" />
 //grunt-end

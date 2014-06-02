@@ -67,9 +67,15 @@ class ArrayList<T> extends TSObject implements IList<T> {
 		this._content.splice(index, 0, t);
 	}
 
-	map(f: Action<T>) : void {
-		for(var i = 0; i < this._content.length; i++) {
-			f(this._content[i]);
+	remove(t : T) : void {
+		var index : number;
+
+		index = this._content.indexOf(t);
+
+		if (index > -1) {
+			this._content.splice(index, 1);
+		} else {
+			throw new Exception('Unable to remove: item not found');
 		}
 	}
 

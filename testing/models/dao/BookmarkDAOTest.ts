@@ -91,6 +91,44 @@ class BookmarkDAOTest extends UnitTestClass {
 			this._delay
 		);
 	}
+
+	BookmarkDAODeleteTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				// Arrange
+				var bookmark : BookmarkDAO;
+				var l : IList<any>;
+
+				bookmark = new BookmarkDAO(BookmarkDAOTest._dbName);
+				bookmark.setId('1');
+				bookmark.setTitle('Chan Chan');
+				bookmark.setURL('http://twitter.com');
+
+				l = new ArrayList<any>();
+				l.add(bookmark.getId());
+				l.add(bookmark.getURL());
+				l.add(bookmark.getTitle());
+				l.add(bookmark.getDescription());
+
+				ActiveRecordObject.insert(
+					DAOTables.Bookmarks,
+					l,
+					(b) => {
+						// Act
+						bookmark.delete(
+							(outcome) => {
+								// Assert
+								this.isTrue(outcome);
+							}
+						);
+					}
+				);
+			},
+			this._delay
+		);
+	}
 }
 
 UnitTestClass.handle(new BookmarkDAOTest());

@@ -13,6 +13,8 @@ interface IList<T> {
 
 	insertAt(index : number, t : T) : void;
 
+	remove(t : T) : void;
+
 	toArray() : Array<T>;
 }
 

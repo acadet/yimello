@@ -87,6 +87,7 @@ class BookmarkDAO extends DataAccessObject {
 		
 	}
 
+	// TODO : test
 	update(callback : Action<boolean> = null) : void {
 		var dict : IDictionary<string, any>;
 		var selector : Pair<string, string>;
@@ -99,6 +100,25 @@ class BookmarkDAO extends DataAccessObject {
 		dict.add('description', this.getDescription());
 
 		ActiveRecordObject.update(DAOTables.Bookmarks, selector, dict, callback);
+	}
+
+	delete(callback : Action<boolean> = null) : void {
+		if (TSObject.exists(this.getId())) {
+			ActiveRecordObject.delete(
+				DAOTables.Bookmarks,
+				new Pair<string, any>('id', this.getId()),
+				(b) => {
+					if (callback !== null) {
+						callback(b);
+					}
+				}
+			);
+		} else {
+			Log.error(new DAOException('Unable to delete: an id must be specify'));
+			if (callback !== null) {
+				callback(false);
+			}
+		}
 	}
 
 	bindToTags(tags : IList<TagDAO>) : void {

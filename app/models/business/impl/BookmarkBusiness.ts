@@ -40,7 +40,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 				msg = new StringBuffer('An error occured when getting url details ');
 				msg.append('with type ' + type);
-				msg.append(' and following message: ' + msg);
+				msg.append(' and following message: ' + error);
 
 				Log.error(new BusinessException(msg.toString()));
 

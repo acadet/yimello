@@ -28,6 +28,9 @@ class TourPresenter extends YimelloPresenter {
 	 */
 	private static _tagID : number;
 
+	private _currentBookmark : BookmarkDAO;
+	private _currentTags : IList<TagDAO>;
+
 	//endregion Fields
 	
 	//region Constructors
@@ -102,11 +105,13 @@ class TourPresenter extends YimelloPresenter {
 	private _createTag(value : string) : void {
 		var tag : DOMElement;
 		var img : DOMElement;
+		var tagObj : TagDAO;
 
 		if (!TSObject.exists(this._tags)) {
 			// Save pointer to tag list if not already done
 			this._tags = DOMTree.findSingle('.js-slide .js-tag-list');
 			TourPresenter._tagID = 0;
+			this._currentTags = new ArrayList<TagDAO>();
 		}
 
 		// Start to build a new tag
@@ -122,10 +127,16 @@ class TourPresenter extends YimelloPresenter {
 		tag.append(img);
 		this._tags.append(tag);
 
+		tagObj = new TagDAO();
+		tagObj.setLabel(value);
+
+		this._currentTags.add(tagObj);
+
 		// On click on delete icon, remove bound tag
 		img.on(DOMElementEvents.Click, (e) => {
 			img.off(DOMElementEvents.Click);
 			tag.remove();
+			this._currentTags.remove(tagObj);
 		});
 	}
 
@@ -261,6 +272,8 @@ class TourPresenter extends YimelloPresenter {
 										urlInput.addClass('error');
 									} else {
 										var timer : Timer;
+
+										this._currentBookmark = bookmark;
 										urlInput.addClass('success');
 
 										timer = new Timer(
@@ -279,6 +292,29 @@ class TourPresenter extends YimelloPresenter {
 			);
 	}
 
+	private _prepareTagForm() : void {
+		var tagSaveTrigger : DOMElement;
+
+		this._prepareTagGenerator();
+
+		DOMTree.findSingle('.js-slide form .js-save-tags-trigger');
+
+		tagSaveTrigger.on(
+			DOMElementEvents.Click,
+			(e) => {
+				if (TSObject.exists(this._currentBookmark)) {
+					if (this._currentTags.getLength() > 0) {
+						
+					} else {
+						// TODO
+					}
+				} else {
+					// TODO
+				}
+			}
+		);
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -290,9 +326,9 @@ class TourPresenter extends YimelloPresenter {
 
 		this._prepareSlidesAndCursors();
 
-		this._prepareTagGenerator();
-
 		this._prepareURLForm();
+
+		this._prepareTagForm();
 
 
 		// Hello trigger moves from 0 to 1
