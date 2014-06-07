@@ -88,8 +88,9 @@ $red : #DD381D;
 	h1 { font-size: 3em; }
 
 	a {
-		border-bottom : 2px dashed #eee;
-		@include transition(border-color, 1s, ease);
+		border-bottom : 3px solid #ccc;
+		padding-bottom: 2px;
+		@include transition(border-color, 0.5s, ease);
 
 		&:hover {
 			border-color: $blue;

@@ -51,18 +51,20 @@
 
 // DAO part
 
+/// <reference path="../app/models/dao/utils/DAOException.ts" />
 /// <reference path="../app/models/dao/DAOTables.ts" />
 /// <reference path="../app/models/dao/DataAccessObject.ts" />
 /// <reference path="../app/models/dao/BookmarkDAO.ts" />
 /// <reference path="../app/models/dao/TagDAO.ts" />
 
 // Business part
-/// <reference path="../app/models/business/BusinessException.ts" />
+/// <reference path="../app/models/business/utils/BusinessException.ts" />
 /// <reference path="../app/models/business/IBookmarkBusiness.ts" />
 /// <reference path="../app/models/business/impl/BookmarkBusiness.ts" />
 
 // Presenters part
 
+/// <reference path="../app/presenters/utils/PresenterException.ts" />
 /// <reference path="../app/presenters/Presenter.ts" />
 /// <reference path="../app/presenters/YimelloPresenter.ts" />
 /// <reference path="../app/presenters/utils/PresenterMediator.ts" />
@@ -71,4 +73,6 @@
 /// <reference path="../app/presenters/MainPresenter.ts" />
 
 //grunt-start
+/// <reference path="../app/models/business/ITagBusiness.ts" />
+/// <reference path="../app/models/business/impl/TagBusiness.ts" />
 //grunt-end

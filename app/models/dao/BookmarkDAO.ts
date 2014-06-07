@@ -17,6 +17,17 @@ class BookmarkDAO extends DataAccessObject {
 	
 	//region Private Methods
 	
+	private static _fromObject(obj : any) : BookmarkDAO {
+		var b : BookmarkDAO = new BookmarkDAO();
+
+		b.setId(obj.id);
+		b.setURL(obj.url);
+		b.setTitle(obj.title);
+		b.setDescription(obj.description);
+
+		return b;
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -46,6 +57,17 @@ class BookmarkDAO extends DataAccessObject {
 	setDescription(d : string) : BookmarkDAO {
 		this._description = d;
 		return this;
+	}
+
+	toList() : IList<any> {
+		var l : IList<any> = new ArrayList<any>();
+
+		l.add(this.getId());
+		l.add(this.getURL());
+		l.add(this.getTitle());
+		l.add(this.getDescription());
+
+		return l;
 	}
 
 	add(callback : Action<BookmarkDAO> = null) : void {
@@ -83,8 +105,7 @@ class BookmarkDAO extends DataAccessObject {
 
 				ActiveRecordObject.insert(DAOTables.Bookmarks, l, f);
 			}
-		);
-		
+		);		
 	}
 
 	// TODO : test
@@ -103,34 +124,38 @@ class BookmarkDAO extends DataAccessObject {
 	}
 
 	delete(callback : Action<boolean> = null) : void {
-		if (TSObject.exists(this.getId())) {
-			ActiveRecordObject.delete(
-				DAOTables.Bookmarks,
-				new Pair<string, any>('id', this.getId()),
-				(b) => {
+		this.initialize(
+			(success) => {
+				if (TSObject.exists(this.getId())) {
+					ActiveRecordObject.delete(
+						DAOTables.Bookmarks,
+						new Pair<string, any>('id', this.getId()),
+						(b) => {
+							if (callback !== null) {
+								callback(b);
+							}
+						}
+					);
+				} else {
+					Log.error(new DAOException('Unable to delete: an id must be specify'));
 					if (callback !== null) {
-						callback(b);
+						callback(false);
 					}
 				}
-			);
-		} else {
-			Log.error(new DAOException('Unable to delete: an id must be specify'));
-			if (callback !== null) {
-				callback(false);
 			}
-		}
+		);
 	}
 
-	bindToTags(tags : IList<TagDAO>) : void {
-		var l : IList<Pair<string, string>> = new ArrayList<Pair<string, string>>();
-
-		tags.forEach((t) => {
-			var p : Pair<string, string>;
-			p = new Pair<string, string>(this.getId(), t.getId());
-			l.add(p);
-			});
-
-		ActiveRecordObject.couple(DAOTables.Bookmarks, l);
+	static get(callback : Action<IList<BookmarkDAO>>) : void {
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.get<BookmarkDAO>(
+					DAOTables.Bookmarks,
+					callback,
+					BookmarkDAO._fromObject
+				);
+			}
+		);
 	}
 
 	//endregion Public Methods

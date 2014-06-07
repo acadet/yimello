@@ -7,6 +7,7 @@
 /// <reference path="helpers/URLDetailsProviderTest.ts" />
 /// <reference path="helpers/URLHelperTest.ts" />
 /// <reference path="models/business/BookmarkBusinessTest.ts" />
+/// <reference path="models/business/TagBusinessTest.ts" />
 /// <reference path="models/dao/BookmarkDAOTest.ts" />
 /// <reference path="models/dao/DataAccessObjectTest.ts" />
 /// <reference path="models/dao/TagDAOTest.ts" />

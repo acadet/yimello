@@ -2,22 +2,20 @@
 
 class DataAccessObjectTest extends UnitTestClass {
 	private _dao : DataAccessObject;
-	private _delay : number;
-	private static _dbName : string = 'yimello-test';
 
 	constructor() {
 	    super();
 
-	    this._delay = 0;
+	    DataAccessObject.setDatabaseName('yimello-test');
 	}
 
 	setUp() : void {
-		this._dao = new DataAccessObject(DataAccessObjectTest._dbName);
+		this._dao = new DataAccessObject();
 	}
 
 	tearDown() : void {
 		this._dao = null;
-		this._delay += 1000;
+		UnitTestClass.increaseDelay();
 	}
 
 	DataAccessObjectIdTest() : void {
@@ -40,17 +38,18 @@ class DataAccessObjectTest extends UnitTestClass {
 				var f : Action<boolean>;
 				var dao : DataAccessObject;
 
-				dao = new DataAccessObject(DataAccessObjectTest._dbName);
+				dao = new DataAccessObject();
 
 				f = (b) => {
 					// Assert
 					this.isTrue(b);
+					DataAccessObject.clean();
 				};
 
 				//Act
 				dao.initialize(f);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 
@@ -64,11 +63,12 @@ class DataAccessObjectTest extends UnitTestClass {
 				var g : Action<boolean>;
 				var dao : DataAccessObject;
 
-				dao = new DataAccessObject(DataAccessObjectTest._dbName);
+				dao = new DataAccessObject();
 
 				g = (b) => {
 					// Assert
 					this.isTrue(b);
+					DataAccessObject.clean();
 				};
 
 				f = (b) => {
@@ -79,7 +79,7 @@ class DataAccessObjectTest extends UnitTestClass {
 				// Act
 				dao.initialize(f);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 }

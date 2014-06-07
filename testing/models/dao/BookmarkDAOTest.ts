@@ -2,22 +2,20 @@
 
 class BookmarkDAOTest extends UnitTestClass {
 	private _dao : BookmarkDAO;
-	private _delay : number;
-	private static _dbName : string = 'yimello-test';
 
 	constructor() {
 		super();
 
-		this._delay = 0;
+		DataAccessObject.setDatabaseName('yimello-test');
 	}
 
 	setUp() : void {
-		this._dao = new BookmarkDAO(BookmarkDAOTest._dbName);
+		this._dao = new BookmarkDAO();
 	}
 
 	tearDown() : void {
 		this._dao = null;
-		this._delay += 500;
+		UnitTestClass.increaseDelay();
 	}
 
 	BookmarkDAOURLTest() : void {
@@ -56,6 +54,32 @@ class BookmarkDAOTest extends UnitTestClass {
 		this.areIdentical(description.toString(), this._dao.getDescription());
 	}
 
+	BookmarkDAOToListTest() : void {
+		// Arrange
+		var id : string = '1';
+		var url : string = 'foo';
+		var title : string = 'foobar';
+		var description : string = 'foobar powaa';
+		var b : BookmarkDAO = new BookmarkDAO();
+		var outcome : IList<any>;
+
+		b.setId(id);
+		b.setURL(url);
+		b.setTitle(title);
+		b.setDescription(description);
+
+		// Act
+		outcome = b.toList();
+
+		// Assert
+		this.isTrue(TSObject.exists(outcome));
+		this.areIdentical(4, outcome.getLength());
+		this.areIdentical(id, outcome.getAt(0));
+		this.areIdentical(url, outcome.getAt(1));
+		this.areIdentical(title, outcome.getAt(2));
+		this.areIdentical(description, outcome.getAt(3));
+	}
+
 	BookmarkDAOAddTest() : void {
 		var timer : Timer;
 
@@ -64,7 +88,7 @@ class BookmarkDAOTest extends UnitTestClass {
 				// Arrange
 				var bookmark : BookmarkDAO;
 
-				bookmark = new BookmarkDAO(BookmarkDAOTest._dbName);
+				bookmark = new BookmarkDAO();
 				bookmark.setId('foo');
 				bookmark.setURL('An url');
 				bookmark.setTitle('A title');
@@ -81,14 +105,11 @@ class BookmarkDAOTest extends UnitTestClass {
 						this.areIdentical(bookmark.getTitle(), outcome.getTitle());
 						this.areIdentical(bookmark.getDescription(), outcome.getDescription());
 
-						ActiveRecordObject.delete(
-							DAOTables.Bookmarks,
-							new Pair<string, any>('id', outcome.getId())
-						);
+						DataAccessObject.clean();
 					}
 				);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 
@@ -99,34 +120,79 @@ class BookmarkDAOTest extends UnitTestClass {
 			(o) => {
 				// Arrange
 				var bookmark : BookmarkDAO;
-				var l : IList<any>;
 
-				bookmark = new BookmarkDAO(BookmarkDAOTest._dbName);
+				bookmark = new BookmarkDAO();
 				bookmark.setId('1');
-				bookmark.setTitle('Chan Chan');
-				bookmark.setURL('http://twitter.com');
 
-				l = new ArrayList<any>();
-				l.add(bookmark.getId());
-				l.add(bookmark.getURL());
-				l.add(bookmark.getTitle());
-				l.add(bookmark.getDescription());
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Bookmarks,
+							bookmark.toList(),
+							(b) => {
+								// Act
+								bookmark.delete(
+									(outcome) => {
+										// Assert
+										this.isTrue(outcome);
 
-				ActiveRecordObject.insert(
-					DAOTables.Bookmarks,
-					l,
-					(b) => {
-						// Act
-						bookmark.delete(
-							(outcome) => {
-								// Assert
-								this.isTrue(outcome);
+										DataAccessObject.clean();
+									}
+								);
 							}
 						);
 					}
 				);
 			},
-			this._delay
+			UnitTestClass.getDelay()
+		);
+	}
+
+	BookmarkDaoGetTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				var b1 : BookmarkDAO, b2 : BookmarkDAO;
+
+				b1 = new BookmarkDAO();
+				b1.setId('1');
+				b1.setTitle('foo');
+				b2 = new BookmarkDAO();
+				b2.setId('2');
+				b2.setTitle('foobar');
+
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Bookmarks,
+							b1.toList(),
+							(success) => {
+								ActiveRecordObject.insert(
+									DAOTables.Bookmarks,
+									b2.toList(),
+									(success) => {
+										BookmarkDAO.get(
+											(outcome) => {
+												this.isTrue(TSObject.exists(outcome));
+
+												this.areIdentical(2, outcome.getLength());
+												this.areIdentical(b1.getId(), outcome.getAt(0).getId());
+												this.areIdentical(b1.getTitle(), outcome.getAt(0).getTitle());
+												this.areIdentical(b2.getId(), outcome.getAt(1).getId());
+												this.areIdentical(b2.getTitle(), outcome.getAt(1).getTitle());
+
+												DataAccessObject.clean();
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			},
+			UnitTestClass.getDelay()
 		);
 	}
 }

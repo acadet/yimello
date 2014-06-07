@@ -4,6 +4,7 @@ class YimelloPresenter extends Presenter {
 	//region Fields
 	
 	private _bookmarkBusiness : IBookmarkBusiness;
+	private _tagBusiness : ITagBusiness;
 
 	//endregion Fields
 	
@@ -13,6 +14,7 @@ class YimelloPresenter extends Presenter {
 		super();
 
 		this._bookmarkBusiness = new BookmarkBusiness();
+		this._tagBusiness = new TagBusiness();
 	}
 
 	//endregion Constructors
@@ -27,6 +29,10 @@ class YimelloPresenter extends Presenter {
 	
 	getBookmarkBusiness() : IBookmarkBusiness {
 		return this._bookmarkBusiness;
+	}
+
+	getTagBusiness() : ITagBusiness {
+		return this._tagBusiness;
 	}
 
 	//endregion Public Methods

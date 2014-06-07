@@ -28,6 +28,8 @@ class TourPresenter extends YimelloPresenter {
 	 */
 	private static _tagID : number;
 
+	private _tagInput : DOMElement;
+
 	private _currentBookmark : BookmarkDAO;
 	private _currentTags : IList<TagDAO>;
 
@@ -197,18 +199,19 @@ class TourPresenter extends YimelloPresenter {
 	 * Prepares tag generator
 	 */
 	private _prepareTagGenerator() : void {
-		this._slides
-			.findSingle('.js-slide .js-tag-form input[name="tags"]')
-			.on(
-				DOMElementEvents.KeyDown, 
-				(e) => {
-					if (e.getWhich() === 13) {
-						// Only trigger when key is 'enter'
-						this._createTag(e.getTarget().getValue());
-						e.getTarget().setValue('');
-					}
+		if (!TSObject.exists(this._tagInput)) {
+			this._tagInput = this._slides.findSingle('.js-slide .js-tag-form input[name="tags"]');
+		}
+		this._tagInput.on(
+			DOMElementEvents.KeyDown, 
+			(e) => {
+				if (e.getWhich() === 13) {
+					// Only trigger when key is 'enter'
+					this._createTag(e.getTarget().getValue());
+					e.getTarget().setValue('');
 				}
-			);
+			}
+		);
 	}
 
 	private _prepareURLForm() : void {
@@ -292,24 +295,97 @@ class TourPresenter extends YimelloPresenter {
 			);
 	}
 
+	private _displayTagError(msg : string) : void {
+		var e : DOMElement;
+		var timer : Timer;
+
+		e = DOMElement.fromString('<div>' + msg + '</div>');
+		e.addClass('error-bubble');
+		e.setCss(
+			{
+				top : this._tagInput.getBottom(),
+				left : (this._tagInput.getWidth() - e.getWidth()) / 2,
+				opacity : 0
+			}
+		);
+
+		DOMTree.append(e);
+		e.animate(
+			{
+				opacity : 1
+			},
+			500
+		);
+
+		timer = new Timer(
+			(o) => {
+				e.animate(
+					{
+						opacity : 0
+					},
+					500,
+					() => {
+						e.remove();
+					}
+				);
+			},
+			2000
+		);
+
+		this._tagInput.addClass('error');
+	}
+
 	private _prepareTagForm() : void {
 		var tagSaveTrigger : DOMElement;
 
 		this._prepareTagGenerator();
 
-		DOMTree.findSingle('.js-slide form .js-save-tags-trigger');
+		tagSaveTrigger = DOMTree.findSingle('.js-slide form .js-save-tags-trigger');
 
 		tagSaveTrigger.on(
 			DOMElementEvents.Click,
 			(e) => {
 				if (TSObject.exists(this._currentBookmark)) {
 					if (this._currentTags.getLength() > 0) {
-						
+						this
+							.getTagBusiness()
+							.addList(
+								this._currentTags,
+								(success) => {
+									if (success) {
+										this
+											.getBookmarkBusiness()
+											.bindTags(
+												this._currentBookmark,
+												this._currentTags,
+												(success) => {
+													if (success) {
+														var timer : Timer;
+														this._tagInput.addClass('success');
+
+														timer = new Timer(
+															(o) => {
+																this._swapSlide(4);
+															},
+															2000
+														);
+													} else {
+														this._displayTagError('An intern error has occured. Please try again');
+														Log.error(new PresenterException('Failed to bind tags to bookmark'));
+													}
+												}
+											);
+									} else {
+										this._displayTagError('An intern error has occured. Please try again');
+										Log.error(new PresenterException('Failed to add tags'));
+									}
+								}
+							);
 					} else {
-						// TODO
+						this._displayTagError('You must add some tags before saving');
 					}
 				} else {
-					// TODO
+					this._displayTagError('You must add some tags before saving');
 				}
 			}
 		);

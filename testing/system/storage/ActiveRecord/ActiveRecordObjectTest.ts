@@ -53,15 +53,6 @@ module ActiveRecordObjectTestUtils {
 
 class ActiveRecordObjectTest extends UnitTestClass {
 	private _config : ActiveRecordConfig;
-	private _period : number;
-	private _delay : number;
-
-	constructor() {
-		super();
-
-		this._period = 1000;
-		this._delay = 0;
-	}
 
 	setUp() : void {
 		if (!TSObject.exists(this._config)) {
@@ -76,7 +67,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 	}
 
 	tearDown(): void {
-		this._delay += this._period;
+		UnitTestClass.increaseDelay();
 	}
 
 	ActiveRecordObjectGetWithConverterTest() : void {
@@ -112,7 +103,6 @@ class ActiveRecordObjectTest extends UnitTestClass {
 											insertRequest2.toString(),
 											(r) => {
 												// Act
-												
 												ActiveRecordObject.get(
 													'people',
 													(outcome) => {
@@ -148,7 +138,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 					}
 				);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 
@@ -219,7 +209,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 					}
 				);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 
@@ -301,7 +291,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 					}
 				);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 
@@ -349,7 +339,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 					}
 				);
 			},
-			this._delay
+			UnitTestClass.getDelay()
 		);
 	}
 }

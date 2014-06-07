@@ -1,3 +1,3 @@
 /// <reference path="../../dependencies.ts" />
 
-class BusinessException extends Exception {}
+class PresenterException extends Exception {}

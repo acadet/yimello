@@ -99,7 +99,7 @@ class ActiveRecordObject extends TSObject {
 			Log.error(new ActiveRecordException('insert(): Provided data are undefined'));
 			if (callback !== null) {
 				callback(false);
-			}			
+			}
 			return;
 		}
 
@@ -230,42 +230,41 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
-	static couple(table : string, pairs : IList<Pair<any, any>>, callback : Action<boolean> = null) : void {
+	// static couple(table : string, pairs : IList<Pair<any, any>>, callback : Action<boolean> = null) : void {
+	// 	if (!TSObject.exists(pairs)) {
+	// 		Log.error(new ActiveRecordException('Provided pairs are undefined'));
+	// 		if (callback !== null) {
+	// 			callback(false);
+	// 		}
+	// 		return;
+	// 	}
 		
-		if (!TSObject.exists(pairs)) {
-			Log.error(new ActiveRecordException('couple(): Provided pairs are undefined'));
-			if (callback !== null) {
-				callback(false);
-			}
-			return;
-		}
-		
-		ActiveRecordObject._init();
-		ActiveRecordObject._currentDB.transaction(
-			(tx) => {
-				for(var i = 0; i < pairs.getLength(); i++) {
-					var p : Pair<any, any> = pairs.getAt(i);
-					var args : IList<any> = new ArrayList<any>();
+	// 	ActiveRecordObject._init();
+	// 	ActiveRecordObject._currentDB.transaction(
+	// 		(tx) => {
+	// 			for(var i = 0; i < pairs.getLength(); i++) {
+	// 				var p : Pair<any, any> = pairs.getAt(i);
+	// 				var args : IList<any> = new ArrayList<any>();
 
-					args.add(table);
-					args.add(p.getFirst());
-					args.add(p.getSecond());
+	// 				args.add(table);
+	// 				args.add(p.getFirst());
+	// 				args.add(p.getSecond());
 
-					tx.execute(
-						'INSERT INTO ? VALUES (?, ?)',
-						args.toArray(),
-						(tx, outcome) => {
-							if (callback !== null) {
-								callback(true);
-							}
-						},
-						ActiveRecordHelper.executeErrorHandler
-					);
-				}
-			},
-			ActiveRecordHelper.transactionErrorHandler
-		);
-	}
+	// 				tx.execute(
+	// 					'INSERT INTO ? VALUES (?, ?)',
+	// 					args.toArray(),
+	// 					(tx, outcome) => {
+	// 						if (callback !== null) {
+	// 							callback(true);
+	// 						}
+	// 					},
+	// 					ActiveRecordHelper.executeErrorHandler
+	// 				);
+	// 			}
+	// 		},
+	// 		ActiveRecordHelper.transactionErrorHandler
+	// 	);
+	// }
 
 	//endregion Public Methods
 	

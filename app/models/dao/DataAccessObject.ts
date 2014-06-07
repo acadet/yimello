@@ -5,17 +5,11 @@ class DataAccessObject extends TSObject {
 	
 	private _id : string;
 	private static _initialized : boolean = false;
-	private _dbName : string;
+	private static _dbName : string = 'yimello';
 
 	//endregion Fields
 	
 	//region Constructors
-	
-	constructor(dbName : string = 'yimello') {
-		super();
-
-		this._dbName = dbName;
-	}
 
 	//endregion Constructors
 	
@@ -36,6 +30,23 @@ class DataAccessObject extends TSObject {
 		return this;
 	}
 
+	static setDatabaseName(value : string) : void {
+		DataAccessObject._dbName = value;
+	}
+
+	static initialize(callback : Action<boolean>) : void {
+		var dao : DataAccessObject;
+
+		if (DataAccessObject._initialized) {
+			callback(true);
+			return;
+		}
+
+		dao = new DataAccessObject();
+
+		dao.initialize(callback);
+	}
+
 	initialize(callback : Action<boolean>) : void {
 		if (!DataAccessObject._initialized) {
 			var tagRequest : StringBuffer;
@@ -43,7 +54,7 @@ class DataAccessObject extends TSObject {
 			var tagBookmarkRequest : StringBuffer;
 			var config : ActiveRecordConfig =
 			new ActiveRecordConfig(
-				this._dbName
+				DataAccessObject._dbName
 			);
 
 			ActiveRecordObject.init(config);
@@ -87,6 +98,36 @@ class DataAccessObject extends TSObject {
 		} else {
 			callback(true);
 		}
+	}
+
+	static clean(callback : Action<boolean> = null) : void {
+		if (!DataAccessObject._initialized) {
+			Log.error(new DAOException('Unable to clean db: db has not been initialized'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+
+		ActiveRecordObject.executeSQL(
+			'DROP TABLE ' + DAOTables.Bookmarks,
+			(outcome) => {
+				ActiveRecordObject.executeSQL(
+					'DROP TABLE ' + DAOTables.Tags,
+					(outcome) => {
+						ActiveRecordObject.executeSQL(
+							'DROP TABLE ' + DAOTables.TagBookmark,
+							(outcome) => {
+								DataAccessObject._initialized = false;
+								if (callback !== null) {
+									callback(true);
+								}
+							}
+						);
+					}
+				);
+			}
+		);
 	}
 
 	//endregion Public Methods
