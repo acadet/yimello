@@ -109,6 +109,8 @@ class TourPresenter extends YimelloPresenter {
 		var img : DOMElement;
 		var tagObj : TagDAO;
 
+		value = SecurityHelper.disarm(value);
+
 		if (!TSObject.exists(this._tags)) {
 			// Save pointer to tag list if not already done
 			this._tags = DOMTree.findSingle('.js-slide .js-tag-list');
@@ -232,7 +234,7 @@ class TourPresenter extends YimelloPresenter {
 					urlInput.removeClass('error');
 
 					if (url !== '') {
-						this
+						PresenterMediator
 							.getBookmarkBusiness()
 							.createFromURL(
 								url,
@@ -347,13 +349,14 @@ class TourPresenter extends YimelloPresenter {
 			(e) => {
 				if (TSObject.exists(this._currentBookmark)) {
 					if (this._currentTags.getLength() > 0) {
-						this
+						PresenterMediator
 							.getTagBusiness()
 							.addList(
 								this._currentTags,
-								(success) => {
-									if (success) {
-										this
+								(outcome) => {
+									if (TSObject.exists(outcome)) {
+										this._currentTags = outcome;
+										PresenterMediator
 											.getBookmarkBusiness()
 											.bindTags(
 												this._currentBookmark,

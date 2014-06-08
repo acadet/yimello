@@ -19,7 +19,7 @@
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
     <body>
-        <div id="js-main-view-wrapper" class="main-view-wrapper">
+        <div class="main-view-wrapper js-main-view-wrapper">
 
             <div class="panel-wrapper">
                 <div class="icon-wrapper">
@@ -27,7 +27,7 @@
                         <li class="icon">
                             <img src="assets/img/menu-icon.png" />
                         </li>
-                        <li id="js-bookmark-add-trigger" class="icon">
+                        <li class="icon js-bookmark-add-trigger">
                             <img src="assets/img/bookmark-icon.png" />
                         </li>
                         <li class="icon">
@@ -37,16 +37,15 @@
                 </div>
 
                 <div class="tag-list">
-                    <ul class="tags">
-                        <li>Most popular</li>
-                        <li>Al Pacino</li>
-                        <li>Bruce Willis</li>
-                        <li>Johnny Depp</li>
+                    <ul class="tags js-tag-list">
+                        <li class="js-most-popular">Most popular</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="bookmark-wrapper"></div>
+            <div class="bookmark-wrapper">
+                <ul class="js-bookmark-list"></ul>
+            </div>
 
             <div class="search-wrapper">
                 <img src="assets/img/search-icon.png" />
@@ -56,7 +55,7 @@
             </div>
         </div>
 
-        <div id="js-bookmark-form-wrapper" class="bookmark-form-wrapper">
+        <div class="bookmark-form-wrapper js-bookmark-form-wrapper">
             <form action="#" method="post">
                 <p>
                     <input type="text" name="url" placeholder="http://" />
@@ -68,18 +67,18 @@
                     <textarea name="description" placeholder="Write something good about your bookmark"></textarea>
                 </p>
                 <p>
-                    <ul class="tags">
+                    <ul class="tags js-form-tag-list">
                         
                     </ul>
                 </p>
                 <p>
-                    <input type="text" name="tags" placeholder="Press Enter to end a tag" />
+                    <input type="text" name="tags" placeholder="Press Enter to end a tag" list="js-tag-suggestions" />
                     <datalist id="js-tag-suggestions">
                     </datalist>
                 </p>
                 <p>
-                    <button type="button" class="cancel-button">Cancel</button>
-                    <button type="button" class="save-button">Save</button>
+                    <button type="button" class="js-cancel-button">Cancel</button>
+                    <button type="button" class="js-save-button">Save</button>
                 </p>
             </form>
         </div>

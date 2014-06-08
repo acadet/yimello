@@ -17,6 +17,7 @@
 /// <reference path="../app/system/Pair.ts" />
 /// <reference path="../app/system/Guid.ts" />
 /// <reference path="../app/system/MathHelper.ts" />
+/// <reference path="../app/system/StringHelper.ts" />
 
 // Collections parts
 
@@ -61,6 +62,8 @@
 /// <reference path="../app/models/business/utils/BusinessException.ts" />
 /// <reference path="../app/models/business/IBookmarkBusiness.ts" />
 /// <reference path="../app/models/business/impl/BookmarkBusiness.ts" />
+/// <reference path="../app/models/business/ITagBusiness.ts" />
+/// <reference path="../app/models/business/impl/TagBusiness.ts" />
 
 // Presenters part
 
@@ -70,9 +73,9 @@
 /// <reference path="../app/presenters/utils/PresenterMediator.ts" />
 /// <reference path="../app/presenters/IntroPresenter.ts" />
 /// <reference path="../app/presenters/TourPresenter.ts" />
-/// <reference path="../app/presenters/MainPresenter.ts" />
+/// <reference path="../app/presenters/MainPresenter/IBookmarkFormMainPresenterSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/BookmarkFormMainPresenter.ts" />
+/// <reference path="../app/presenters/MainPresenter/MainPresenter.ts" />
 
 //grunt-start
-/// <reference path="../app/models/business/ITagBusiness.ts" />
-/// <reference path="../app/models/business/impl/TagBusiness.ts" />
 //grunt-end

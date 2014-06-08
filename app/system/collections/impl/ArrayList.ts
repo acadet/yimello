@@ -39,6 +39,18 @@ class ArrayList<T> extends TSObject implements IList<T> {
 		return l;
 	}
 
+	findFirst(f : Func<T, boolean>) : T {
+		for (var i = 0; i < this.getLength(); i++) {
+			var t : T = this.getAt(i);
+
+			if (f(t)) {
+				return t;
+			}
+		}
+
+		return null;
+	}
+
 	forEach(f : Action<T>) : void {
 		for(var i = 0; i < this.getLength() ; i++) {
 			f(this.getAt(i));

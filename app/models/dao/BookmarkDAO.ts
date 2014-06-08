@@ -6,6 +6,7 @@ class BookmarkDAO extends DataAccessObject {
 	private _url : string;
 	private _title : string;
 	private _description : string;
+	private _views : number;
 
 	//endregion Fields
 	
@@ -16,17 +17,6 @@ class BookmarkDAO extends DataAccessObject {
 	//region Methods
 	
 	//region Private Methods
-	
-	private static _fromObject(obj : any) : BookmarkDAO {
-		var b : BookmarkDAO = new BookmarkDAO();
-
-		b.setId(obj.id);
-		b.setURL(obj.url);
-		b.setTitle(obj.title);
-		b.setDescription(obj.description);
-
-		return b;
-	}
 
 	//endregion Private Methods
 	
@@ -59,6 +49,15 @@ class BookmarkDAO extends DataAccessObject {
 		return this;
 	}
 
+	getViews() : number {
+		return this._views;
+	}
+
+	setViews(value : number) : BookmarkDAO {
+		this._views = value;
+		return this;
+	}
+
 	toList() : IList<any> {
 		var l : IList<any> = new ArrayList<any>();
 
@@ -66,8 +65,21 @@ class BookmarkDAO extends DataAccessObject {
 		l.add(this.getURL());
 		l.add(this.getTitle());
 		l.add(this.getDescription());
+		l.add(this.getViews());
 
 		return l;
+	}
+
+	static fromObject(obj : any) : BookmarkDAO {
+		var b : BookmarkDAO = new BookmarkDAO();
+
+		b.setId(obj.id);
+		b.setURL(obj.url);
+		b.setTitle(obj.title);
+		b.setDescription(obj.description);
+		b.setViews(obj.views);
+
+		return b;
 	}
 
 	add(callback : Action<BookmarkDAO> = null) : void {
@@ -78,6 +90,7 @@ class BookmarkDAO extends DataAccessObject {
 		l.add(this.getURL());
 		l.add(this.getTitle());
 		l.add(this.getDescription());
+		l.add(0);
 
 		this.initialize(
 			(b) => {
@@ -94,6 +107,7 @@ class BookmarkDAO extends DataAccessObject {
 				bookmark.setURL(this.getURL());
 				bookmark.setTitle(this.getTitle());
 				bookmark.setDescription(this.getDescription());
+				bookmark.setViews(this.getViews());
 
 				f = (b) => {
 					if (b) {
@@ -105,7 +119,7 @@ class BookmarkDAO extends DataAccessObject {
 
 				ActiveRecordObject.insert(DAOTables.Bookmarks, l, f);
 			}
-		);		
+		);
 	}
 
 	// TODO : test
@@ -152,7 +166,25 @@ class BookmarkDAO extends DataAccessObject {
 				ActiveRecordObject.get<BookmarkDAO>(
 					DAOTables.Bookmarks,
 					callback,
-					BookmarkDAO._fromObject
+					BookmarkDAO.fromObject
+				);
+			}
+		);
+	}
+
+	static sortByViewsDescThenByTitleAsc(callback : Action<IList<BookmarkDAO>>) : void {
+		var request : StringBuffer;
+
+		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' ');
+		request.append('ORDER BY views DESC, title ASC');
+
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(outcome) => {
+						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, BookmarkDAO.fromObject));
+					}
 				);
 			}
 		);

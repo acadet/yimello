@@ -26,7 +26,7 @@ class UnitTestClass extends tsUnit.TestClass {
 	}
 
 	static increaseDelay() : void {
-		UnitTestClass._delay += 300;
+		UnitTestClass._delay += 100;
 	}
 
 	static handle(u : UnitTestClass) : void {
@@ -46,6 +46,7 @@ class UnitTestClass extends tsUnit.TestClass {
 		}
 		
 		test.showResults(document.getElementById('outcome'), test.run());
+		Log.inform('Delay: ' + UnitTestClass.getDelay());
 	}
 
 	//endregion Public Methods

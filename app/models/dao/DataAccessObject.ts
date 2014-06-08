@@ -69,7 +69,8 @@ class DataAccessObject extends TSObject {
 			bookmarkRequest.append('id VARCHAR(36) PRIMARY KEY NOT NULL, ');
 			bookmarkRequest.append('url VARCHAR(255), ');
 			bookmarkRequest.append('title VARCHAR(255), ');
-			bookmarkRequest.append('description TEXT(300))');
+			bookmarkRequest.append('description TEXT(300), ');
+			bookmarkRequest.append('views INT)');
 
 			tagBookmarkRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');
 			tagBookmarkRequest.append(DAOTables.TagBookmark + ' (');

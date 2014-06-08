@@ -42,6 +42,8 @@ class SecurityHelper {
 			}
 		}
 
+		outcome = outcome.trim();
+
 		return outcome;
 	}
 

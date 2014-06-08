@@ -38,22 +38,17 @@ class TagBusinessTest extends UnitTestClass {
 				// Act
 				this._business.addList(
 					tagList,
-					(success) => {
+					(outcome) => {
 						// Assert
-						this.isTrue(success);
+						this.isTrue(TSObject.exists(outcome));
+						
+						this.areIdentical(2, outcome.getLength());
+						this.areNotIdentical(t1.getId(), outcome.getAt(0).getId());
+						this.areIdentical(t1.getLabel(), outcome.getAt(0).getLabel());
+						this.areNotIdentical(t2.getId(), outcome.getAt(1).getId());
+						this.areIdentical(t2.getLabel(), outcome.getAt(1).getLabel());
 
-						TagDAO.get(
-							(outcome) => {
-								this.isTrue(TSObject.exists(outcome));
-								this.areIdentical(2, outcome.getLength());
-								this.areNotIdentical(t1.getId(), outcome.getAt(0).getId());
-								this.areIdentical(t1.getLabel(), outcome.getAt(0).getLabel());
-								this.areNotIdentical(t2.getId(), outcome.getAt(1).getId());
-								this.areIdentical(t2.getLabel(), outcome.getAt(1).getLabel());
-
-								DataAccessObject.clean();
-							}
-						);
+						DataAccessObject.clean();
 					}
 				);
 			},
@@ -67,8 +62,8 @@ class TagBusinessTest extends UnitTestClass {
 		timer = new Timer(
 			(o) => {
 				// Arrange
-				var t : TagDAO;
 				var data1 : IList<any>, data2 : IList<any>;
+				var t : TagDAO;
 
 				t = new TagDAO();
 				t.setId('1');
@@ -79,32 +74,38 @@ class TagBusinessTest extends UnitTestClass {
 				data2.add(t.getId());
 				data2.add('2');
 
-				t.add(
+				DataAccessObject.initialize(
 					(success) => {
 						ActiveRecordObject.insert(
-							DAOTables.TagBookmark,
-							data1,
+							DAOTables.Tags,
+							t.toList(),
 							(success) => {
 								ActiveRecordObject.insert(
 									DAOTables.TagBookmark,
-									data2,
+									data1,
 									(success) => {
-										// Act
-										this._business.delete(
-											t,
+										ActiveRecordObject.insert(
+											DAOTables.TagBookmark,
+											data2,
 											(success) => {
-												// Assert
-												this.isTrue(success);
+												// Act
+												this._business.delete(
+													t,
+													(success) => {
+														// Assert
+														this.isTrue(success);
 
-												TagDAO.get(
-													(outcome) => {
-														this.areIdentical(0, outcome.getLength());
-
-														ActiveRecordObject.get(
-															DAOTables.TagBookmark,
+														TagDAO.get(
 															(outcome) => {
 																this.areIdentical(0, outcome.getLength());
-																DataAccessObject.clean();
+
+																ActiveRecordObject.get(
+																	DAOTables.TagBookmark,
+																	(outcome) => {
+																		this.areIdentical(0, outcome.getLength());
+																		DataAccessObject.clean();
+																	}
+																);
 															}
 														);
 													}

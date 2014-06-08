@@ -167,6 +167,107 @@ class BookmarkBusinessTest extends UnitTestClass {
 			UnitTestClass.getDelay()
 		);
 	}
+
+	BookmarkBusinessSortByTitleForTag() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				// Arrange
+				var b1 : BookmarkDAO, b2 : BookmarkDAO, b3 : BookmarkDAO;
+				var t1 : TagDAO, t2 : TagDAO;
+
+				b1 = new BookmarkDAO();
+				b1.setTitle('B');
+				b2 = new BookmarkDAO();
+				b2.setTitle('A');
+				b3 = new BookmarkDAO();
+				b3.setTitle('C');
+
+				t1 = new TagDAO();
+				t1.setLabel('a tag');
+				t2 = new TagDAO();
+				t2.setLabel('another tag');
+
+				b1.add(
+					(outcome) => {
+						b1 = outcome;
+						b2.add(
+							(outcome) => {
+								b2 = outcome;
+								b3.add(									
+									(outcome) => {
+										b3 = outcome;
+										t1.add(
+											(outcome) => {
+												t1 = outcome;
+												t2.add(
+													(outcome) => {
+														var data : IList<any>;
+
+														t2 = outcome;
+														data = new ArrayList<any>();
+														data.add(t1.getId());
+														data.add(b1.getId());
+
+														ActiveRecordObject.insert(
+															DAOTables.TagBookmark,
+															data,
+															(success) => {
+																var data : IList<any> = new ArrayList<any>();
+
+																data.add(t1.getId());
+																data.add(b2.getId());
+
+																ActiveRecordObject.insert(
+																	DAOTables.TagBookmark,
+																	data,
+																	(success) => {
+																		var data : IList<any> = new ArrayList<any>();
+
+																		data.add(t2.getId());
+																		data.add(b3.getId());
+
+																		ActiveRecordObject.insert(
+																			DAOTables.TagBookmark,
+																			data,
+																			(success) => {
+																				// Act
+																				this._business.sortByTitleForTag(
+																					t1,
+																					(outcome) => {
+																						// Assert
+																						this.isTrue(TSObject.exists(outcome));
+
+																						this.areIdentical(2, outcome.getLength());
+																						this.areIdentical(b2.getId(), outcome.getAt(0).getId());
+																						this.areIdentical(b2.getTitle(), outcome.getAt(0).getTitle());
+																						this.areIdentical(b1.getId(), outcome.getAt(1).getId());
+																						this.areIdentical(b1.getTitle(), outcome.getAt(1).getTitle());
+
+																						DataAccessObject.clean();
+																					}
+																				);
+																			}
+																		);
+																	}
+																);
+															}
+														);
+													}
+												);
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			},
+			UnitTestClass.getDelay()
+		);
+	}
 }
 
 UnitTestClass.handle(new BookmarkBusinessTest());

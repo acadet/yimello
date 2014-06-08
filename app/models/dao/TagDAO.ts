@@ -14,14 +14,6 @@ class TagDAO extends DataAccessObject {
 	//region Methods
 	
 	//region Private Methods
-	
-	private static _fromObject(obj : any) : TagDAO {
-		var t : TagDAO = new TagDAO();
-		t.setId(obj.id);
-		t.setLabel(obj.label);
-
-		return t;
-	}
 
 	//endregion Private Methods
 	
@@ -43,6 +35,14 @@ class TagDAO extends DataAccessObject {
 		l.add(this.getLabel());
 
 		return l;
+	}
+
+	static fromObject(obj : any) : TagDAO {
+		var t : TagDAO = new TagDAO();
+		t.setId(obj.id);
+		t.setLabel(obj.label);
+
+		return t;
 	}
 
 	add(callback : Action<TagDAO> = null) : void {
@@ -77,7 +77,7 @@ class TagDAO extends DataAccessObject {
 	static get(callback : Action<IList<TagDAO>>) : void {
 		DataAccessObject.initialize(
 			(success) => {
-				ActiveRecordObject.get<TagDAO>(DAOTables.Tags, callback, TagDAO._fromObject);
+				ActiveRecordObject.get<TagDAO>(DAOTables.Tags, callback, TagDAO.fromObject);
 			}
 		);
 	}
@@ -101,6 +101,24 @@ class TagDAO extends DataAccessObject {
 						if (callback !== null) {
 							callback(success);
 						}
+					}
+				);
+			}
+		);
+	}
+
+	static sortByLabelAsc(callback : Action<IList<TagDAO>>): void {
+		var request : StringBuffer;
+
+		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' ');
+		request.append('ORDER BY label ASC');
+
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(outcome) => {
+						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, TagDAO.fromObject));
 					}
 				);
 			}

@@ -13,22 +13,29 @@ class TagBusiness implements ITagBusiness {
 	
 	//region Private Methods
 	
-	private _addList(tags : IList<TagDAO>, index : number, callback : Action<boolean> = null) : void {
+	private _addList(
+		tags : IList<TagDAO>,
+		index : number,
+		outcome : IList<TagDAO>,
+		callback : Action<IList<TagDAO>> = null) : void {
+
 		tags
 			.getAt(index)
-			.add((outcome) => {
-					if (!TSObject.exists(outcome) && callback !== null) {
+			.add((result) => {
+					if (!TSObject.exists(result) && callback !== null) {
 						Log.error(new BusinessException('Failed to add tag #' + index));
-						callback(false);
+						callback(null);
 						return;
 					}
 
 					index++;
+					outcome.add(result);
+
 					if (index < tags.getLength()) {
-						this._addList(tags, index, callback);
+						this._addList(tags, index, outcome, callback);
 					} else {
 						if (callback !== null) {
-							callback(true);
+							callback(outcome);
 						}
 					}
 				}
@@ -39,25 +46,28 @@ class TagBusiness implements ITagBusiness {
 	
 	//region Public Methods
 	
-	addList(tags : IList<TagDAO>, callback : Action<boolean> = null) : void {
+	addList(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null) : void {
+		var outcome : IList<TagDAO>;
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Provided tag list is null'));
 			if (callback !== null) {
-				callback(false);
+				callback(null);
 			}
 			return;
 		}
+
+		outcome = new ArrayList<TagDAO>();
 
 		if (tags.getLength() < 1) {
 			Log.warn('No tag added: list is empty');
 			if (callback !== null) {
-				callback(true);
+				callback(outcome);
 			}
 			return;
 		}
 
-		this._addList(tags, 0, callback);
+		this._addList(tags, 0, outcome, callback);
 	}
 
 	delete(tag : TagDAO, callback : Action<boolean> = null) : void {
@@ -88,6 +98,54 @@ class TagBusiness implements ITagBusiness {
 					(outcome) => {
 						if (callback !== null) {
 							callback(true);
+						}
+					}
+				);
+			}
+		);
+	}
+
+	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null) : void {
+		var newOnes : IList<any>;
+		var mergedList : IList<any>;
+
+		if (!TSObject.exists(tags)) {
+			Log.error(new BusinessException('Unable to merge: provided list is null'));
+			if (callback !== null) {
+				callback(null);
+			}
+		}
+
+		newOnes = new ArrayList<TagDAO>();
+		mergedList = new ArrayList<TagDAO>();
+
+		TagDAO.get(
+			(outcome) => {
+				tags.forEach(
+					(tag) => {
+						var o : TagDAO;
+
+						o = outcome.findFirst(
+							(e) => {
+								return StringHelper.compare(e.getLabel(), tag.getLabel());
+							}
+						);
+
+						if (o !== null) {
+							mergedList.add(o);
+						} else {
+							newOnes.add(o);
+						}
+					}
+				);
+
+				this.addList(
+					newOnes,
+					(outcome) => {
+						outcome.forEach(e => mergedList.add(e));
+
+						if (callback !== null) {
+							callback(mergedList);
 						}
 					}
 				);

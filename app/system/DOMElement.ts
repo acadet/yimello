@@ -233,6 +233,10 @@ class DOMElement extends TSObject {
 		this._element.attr('data-' + key, value);
 	}
 
+	setHTML(value : string) : void {
+		this._element.html(value);
+	}
+
 	setText(text : string) : void {
 		this._element.text(text);
 	}

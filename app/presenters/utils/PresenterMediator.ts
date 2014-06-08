@@ -1,7 +1,27 @@
 /// <reference path="../../dependencies.ts" />
 
 class PresenterMediator extends TSObject {
+	//region Fields
+	
+	private static _currentInstance : Presenter;
+	private static _hasResumed : boolean;
+	private static _tagBusiness : ITagBusiness;
+	private static _bookmarkBusiness : IBookmarkBusiness;
 
+	//endregion Fields
+	
+	//region Constructors
+	
+	//endregion Constructors
+	
+	//region Methods
+	
+	//region Private Methods
+	
+	//endregion Private Methods
+	
+	//region Public Methods
+	
 	static getInstance() : Presenter {
 		return PresenterMediator._currentInstance;
 	}
@@ -19,6 +39,23 @@ class PresenterMediator extends TSObject {
 		PresenterMediator._hasResumed = b;
 	}
 
-	private static _currentInstance : Presenter;
-	private static _hasResumed : boolean;
+	static getBookmarkBusiness() : IBookmarkBusiness {
+		if (!TSObject.exists(PresenterMediator._bookmarkBusiness)) {
+			PresenterMediator._bookmarkBusiness = new BookmarkBusiness();
+		}
+
+		return PresenterMediator._bookmarkBusiness;
+	}
+
+	static getTagBusiness() : ITagBusiness {
+		if (!TSObject.exists(PresenterMediator._tagBusiness)) {
+			PresenterMediator._tagBusiness = new TagBusiness();
+		}
+
+		return PresenterMediator._tagBusiness;
+	}
+	
+	//endregion Public Methods
+	
+	//endregion Methods
 }

@@ -13,6 +13,39 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	
 	//region Private Methods
 	
+	private _bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, index : number, callback : Action<boolean> = null) : void {
+		var t : TagDAO;
+		var data :IList<any>;
+
+		t = tags.getAt(index);
+		data = new ArrayList<any>();
+		data.add(t.getId());
+		data.add(bookmark.getId());
+
+		ActiveRecordObject.insert(
+			DAOTables.TagBookmark,
+			data,
+			(success) => {
+				if (!success) {
+					Log.error(new BusinessException('Failed to insert values'));
+					if (callback !== null) {
+						callback(false);
+					}
+				} else {
+					index++;
+
+					if (index < tags.getLength()) {
+						this._bindTags(bookmark, tags, index, callback);
+					} else {
+						if (callback !== null) {
+							callback(true);
+						}
+					}
+				}
+			}
+		);
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -46,39 +79,6 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 				if (callback !== null) {
 					callback(null);
-				}
-			}
-		);
-	}
-
-	_bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, index : number, callback : Action<boolean> = null) : void {
-		var t : TagDAO;
-		var data :IList<any>;
-
-		t = tags.getAt(index);
-		data = new ArrayList<any>();
-		data.add(t.getId());
-		data.add(bookmark.getId());
-
-		ActiveRecordObject.insert(
-			DAOTables.TagBookmark,
-			data,
-			(success) => {
-				if (!success) {
-					Log.error(new BusinessException('Failed to insert values'));
-					if (callback !== null) {
-						callback(false);
-					}
-				} else {
-					index++;
-
-					if (index < tags.getLength()) {
-						this._bindTags(bookmark, tags, index, callback);
-					} else {
-						if (callback !== null) {
-							callback(true);
-						}
-					}
 				}
 			}
 		);
@@ -142,6 +142,54 @@ class BookmarkBusiness implements IBookmarkBusiness {
 						}
 					}
 				);
+			}
+		);
+	}
+
+	sortByTitleForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void {
+		var request : StringBuffer;
+
+		if (!TSObject.exists(tag)) {
+			Log.error(new BusinessException('Unable to sort: provided tag is null'));
+			callback(null);
+			return;
+		}
+
+		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' WHERE id IN ');
+		request.append('(SELECT bookmark_id FROM ' + DAOTables.TagBookmark + ' ');
+		request.append('WHERE tag_id = "' + tag.getId() + '") ');
+		request.append('ORDER BY title ASC');
+
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(outcome) => {
+						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, BookmarkDAO.fromObject));
+					}
+				);
+			}
+		);
+	}
+
+	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
+		if (!URLHelper.isValid(bookmark.getURL())) {
+			Log.error(new BusinessException('Failed to save: url is not valid'));
+			if (callback !== null) {
+				callback(null);
+			}
+			return;
+		}
+
+		bookmark.setURL(SecurityHelper.disarm(bookmark.getURL()));
+		bookmark.setTitle(SecurityHelper.disarm(bookmark.getTitle()));
+		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));
+
+		bookmark.add(
+			(outcome) => {
+				if (callback !== null) {
+					callback(outcome);
+				}
 			}
 		);
 	}

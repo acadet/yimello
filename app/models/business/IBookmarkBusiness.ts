@@ -6,4 +6,8 @@ interface IBookmarkBusiness {
 	bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, callback : Action<boolean>) : void;
 
 	delete(bookmark : BookmarkDAO, callback : Action<boolean>) : void;
+
+	sortByTitleForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void;
+
+	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO>) : void;
 }

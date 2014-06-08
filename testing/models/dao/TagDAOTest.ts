@@ -161,6 +161,64 @@ class TagDAOTest extends UnitTestClass {
 			UnitTestClass.getDelay()
 		);
 	}
+
+	TagDAOSortByLabelAscTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				var t1 : TagDAO, t2 : TagDAO, t3 : TagDAO;
+
+				t1 = new TagDAO();
+				t1
+					.setLabel('C')
+					.setId('1');
+				t2 = new TagDAO();
+				t2
+					.setLabel('A')
+					.setId('2');
+				t3 = new TagDAO();
+				t3
+					.setLabel('B')
+					.setId('3');
+
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Tags,
+							t1.toList(),
+							(success) => {
+								ActiveRecordObject.insert(
+									DAOTables.Tags,
+									t2.toList(),
+									(success) => {
+										ActiveRecordObject.insert(
+											DAOTables.Tags,
+											t3.toList(),
+											(success) => {
+												TagDAO.sortByLabelAsc(
+													(outcome) => {
+														this.isTrue(TSObject.exists(outcome));
+														this.areIdentical(3, outcome.getLength());
+														this.areIdentical(t2.getLabel(), outcome.getAt(0).getLabel());
+														this.areIdentical(t3.getLabel(), outcome.getAt(1).getLabel());
+														this.areIdentical(t1.getLabel(), outcome.getAt(2).getLabel());
+
+														DataAccessObject.clean();
+													}
+												);
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			},
+			UnitTestClass.getDelay()
+		);
+	}
 }
 
 UnitTestClass.handle(new TagDAOTest());

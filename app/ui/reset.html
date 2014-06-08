@@ -1,0 +1,13 @@
+<script type="text/javascript" src="js/output.js"></script>
+<script type="text/javascript">
+	if (confirm('Reset db?')) {
+		DataAccessObject.initialize(function(success) {
+			if (success) {
+				DataAccessObject.clean();
+				alert('Database cleaned');
+			} else {
+				alert('An error occured when initializing');
+			}
+		});		
+	}
+</script>

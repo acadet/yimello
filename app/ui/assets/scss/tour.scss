@@ -85,7 +85,13 @@ $red : #DD381D;
 
 	h1, h2, a { color: $black; }
 
-	h1 { font-size: 3em; }
+	h1 { 
+		margin-bottom : 0;
+
+		font-size: 3em; 
+	}
+
+	h2 { line-height: 1.6em; }
 
 	a {
 		border-bottom : 3px solid #ccc;

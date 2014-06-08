@@ -5,6 +5,8 @@ interface IList<T> {
 
 	clone() : IList<T>;
 
+	findFirst(f : Func<T, boolean>) : T;
+
 	forEach(f : Action<T>) : void;
 
 	getAt(index: number) : T;
