@@ -1,5 +1,8 @@
 /// <reference path="../dependencies.ts" />
 
+/**
+ * Provides useful methods for URL manipulation
+ */
 class URLHelper extends TSObject {
 	//region Fields
 	
@@ -17,6 +20,11 @@ class URLHelper extends TSObject {
 	
 	//region Public Methods
 	
+	/**
+	 * Tests if an URL has valid format
+	 * @param  {string}  url [description]
+	 * @return {boolean}     [description]
+	 */
 	static isValid(url : string) : boolean {
 		var e : Regex;
 

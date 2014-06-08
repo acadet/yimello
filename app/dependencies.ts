@@ -78,4 +78,5 @@
 /// <reference path="presenters/MainPresenter/MainPresenter.ts" />
 
 //grunt-start
+/// <reference path="helpers/FormHelper.ts" />
 //grunt-end

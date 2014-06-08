@@ -2,4 +2,6 @@
 
 interface IBookmarkFormMainPresenterSubscriber {
 	onCancel() : void;
+
+	onSave() : void;
 }

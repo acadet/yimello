@@ -168,7 +168,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 		);
 	}
 
-	BookmarkBusinessSortByTitleForTag() : void {
+	BookmarkBusinessSortByTitleAscForTagTest() : void {
 		var timer : Timer;
 
 		timer = new Timer(
@@ -233,7 +233,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 																			data,
 																			(success) => {
 																				// Act
-																				this._business.sortByTitleForTag(
+																				this._business.sortByTitleAscForTag(
 																					t1,
 																					(outcome) => {
 																						// Assert
@@ -260,6 +260,84 @@ class BookmarkBusinessTest extends UnitTestClass {
 										);
 									}
 								);
+							}
+						);
+					}
+				);
+			},
+			UnitTestClass.getDelay()
+		);
+	}
+
+	BookmarkBusinessAddTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				// Arrange
+				var b : BookmarkDAO;
+				var disarmURL : string = 'http://google.fr';
+				var disarmTitle : string = '&lt;script&gt;Google&lt;/script&gt;';
+				var disarmDescription : string = '&lt;p&gt;Trying to break down your app&lt;/p&gt;';
+
+				b = new BookmarkDAO();
+				b
+					.setURL('http://google.fr')
+					.setTitle('<script>Google</script>')
+					.setDescription('<p>Trying to break down your app</p>');
+
+				// Act
+				this._business.add(
+					b,
+					(outcome) => {
+						// Assert
+						this.isTrue(TSObject.exists(outcome));
+						this.areIdentical(disarmURL, outcome.getURL());
+						this.areIdentical(disarmTitle, outcome.getTitle());
+						this.areIdentical(disarmDescription, outcome.getDescription());
+
+						BookmarkDAO.get(
+							(outcome) => {
+								this.isTrue(TSObject.exists(outcome));
+								this.areIdentical(1, outcome.getLength());
+								this.areIdentical(disarmURL, outcome.getAt(0).getURL());
+								this.areIdentical(disarmTitle, outcome.getAt(0).getTitle());
+								this.areIdentical(disarmDescription, outcome.getAt(0).getDescription());
+
+								DataAccessObject.clean();
+							}
+						);
+					}
+				);
+			},
+			UnitTestClass.getDelay()
+		);
+	}
+
+	BookmarkBusinessAddInvalidURLTest() : void {
+		var timer : Timer;
+
+		timer = new Timer(
+			(o) => {
+				// Arrange
+				var b : BookmarkDAO;
+
+				b = new BookmarkDAO();
+				b.setURL('foobar');
+
+				// Act
+				this._business.add(
+					b,
+					(outcome) => {
+						// Assert
+						this.isTrue(outcome === null);
+
+						BookmarkDAO.get(
+							(outcome) => {
+								this.isTrue(TSObject.exists(outcome));
+								this.areIdentical(0, outcome.getLength());
+
+								DataAccessObject.clean();
 							}
 						);
 					}

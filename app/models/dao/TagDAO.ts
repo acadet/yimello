@@ -1,8 +1,14 @@
 /// <reference path="../../dependencies.ts" />
 
+/**
+ * A tag entity
+ */
 class TagDAO extends DataAccessObject {
 	//region Fields
 	
+	/**
+	 * Label of tag
+	 */
 	private _label : string;
 
 	//endregion Fields
@@ -19,15 +25,29 @@ class TagDAO extends DataAccessObject {
 	
 	//region Public Methods
 	
+	/**
+	 * Returns label
+	 * @return {string} [description]
+	 */
 	getLabel() : string {
 		return this._label;
 	}
 
+	/**
+	 * Sets label
+	 * @param  {string} l [description]
+	 * @return {TagDAO}   [description]
+	 */
 	setLabel(l : string) : TagDAO {
 		this._label = l;
 		return this;
 	}
 
+	/**
+	 * Transforms current tag as a list of data.
+	 * Data are sorted to match organization of DB
+	 * @return {IList<any>} [description]
+	 */
 	toList() : IList<any> {
 		var l : IList<any> = new ArrayList<any>();
 
@@ -37,6 +57,11 @@ class TagDAO extends DataAccessObject {
 		return l;
 	}
 
+	/**
+	 * Fills a tag entity from a DB object
+	 * @param  {any}    obj Object built by DB
+	 * @return {TagDAO}     [description]
+	 */
 	static fromObject(obj : any) : TagDAO {
 		var t : TagDAO = new TagDAO();
 		t.setId(obj.id);
@@ -45,6 +70,10 @@ class TagDAO extends DataAccessObject {
 		return t;
 	}
 
+	/**
+	 * Adds a new tag into DB
+	 * @param {Action<TagDAO> = null} callback Callback with new built tag. Id is filled
+	 */
 	add(callback : Action<TagDAO> = null) : void {
 		var data : IList<any> = new ArrayList<any>();
 		var id : string = Guid.newGuid();
@@ -74,6 +103,10 @@ class TagDAO extends DataAccessObject {
 		);
 	}
 
+	/**
+	 * Gets all tags from DB
+	 * @param {Action<IList<TagDAO>>} callback Callback with tag list
+	 */
 	static get(callback : Action<IList<TagDAO>>) : void {
 		DataAccessObject.initialize(
 			(success) => {
@@ -82,18 +115,21 @@ class TagDAO extends DataAccessObject {
 		);
 	}
 
+	/**
+	 * Deletes tag from DB
+	 * @param {Action<boolean> = null} callback Callback with succeed arg
+	 */
 	delete(callback : Action<boolean> = null) : void {
+		if (!TSObject.exists(this.getId())) {
+			Log.error(new DAOException('Failed to delete: an id must be provided'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+
 		this.initialize(
 			(success) => {
-				if (!TSObject.exists(this.getId())) {
-					Log.error(new DAOException('Failed to delete: an id must be provided'));
-					if (callback !== null) {
-						callback(false);
-					}
-
-					return;
-				}
-
 				ActiveRecordObject.delete(
 					DAOTables.Tags,
 					new Pair<string, any>('id', this.getId()),
@@ -107,6 +143,10 @@ class TagDAO extends DataAccessObject {
 		);
 	}
 
+	/**
+	 * Sorts all tags by label asc
+	 * @param {Action<IList<TagDAO>>} callback Callback with sorted tag list
+	 */
 	static sortByLabelAsc(callback : Action<IList<TagDAO>>): void {
 		var request : StringBuffer;
 

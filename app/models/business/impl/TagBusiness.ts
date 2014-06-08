@@ -1,5 +1,8 @@
 /// <reference path="../../../dependencies.ts" />
 
+/**
+ * Implementation of tag business layer
+ */
 class TagBusiness implements ITagBusiness {
 	//region Fields
 	
@@ -13,6 +16,13 @@ class TagBusiness implements ITagBusiness {
 	
 	//region Private Methods
 	
+	/**
+	 * Recursive function for adding a list of tags
+	 * @param {IList<TagDAO>}            tags    [description]
+	 * @param {number}                   index   Current index
+	 * @param {IList<TagDAO>}            outcome List to use for callback
+	 * @param {Action<IList<TagDAO>> =       null}        callback [description]
+	 */
 	private _addList(
 		tags : IList<TagDAO>,
 		index : number,
@@ -22,9 +32,12 @@ class TagBusiness implements ITagBusiness {
 		tags
 			.getAt(index)
 			.add((result) => {
-					if (!TSObject.exists(result) && callback !== null) {
+					if (!TSObject.exists(result)) {
 						Log.error(new BusinessException('Failed to add tag #' + index));
-						callback(null);
+
+						if (callback !== null) {
+							callback(null);
+						}
 						return;
 					}
 
@@ -34,6 +47,7 @@ class TagBusiness implements ITagBusiness {
 					if (index < tags.getLength()) {
 						this._addList(tags, index, outcome, callback);
 					} else {
+						// Browsing has ended, trigger callback
 						if (callback !== null) {
 							callback(outcome);
 						}
@@ -93,6 +107,8 @@ class TagBusiness implements ITagBusiness {
 					return;
 				}
 
+				// Foreign key constraints do not work with webSQL
+				// Then, remove deps
 				ActiveRecordObject.executeSQL(
 					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = ' + id,
 					(outcome) => {
@@ -106,8 +122,8 @@ class TagBusiness implements ITagBusiness {
 	}
 
 	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null) : void {
-		var newOnes : IList<any>;
-		var mergedList : IList<any>;
+		var newOnes : IList<any>; // tags which are not in DB
+		var mergedList : IList<any>; // outcome to use for callback, will contains only tags into DB
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to merge: provided list is null'));
@@ -125,6 +141,7 @@ class TagBusiness implements ITagBusiness {
 					(tag) => {
 						var o : TagDAO;
 
+						// Find a tag with same name
 						o = outcome.findFirst(
 							(e) => {
 								return StringHelper.compare(e.getLabel(), tag.getLabel());
@@ -132,13 +149,16 @@ class TagBusiness implements ITagBusiness {
 						);
 
 						if (o !== null) {
+							// A tag with same is already existing, nothing to do
 							mergedList.add(o);
 						} else {
+							// New tag spotted
 							newOnes.add(o);
 						}
 					}
 				);
 
+				// Add pending tags
 				this.addList(
 					newOnes,
 					(outcome) => {

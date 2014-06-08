@@ -1,5 +1,8 @@
 /// <reference path="../../../dependencies.ts" />
 
+/**
+ * Implemntation of business layer for bookmarks
+ */
 class BookmarkBusiness implements IBookmarkBusiness {
 	//region Fields
 	
@@ -13,15 +16,23 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	
 	//region Private Methods
 	
+	/**
+	 * Recursive function for binding a list of tags to a bookmark
+	 * @param {BookmarkDAO}        bookmark [description]
+	 * @param {IList<TagDAO>}      tags     [description]
+	 * @param {number}             index    Current index in tag list
+	 * @param {Action<boolean> =        null}        callback [description]
+	 */
 	private _bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, index : number, callback : Action<boolean> = null) : void {
 		var t : TagDAO;
-		var data :IList<any>;
+		var data : IList<any>;
 
 		t = tags.getAt(index);
 		data = new ArrayList<any>();
 		data.add(t.getId());
 		data.add(bookmark.getId());
 
+		// Insert new couple into table
 		ActiveRecordObject.insert(
 			DAOTables.TagBookmark,
 			data,
@@ -37,6 +48,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 					if (index < tags.getLength()) {
 						this._bindTags(bookmark, tags, index, callback);
 					} else {
+						// Browsing has ended, trigger the callback
 						if (callback !== null) {
 							callback(true);
 						}
@@ -51,15 +63,22 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	//region Public Methods
 	
 	createFromURL(url : string, callback : Action<BookmarkDAO> = null) : void {
+		var disarmedURL : string;
+
+		disarmedURL = SecurityHelper.disarm(url);
+
+		// Use helper to get extra data
 		URLDetailsProvider.getDetails(
-			url,
+			disarmedURL,
 			(title, description) => {
 				var bookmark : BookmarkDAO;
 
 				bookmark = new BookmarkDAO();
-				bookmark.setURL(url);
+				bookmark.setURL(disarmedURL);
 				bookmark.setTitle(SecurityHelper.disarm(title));
 				bookmark.setDescription(SecurityHelper.disarm(description));
+
+				// Add finally new bookmark
 				bookmark.add(
 					(outcome) => {
 						if (callback !== null) {
@@ -134,6 +153,8 @@ class BookmarkBusiness implements IBookmarkBusiness {
 					return;
 				}
 
+				// Foreign keys constraints are not working with webSQL
+				// Then, removing dependencies are needed
 				ActiveRecordObject.executeSQL(
 					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE bookmark_id = ' + id,
 					(outcome) => {
@@ -146,7 +167,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		);
 	}
 
-	sortByTitleForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void {
+	sortByTitleAscForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void {
 		var request : StringBuffer;
 
 		if (!TSObject.exists(tag)) {
@@ -155,6 +176,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
+		// Avoid join, use in condition
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' WHERE id IN ');
 		request.append('(SELECT bookmark_id FROM ' + DAOTables.TagBookmark + ' ');
 		request.append('WHERE tag_id = "' + tag.getId() + '") ');
@@ -181,6 +203,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
+		// Apply security operation
 		bookmark.setURL(SecurityHelper.disarm(bookmark.getURL()));
 		bookmark.setTitle(SecurityHelper.disarm(bookmark.getTitle()));
 		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));

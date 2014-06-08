@@ -17,6 +17,12 @@ class SecurityHelper {
 	
 	//region Public Methods
 	
+	/**
+	 * Makes a string harmless.
+	 * Avoids scripts to break down the app
+	 * @param  {string} s The string to use
+	 * @return {string} An harmless string
+	 */
 	static disarm(s : string) : string {
 		var outcome : string;
 
@@ -29,6 +35,7 @@ class SecurityHelper {
 		for (var i = 0; i < s.length; i++) {
 			var c : string = s.charAt(i);
 
+			// Block chevrons
 			switch (c) {
 				case '<':
 					outcome += '&lt;';
@@ -42,6 +49,7 @@ class SecurityHelper {
 			}
 		}
 
+		// Apply a final trim
 		outcome = outcome.trim();
 
 		return outcome;

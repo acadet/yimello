@@ -77,19 +77,58 @@ class BookmarkFormMainPresenter extends TSObject {
 	
 	private _onSave() : void {
 		var b : BookmarkDAO;
+		var url : string = this._urlInput.getValue();
+		var title : string = this._titleInput.getValue();
+		var description : string = this._descriptionInput.getValue();
+
+		if (!FormHelper.isFilled(url)) {
+			alert('URL field must be filled');
+			return;
+		}
+
+		if (!FormHelper.isFilled(title)) {
+			alert('title field must be filled');
+			return;
+		}
+
+		if (!FormHelper.isFilled(description)) {
+			alert('description field must be filled');
+			return;
+		}
 
 		b = new BookmarkDAO();
 		b
-			.setURL(this._urlInput.getValue())
-			.setTitle(this._titleInput.getValue())
-			.setDescription(this._descriptionInput.getValue());
+			.setURL(url)
+			.setTitle(title)
+			.setDescription(description);
 
 		PresenterMediator
 			.getBookmarkBusiness()
 			.add(
 				b,
 				(outcome) => {
-					// TODO save tags
+					b = outcome;
+
+					PresenterMediator
+						.getTagBusiness()
+						.merge(
+							this._currentTags,
+							(outcome) => {
+								PresenterMediator
+									.getBookmarkBusiness()
+									.bindTags(
+										b,
+										outcome,
+										(success) => {
+											if (success) {
+												this._subscriber.onSave();
+											} else {
+												alert('An error has occured when saving bookmark');
+											}
+										}
+									);
+							}
+						);
 				}
 			);
 	}
