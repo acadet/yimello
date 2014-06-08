@@ -18,9 +18,11 @@
 /// <reference path="../app/system/Guid.ts" />
 /// <reference path="../app/system/MathHelper.ts" />
 /// <reference path="../app/system/StringHelper.ts" />
+/// <reference path="../app/helpers/FormHelper.ts" />
 
 // Collections parts
 
+/// <reference path="../app/system/collections/utils/CollectionException.ts" />
 /// <reference path="../app/system/collections/IList.ts" />
 /// <reference path="../app/system/collections/impl/ArrayList.ts" />
 /// <reference path="../app/system/collections/IDictionary.ts" />

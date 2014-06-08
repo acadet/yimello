@@ -1,11 +1,14 @@
 /// <reference path="../../dependencies.ts" />
 
+/**
+ * Type of ajax calls
+ */
 class AjaxRequestType {
-	static Get : string = 'GET';
+	static GET : string = 'GET';
 
-	static Post : string = 'POST';
+	static POST : string = 'POST';
 
-	static Put : string = 'PUT';
+	static PUT : string = 'PUT';
 
-	static Delete : string = 'DELETE';
+	static DELETE : string = 'DELETE';
 }

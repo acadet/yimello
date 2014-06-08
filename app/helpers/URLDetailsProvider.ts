@@ -46,7 +46,7 @@ class URLDetailsProvider extends TSObject {
 			var request : GetRequest;
 
 			request = new GetRequest(url);
-			request.setDataType(AjaxRequestDataType.Html);
+			request.setDataType(AjaxRequestDataType.HTML);
 
 			// In case of ajax errors, only report it
 			request.setErrorHandler((xhr, status, error) => {

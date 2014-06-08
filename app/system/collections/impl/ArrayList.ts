@@ -1,8 +1,15 @@
 /// <reference path="../../../dependencies.ts" />
 
+/**
+ * An implementation of list collection.
+ * Based on an array
+ */
 class ArrayList<T> extends TSObject implements IList<T> {
 	//region Fields
 
+	/**
+	 * Used array for storing data
+	 */
 	private _content : Array<T>;
 
 	//endregion Fields
@@ -68,7 +75,7 @@ class ArrayList<T> extends TSObject implements IList<T> {
 	insertAt(index : number, t : T) : void {
 
 		if (index > this.getLength() || index < 0) {
-			throw new Exception('Unbound index');
+			throw new CollectionException('Unbound index');
 		}
 
 		if (index === this.getLength() || this.getLength() === 0) {

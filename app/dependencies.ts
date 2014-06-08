@@ -18,9 +18,11 @@
 /// <reference path="system/Guid.ts" />
 /// <reference path="system/MathHelper.ts" />
 /// <reference path="system/StringHelper.ts" />
+/// <reference path="helpers/FormHelper.ts" />
 
 // Collections parts
 
+/// <reference path="system/collections/utils/CollectionException.ts" />
 /// <reference path="system/collections/IList.ts" />
 /// <reference path="system/collections/impl/ArrayList.ts" />
 /// <reference path="system/collections/IDictionary.ts" />
@@ -78,5 +80,4 @@
 /// <reference path="presenters/MainPresenter/MainPresenter.ts" />
 
 //grunt-start
-/// <reference path="helpers/FormHelper.ts" />
 //grunt-end

@@ -1,11 +1,21 @@
 /// <reference path="../../../dependencies.ts" />
 
-class DictionaryException extends Exception {}
-
+/**
+ * An implementation of dictionary collection.
+ * Uses two arrays in parallel
+ * @type {[type]}
+ */
 class Dictionary<T, U> extends TSObject implements IDictionary<T, U> {
 	//region Fields
 	
+	/**
+	 * Array of keys
+	 */
 	private _keys : Array<T>;
+
+	/**
+	 * Array of values
+	 */
 	private _values : Array<U>;
 
 	//endregion Fields
@@ -31,7 +41,7 @@ class Dictionary<T, U> extends TSObject implements IDictionary<T, U> {
 	
 	add(key : T, value : U) : void {
 		if (this.containsKey(key)) {
-			throw new DictionaryException('Unable to add couple: key is already existing');
+			throw new CollectionException('Unable to add couple: key is already existing');
 		}
 
 		this._keys.push(key);
@@ -58,7 +68,7 @@ class Dictionary<T, U> extends TSObject implements IDictionary<T, U> {
 		return false;
 	}
 
-	forEach(f : (key : T, value : U)=>void) : void {
+	forEach(f : Action2<T, U>) : void {
 		for (var i = 0; i < this._keys.length; i++) {
 			f(this._keys[i], this._values[i]);
 		}
@@ -71,7 +81,7 @@ class Dictionary<T, U> extends TSObject implements IDictionary<T, U> {
 			}
 		}
 
-		return null;
+		throw new CollectionException('Unable to find value for specified key');
 	}
 
 	getLength() : number {

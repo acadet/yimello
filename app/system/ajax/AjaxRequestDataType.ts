@@ -1,9 +1,12 @@
 /// <reference path="../../dependencies.ts" />
 
+/**
+ * Supported ajax data type
+ */
 class AjaxRequestDataType {
-	static Xml : string = 'xml';
+	static XML : string = 'xml';
 
-	static Html : string = 'html';
+	static HTML : string = 'html';
 
 	static Json : string = 'json';
 

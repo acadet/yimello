@@ -12,6 +12,7 @@
 /// <reference path="models/dao/DataAccessObjectTest.ts" />
 /// <reference path="models/dao/TagDAOTest.ts" />
 /// <reference path="system/GuidTest.ts" />
+/// <reference path="system/collections/ArrayListTest.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordHelperTest.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordObjectTest.ts" />
 //grunt-end

@@ -1,5 +1,6 @@
 /// <reference path="../../dependencies.ts" />
 
-class AjaxRequestException extends Exception {
-
-}
+/**
+ * Custom exception for ajax calls
+ */
+class AjaxRequestException extends Exception {}
