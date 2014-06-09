@@ -86,6 +86,16 @@ class ArrayList<T> extends TSObject implements IList<T> {
 		this._content.splice(index, 0, t);
 	}
 
+	map(f : Func<T, T>) : void {
+		var a : Array<T> = new Array<T>();
+
+		for (var i = 0; i < this.getLength(); i++) {
+			a.push(f(this.getAt(i)));
+		}
+
+		this._content = a;
+	}
+
 	remove(t : T) : void {
 		var index : number;
 
@@ -94,7 +104,7 @@ class ArrayList<T> extends TSObject implements IList<T> {
 		if (index > -1) {
 			this._content.splice(index, 1);
 		} else {
-			throw new Exception('Unable to remove: item not found');
+			throw new CollectionException('Unable to remove: item not found');
 		}
 	}
 

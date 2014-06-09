@@ -4,22 +4,22 @@ class BookmarkFormMainPresenter extends TSObject {
 	//region Fields
 	
 	/**
-	 * URL input of bookmark form
+	 * URL input
 	 */
 	private _urlInput : DOMElement;
 
 	/**
-	 * Title input of bookmark form
+	 * Title input
 	 */
 	private _titleInput : DOMElement;
 
 	/**
-	 * Description input of bookmark form
+	 * Description input
 	 */
 	private _descriptionInput : DOMElement;
 
 	/**
-	 * Tags input of bookmark form
+	 * Tags input
 	 */
 	private _tagsInput : DOMElement;
 

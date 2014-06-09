@@ -51,6 +51,13 @@ interface IList<T> {
 	insertAt(index : number, t : T) : void;
 
 	/**
+	 * Applies a transformation to each element
+	 * of list
+	 * @param {Func<T, T>} f [description]
+	 */
+	map(f : Func<T, T>) : void;
+
+	/**
 	 * Removes an element from list
 	 * @param {T} t [description]
 	 */
