@@ -14,14 +14,11 @@ class TagBusinessTest extends UnitTestClass {
 	}
 
 	tearDown() : void {
-		UnitTestClass.increaseDelay();
 	}
 
 	TagBusinessAddListTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var tagList : IList<TagDAO>;
 				var t1 : TagDAO, t2 : TagDAO;
@@ -48,19 +45,16 @@ class TagBusinessTest extends UnitTestClass {
 						this.areNotIdentical(t2.getId(), outcome.getAt(1).getId());
 						this.areIdentical(t2.getLabel(), outcome.getAt(1).getLabel());
 
-						DataAccessObject.clean();
+						DataAccessObject.clean((success) => UnitTestClass.done());
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	TagBusinessDeleteTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var data1 : IList<any>, data2 : IList<any>;
 				var t : TagDAO;
@@ -103,7 +97,7 @@ class TagBusinessTest extends UnitTestClass {
 																	DAOTables.TagBookmark,
 																	(outcome) => {
 																		this.areIdentical(0, outcome.getLength());
-																		DataAccessObject.clean();
+																		DataAccessObject.clean((success) => UnitTestClass.done());
 																	}
 																);
 															}
@@ -118,16 +112,13 @@ class TagBusinessTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	TagBusinessMergeTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var t1 : TagDAO, t2 : TagDAO, t3 : TagDAO;
 				var tags : IList<TagDAO>;
@@ -167,15 +158,14 @@ class TagBusinessTest extends UnitTestClass {
 										this.areIdentical(t1.getLabel(), u1.getLabel());
 										this.areIdentical(t2.getLabel(), u2.getLabel());
 
-										DataAccessObject.clean();
+										DataAccessObject.clean((success) => UnitTestClass.done());
 									}
 								);
 							}
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 }

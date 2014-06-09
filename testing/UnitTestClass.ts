@@ -5,7 +5,7 @@ class UnitTestClass extends tsUnit.TestClass {
 
 	private static _classes : IList<UnitTestClass>;
 
-	private static _delay : number = 0;
+	private static _queue : Queue<Action0>;
 
 	//endregion Fields
 	
@@ -20,14 +20,6 @@ class UnitTestClass extends tsUnit.TestClass {
 	//endregion Private Methods
 	
 	//region Public Methods
-
-	static getDelay() : number {
-		return UnitTestClass._delay;
-	}
-
-	static increaseDelay() : void {
-		UnitTestClass._delay += 100;
-	}
 
 	static handle(u : UnitTestClass) : void {
 		if (!TSObject.exists(UnitTestClass._classes)) {
@@ -46,7 +38,31 @@ class UnitTestClass extends tsUnit.TestClass {
 		}
 		
 		test.showResults(document.getElementById('outcome'), test.run());
-		Log.inform('Delay: ' + UnitTestClass.getDelay());
+		if (TSObject.exists(UnitTestClass._queue)) {
+			if (UnitTestClass._queue.getLength() > 0) {
+				UnitTestClass._queue.pop()();
+			}
+		}
+	}
+
+	static queue(f : Action0) : void {
+		if (!TSObject.exists(UnitTestClass._queue)) {
+			UnitTestClass._queue = new Queue<Action0>();
+		}
+
+		UnitTestClass._queue.push(f);
+	}
+
+	static done() : void {
+		if (!TSObject.exists(UnitTestClass._queue)) {
+			Log.error(new Exception('Unable to call done: no functions have been queued'));
+			return;
+		}
+
+		if (UnitTestClass._queue.getLength() > 0) {
+			var f : Action0 = UnitTestClass._queue.pop();
+			f();
+		}
 	}
 
 	//endregion Public Methods

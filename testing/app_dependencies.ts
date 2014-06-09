@@ -80,4 +80,5 @@
 /// <reference path="../app/presenters/MainPresenter/MainPresenter.ts" />
 
 //grunt-start
+/// <reference path="../app/system/collections/Queue.ts" />
 //grunt-end

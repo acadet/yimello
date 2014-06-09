@@ -15,7 +15,6 @@ class BookmarkDAOTest extends UnitTestClass {
 
 	tearDown() : void {
 		this._dao = null;
-		UnitTestClass.increaseDelay();
 	}
 
 	BookmarkDAOURLTest() : void {
@@ -95,10 +94,8 @@ class BookmarkDAOTest extends UnitTestClass {
 	}
 
 	BookmarkDAOAddTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var bookmark : BookmarkDAO;
 
@@ -121,19 +118,16 @@ class BookmarkDAOTest extends UnitTestClass {
 						this.areIdentical(bookmark.getDescription(), outcome.getDescription());
 						this.areIdentical(bookmark.getViews(), outcome.getViews());
 
-						DataAccessObject.clean();
+						DataAccessObject.clean((success) => UnitTestClass.done());
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkDAODeleteTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var bookmark : BookmarkDAO;
 
@@ -152,23 +146,20 @@ class BookmarkDAOTest extends UnitTestClass {
 										// Assert
 										this.isTrue(outcome);
 
-										DataAccessObject.clean();
+										DataAccessObject.clean((success) => UnitTestClass.done());
 									}
 								);
 							}
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkDaoGetTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var b1 : BookmarkDAO, b2 : BookmarkDAO;
 
@@ -201,7 +192,7 @@ class BookmarkDAOTest extends UnitTestClass {
 												this.areIdentical(b2.getId(), outcome.getAt(1).getId());
 												this.areIdentical(b2.getTitle(), outcome.getAt(1).getTitle());
 
-												DataAccessObject.clean();
+												DataAccessObject.clean((success) => UnitTestClass.done());
 											}
 										);
 									}
@@ -210,16 +201,13 @@ class BookmarkDAOTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkDAOSortByViewsDescThenByTitleAscTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var b1 : BookmarkDAO, b2 : BookmarkDAO, b3 : BookmarkDAO;
 
@@ -267,7 +255,7 @@ class BookmarkDAOTest extends UnitTestClass {
 														this.areIdentical(b2.getTitle(), outcome.getAt(2).getTitle());
 														this.areIdentical(b2.getViews(), outcome.getAt(2).getViews());
 
-														DataAccessObject.clean();
+														DataAccessObject.clean((success) => UnitTestClass.done());
 													}
 												);
 											}
@@ -278,8 +266,7 @@ class BookmarkDAOTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 }

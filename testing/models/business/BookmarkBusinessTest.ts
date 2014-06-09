@@ -11,19 +11,13 @@ class BookmarkBusinessTest extends UnitTestClass {
 		this._business = new BookmarkBusiness();
 	}
 
-	setUp() : void {
-		
-	}
+	setUp() : void { }
 
-	tearDown() : void {
-		UnitTestClass.increaseDelay();
-	}
+	tearDown() : void {	}
 
 	BookmarkBusinessCreateFromURLTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var url : string = 'http://google.fr';
 
@@ -36,19 +30,16 @@ class BookmarkBusinessTest extends UnitTestClass {
 						this.areIdentical(url, outcome.getURL());
 						this.areIdentical('Google', outcome.getTitle());
 
-						DataAccessObject.clean();
+						DataAccessObject.clean((success) => UnitTestClass.done());
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkBusinessBindTagsTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var bookmark : BookmarkDAO;
 				var t1 : TagDAO, t2 : TagDAO;
@@ -93,7 +84,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 														this.areIdentical(t2.getId(), r2.tag_id);
 														this.areIdentical(bookmark.getId(), r2.bookmark_id);
 
-														DataAccessObject.clean();
+														DataAccessObject.clean((success) => UnitTestClass.done());
 													}
 												);
 											}
@@ -104,16 +95,13 @@ class BookmarkBusinessTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkBusinessDeleteTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				var bookmark : BookmarkDAO;
 				var data1 : IList<any>, data2 : IList<any>;
 
@@ -150,7 +138,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 															(outcome) => {
 																this.areIdentical(0, outcome.getLength());
 
-																DataAccessObject.clean();
+																DataAccessObject.clean((success) => UnitTestClass.done());
 															}
 														);
 													}
@@ -163,16 +151,13 @@ class BookmarkBusinessTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkBusinessSortByTitleAscForTagTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var b1 : BookmarkDAO, b2 : BookmarkDAO, b3 : BookmarkDAO;
 				var t1 : TagDAO, t2 : TagDAO;
@@ -245,7 +230,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 																						this.areIdentical(b1.getId(), outcome.getAt(1).getId());
 																						this.areIdentical(b1.getTitle(), outcome.getAt(1).getTitle());
 
-																						DataAccessObject.clean();
+																						DataAccessObject.clean((success) => UnitTestClass.done());
 																					}
 																				);
 																			}
@@ -264,16 +249,13 @@ class BookmarkBusinessTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkBusinessAddTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var b : BookmarkDAO;
 				var disarmURL : string = 'http://google.fr';
@@ -304,21 +286,18 @@ class BookmarkBusinessTest extends UnitTestClass {
 								this.areIdentical(disarmTitle, outcome.getAt(0).getTitle());
 								this.areIdentical(disarmDescription, outcome.getAt(0).getDescription());
 
-								DataAccessObject.clean();
+								DataAccessObject.clean((success) => UnitTestClass.done());
 							}
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	BookmarkBusinessAddInvalidURLTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var b : BookmarkDAO;
 
@@ -337,13 +316,12 @@ class BookmarkBusinessTest extends UnitTestClass {
 								this.isTrue(TSObject.exists(outcome));
 								this.areIdentical(0, outcome.getLength());
 
-								DataAccessObject.clean();
+								DataAccessObject.clean((success) => UnitTestClass.done());
 							}
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 }

@@ -23,12 +23,26 @@ class BookmarkFormMainPresenter extends TSObject {
 	 */
 	private _tagsInput : DOMElement;
 
+	/**
+	 * List where tags are displayed
+	 */
 	private _tagList : DOMElement;
 
+	/**
+	 * DataList where tags are appended (suggested tags for user)
+	 * @type {DOMElement}
+	 */
 	private _tagDataList : DOMElement;
 
+	/**
+	 * List of current tags
+	 * @type {IList<TagDAO>}
+	 */
 	private _currentTags : IList<TagDAO>;
 
+	/**
+	 * Subscriber to form event
+	 */
 	private _subscriber : IBookmarkFormMainPresenterSubscriber;
 
 	//endregion Fields
@@ -40,6 +54,7 @@ class BookmarkFormMainPresenter extends TSObject {
 
 		this._subscriber = subscriber;
 
+		// First, grab all dom elements
 		this._urlInput = wrapper.findSingle('input[name="url"]');
 		this._titleInput = wrapper.findSingle('input[name="title"]');
 		this._descriptionInput = wrapper.findSingle('textarea[name="description"]');
@@ -47,6 +62,7 @@ class BookmarkFormMainPresenter extends TSObject {
 		this._tagList = wrapper.findSingle('.js-form-tag-list');
 		this._tagDataList = wrapper.findSingle('.js-tag-suggestions');
 
+		// Cancel button
 		wrapper
 			.findSingle('.js-cancel-button')
 			.on(
@@ -56,6 +72,7 @@ class BookmarkFormMainPresenter extends TSObject {
 				}
 			);
 
+		// Save button
 		wrapper
 			.findSingle('.js-save-button')
 			.on(
@@ -75,12 +92,16 @@ class BookmarkFormMainPresenter extends TSObject {
 	
 	//region Private Methods
 	
+	/**
+	 * Called when user asks for saving
+	 */
 	private _onSave() : void {
 		var b : BookmarkDAO;
 		var url : string = this._urlInput.getValue();
 		var title : string = this._titleInput.getValue();
 		var description : string = this._descriptionInput.getValue();
 
+		// Test if all values have been provided
 		if (!FormHelper.isFilled(url)) {
 			alert('URL field must be filled');
 			return;
@@ -102,6 +123,9 @@ class BookmarkFormMainPresenter extends TSObject {
 			.setTitle(title)
 			.setDescription(description);
 
+		// Process: add new bookmark
+		// Then save new tags
+		// Finally bind tags to bookmark
 		PresenterMediator
 			.getBookmarkBusiness()
 			.add(
@@ -123,7 +147,7 @@ class BookmarkFormMainPresenter extends TSObject {
 											if (success) {
 												this._subscriber.onSave();
 											} else {
-												alert('An error has occured when saving bookmark');
+												alert('An error has occured while saving bookmark');
 											}
 										}
 									);
@@ -133,13 +157,19 @@ class BookmarkFormMainPresenter extends TSObject {
 			);
 	}
 
+	/**
+	 * Called when a new tag is added by user
+	 * @param {string} value [description]
+	 */
 	private _addTag(value : string) : void {
 		var tag : TagDAO;
 		var e : DOMElement;
 		var test : TagDAO;
 
+		// Avoid harmful values
 		value = SecurityHelper.disarm(value);
 
+		// Test if tag is not already in list
 		test = this._currentTags.findFirst(
 			(o) => {
 				return StringHelper.compare(o.getLabel(), value);
@@ -147,6 +177,7 @@ class BookmarkFormMainPresenter extends TSObject {
 		);
 
 		if (test !== null) {
+			// A similar value is already in list, do nothing
 			return;
 		}
 
@@ -159,6 +190,9 @@ class BookmarkFormMainPresenter extends TSObject {
 		this._tagList.append(e);
 	}
 
+	/**
+	 * Binds events to tag input
+	 */
 	private _prepareTagsInput() : void {
 		this._tagsInput.on(
 			DOMElementEvents.KeyDown,
@@ -171,6 +205,9 @@ class BookmarkFormMainPresenter extends TSObject {
 		);
 	}
 
+	/**
+	 * Binds events to url input
+	 */
 	private _prepareURLInput() : void {
 		var callback : DOMElementEventHandler;
 
@@ -183,9 +220,12 @@ class BookmarkFormMainPresenter extends TSObject {
 
 			if (TSObject.exists(title) || title !== ''
 				|| TSObject.exists(description) || description !== '') {
+				// Fill title and description only if they are not already
+				// filled
 				return;
 			}
 
+			// Get details from provided url
 			URLDetailsProvider.getDetails(
 				e.getTarget().getValue(),
 				(title, description) => {
@@ -198,6 +238,7 @@ class BookmarkFormMainPresenter extends TSObject {
 			);
 		};
 
+		// Handler can be triggered on blur or enter key pressed
 		this._urlInput.on(DOMElementEvents.Blur, callback);
 		this._urlInput.on(
 			DOMElementEvents.KeyDown,
@@ -213,6 +254,9 @@ class BookmarkFormMainPresenter extends TSObject {
 	
 	//region Public Methods
 	
+	/**
+	 * Resets whole form for a new input
+	 */
 	reset() : void {
 		// Reset all fields
 		this._urlInput.setValue('');

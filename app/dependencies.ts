@@ -27,6 +27,7 @@
 /// <reference path="system/collections/impl/ArrayList.ts" />
 /// <reference path="system/collections/IDictionary.ts" />
 /// <reference path="system/collections/impl/Dictionary.ts" />
+/// <reference path="system/collections/Queue.ts" />
 
 // Storage part
 

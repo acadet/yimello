@@ -1,6 +1,12 @@
 /// <reference path="../../../test_dependencies.ts" />
 
+/**
+ * Wraps mocks for ActiveRecordHelper testing
+ */
 module ActiveRecordHelperTestMocks {
+	/**
+	 * A mock for SQLRowSet objects
+	 */
 	export class SetMock {
 		private _content : Array<any>;
 		length : number;
@@ -20,11 +26,17 @@ module ActiveRecordHelperTestMocks {
 		}
 	}
 
+	/**
+	 * A mock for SQLResultSet
+	 */
 	export class ResultSetMock {
 		rows : any;
 	}
 }
 
+/**
+ * Test class for ActiveRecordHelper
+ */
 class ActiveRecordHelperTest extends UnitTestClass {
 
 	setUp() : void {
@@ -35,6 +47,9 @@ class ActiveRecordHelperTest extends UnitTestClass {
 
 	}
 
+	/**
+	 * Tests GetListFromSQLResultSet method with a converter
+	 */
 	ActiveRecordHelperGetListFromSQLResultSetWithConverterTest() : void {
 		// Arrange
 		var set : ActiveRecordHelperTestMocks.SetMock;
@@ -43,6 +58,7 @@ class ActiveRecordHelperTest extends UnitTestClass {
 		var outcome : IList<number>;
 		var converter : Func<any, number>;
 
+		// Used converter
 		converter = (e) => {
 			if (e < 0) {
 				return -e;
@@ -51,6 +67,7 @@ class ActiveRecordHelperTest extends UnitTestClass {
 			}
 		};
 
+		// Mocked set
 		set = new ActiveRecordHelperTestMocks.SetMock();
 		set.addItem(-3);
 		set.addItem(5);
@@ -60,7 +77,7 @@ class ActiveRecordHelperTest extends UnitTestClass {
 		resultSet = new ActiveRecordHelperTestMocks.ResultSetMock();
 		resultSet.rows = set;
 
-		sqlSet  = new SQLResultSet(resultSet);
+		sqlSet = new SQLResultSet(resultSet);
 
 		// Act
 		outcome = ActiveRecordHelper.getListFromSQLResultSet(sqlSet, converter);
@@ -72,6 +89,9 @@ class ActiveRecordHelperTest extends UnitTestClass {
 		this.areIdentical(0, outcome.getAt(3));
 	}
 
+	/**
+	 * Tests GetListFromSQLResultSet method without a converter
+	 */
 	ActiveRecordHelperGetListFromSQLResultSetWithoutConverterTest() : void {
 		// Arrange
 		var set : ActiveRecordHelperTestMocks.SetMock;
@@ -79,6 +99,7 @@ class ActiveRecordHelperTest extends UnitTestClass {
 		var sqlSet : SQLResultSet;
 		var outcome : IList<any>;
 
+		// Mocked set
 		set = new ActiveRecordHelperTestMocks.SetMock();
 		set.addItem(-3);
 		set.addItem(5);

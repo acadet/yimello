@@ -1,5 +1,8 @@
 /// <reference path="../../../test_dependencies.ts" />
 
+/**
+ * Wraps extra data used for ARO testing
+ */
 module ActiveRecordObjectTestUtils {
 	export class Person extends TSObject {
 		id : number;
@@ -51,34 +54,41 @@ module ActiveRecordObjectTestUtils {
 	}
 }
 
+/**
+ * Tests ARO
+ */
 class ActiveRecordObjectTest extends UnitTestClass {
 	private _config : ActiveRecordConfig;
 
-	setUp() : void {
-		if (!TSObject.exists(this._config)) {
-			this._config = new ActiveRecordConfig(
-				'yimello-test',
-				'1.0',
-				1 * 1024
-			);
+	constructor() {
+		super();
 
-			ActiveRecordObject.init(this._config);
-		}
+		this._config = new ActiveRecordConfig(
+			'yimello-test',
+			'1.0',
+			1 * 1024
+		);
+
+		ActiveRecordObject.init(this._config);
 	}
+
+	setUp() : void { }
 
 	tearDown(): void {
-		UnitTestClass.increaseDelay();
 	}
 
+	/**
+	 * Tests Get method with a converter
+	 */
 	ActiveRecordObjectGetWithConverterTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var createRequest : StringBuffer;
 				var insertRequest1 : StringBuffer, insertRequest2 : StringBuffer;
 
+				// Create fake table, insert data and check if 
+				// each entry is get
 				createRequest = new StringBuffer('CREATE TABLE people (');
 				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
 				createRequest.append('firstName VARCHAR(255), ');
@@ -125,7 +135,12 @@ class ActiveRecordObjectTest extends UnitTestClass {
 														p2.lastName = 'Connery';
 														this.isTrue(p2.equals(outcome.getAt(1)));
 
-														ActiveRecordObject.executeSQL('DROP TABLE people');
+														ActiveRecordObject.executeSQL(
+															'DROP TABLE people',
+															(outcome) => {
+																UnitTestClass.done();
+															}
+														);
 													},
 													ActiveRecordObjectTestUtils.Person.toPerson
 												);
@@ -137,25 +152,30 @@ class ActiveRecordObjectTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
+	/**
+	 * Tests Get method without a converter
+	 */
 	ActiveRecordObjectGetWithoutConverterTest() : void {
+		// TODO
 		this.fail();
 	}
 
+	/**
+	 * Tests insert method
+	 */
 	ActiveRecordObjectInsertTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var data : IList<any>;
 				var createRequest : StringBuffer;
 				var expectedPerson : ActiveRecordObjectTestUtils.Person;
 
+				// Insert person and test if entry is valid into DB
 				expectedPerson = new ActiveRecordObjectTestUtils.Person();
 				expectedPerson.id = 1;
 				expectedPerson.firstName = 'Timothy';
@@ -199,7 +219,12 @@ class ActiveRecordObjectTest extends UnitTestClass {
 												this.isTrue(
 													expectedPerson.equals(ActiveRecordObjectTestUtils.Person.toPerson(set.item(0))));
 
-												ActiveRecordObject.executeSQL('DROP TABLE people');
+												ActiveRecordObject.executeSQL(
+													'DROP TABLE people',
+													(outcome) => {
+														UnitTestClass.done();
+													}
+												);
 											}
 										);
 									}
@@ -208,16 +233,16 @@ class ActiveRecordObjectTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
+	/**
+	 * Tests Update method
+	 */
 	ActiveRecordObjectUpdateTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var createRequest : StringBuffer;
 				var insertRequest : StringBuffer;
@@ -225,6 +250,8 @@ class ActiveRecordObjectTest extends UnitTestClass {
 				var data : IDictionary<string, any>;
 				var expectedPerson : ActiveRecordObjectTestUtils.Person;
 
+				// Create fake table, insert data then update it
+				// Finally test if entry is one expected
 				createRequest = new StringBuffer('CREATE TABLE people (');
 				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
 				createRequest.append('firstName VARCHAR(255), ');
@@ -279,7 +306,12 @@ class ActiveRecordObjectTest extends UnitTestClass {
 															)
 														);
 
-														ActiveRecordObject.executeSQL('DROP TABLE people');
+														ActiveRecordObject.executeSQL(
+															'DROP TABLE people',
+															(outcome) => {
+																UnitTestClass.done();
+															}
+														);
 													}
 												);
 											}
@@ -290,34 +322,34 @@ class ActiveRecordObjectTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
+	/**
+	 * Tests delete method
+	 */
 	ActiveRecordObjectDeleteTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
+				var createRequest : StringBuffer;
+				var insertRequest : StringBuffer;
+
+				// Insert fake data. Try getting them after deleting
+				createRequest = new StringBuffer('CREATE TABLE people ');
+				createRequest.append('(id INTEGER PRIMARY KEY NOT NULL, ');
+				createRequest.append('name VARCHAR(255) NOT NULL)');
+
+				insertRequest = new StringBuffer('INSERT INTO people VALUES ');
+				insertRequest.append('(1, "Bruce Willis")');
+
 				ActiveRecordObject.executeSQL(
 					'DROP TABLE IF EXISTS people',
 					(r) => {
-						var createRequest : StringBuffer;
-
-						createRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS people ');
-						createRequest.append('(id INTEGER PRIMARY KEY NOT NULL, ');
-						createRequest.append('name VARCHAR(255) NOT NULL)');
-
 						ActiveRecordObject.executeSQL(
 							createRequest.toString(),
 							(r) => {
-								var insertRequest : StringBuffer;
-
-								insertRequest = new StringBuffer('INSERT INTO people VALUES ');
-								insertRequest.append('(1, "Bruce Willis")');
-
 								ActiveRecordObject.executeSQL(
 									insertRequest.toString(),
 									(r) => {
@@ -329,7 +361,20 @@ class ActiveRecordObjectTest extends UnitTestClass {
 												// Assert
 												this.isTrue(outcome);
 
-												ActiveRecordObject.executeSQL('DROP TABLE people');
+												ActiveRecordObject.get(
+													'people',
+													(outcome) => {
+														this.isTrue(TSObject.exists(outcome));
+														this.areIdentical(0, outcome.getLength());
+
+														ActiveRecordObject.executeSQL(
+															'DROP TABLE people',
+															(outcome) => {
+																UnitTestClass.done();
+															}
+														);
+													}
+												);
 											}
 										);
 									}
@@ -338,8 +383,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 }

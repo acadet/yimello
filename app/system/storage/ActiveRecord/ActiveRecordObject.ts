@@ -1,9 +1,20 @@
 /// <reference path="../../../dependencies.ts" />
 
+/**
+ * Matches ARO pattern. Provides shortcut for
+ * SQL requests
+ */
 class ActiveRecordObject extends TSObject {
 	//region Fields
 	
+	/**
+	 * Current DB
+	 */
 	private static _currentDB : SQLDatabase;
+
+	/**
+	 * Current configuration
+	 */
 	private static _currentConfig : ActiveRecordConfig;
 
 	//endregion Fields
@@ -16,6 +27,9 @@ class ActiveRecordObject extends TSObject {
 	
 	//region Private Methods
 	
+	/**
+	 * Called by intern methods to enable an endpoint with DB
+	 */
 	private static _init() : void {
 		if (!TSObject.exists(ActiveRecordObject._currentDB)) {
 			ActiveRecordObject._currentDB =
@@ -32,6 +46,10 @@ class ActiveRecordObject extends TSObject {
 	
 	//region Public Methods
 	
+	/**
+	 * Initializes ARO with provided configuration
+	 * @param {ActiveRecordConfig} config [description]
+	 */
 	static init(config : ActiveRecordConfig) : void {
 		ActiveRecordObject._currentConfig = config;
 	}
@@ -140,6 +158,9 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
+	/**
+	 * Updates entry from DB using provided selector
+	 */
 	static update(
 		table : string,
 		selector : Pair<string, any>,
@@ -168,7 +189,9 @@ class ActiveRecordObject extends TSObject {
 						marks.append(', ');
 					}
 
+					// Keys are used for request
 					marks.append(k + ' = ?');
+					// Values are used as prepared data
 					args.add(v);
 					i++;
 				});
@@ -196,6 +219,9 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
+	/**
+	 * Deletes an entry from DB
+	 */
 	static delete(table : string, selector : Pair<string, any>, callback : Action<boolean> = null) : void {
 		ActiveRecordObject._init();
 

@@ -15,7 +15,6 @@ class DataAccessObjectTest extends UnitTestClass {
 
 	tearDown() : void {
 		this._dao = null;
-		UnitTestClass.increaseDelay();
 	}
 
 	DataAccessObjectIdTest() : void {
@@ -30,10 +29,8 @@ class DataAccessObjectTest extends UnitTestClass {
 	}
 
 	DataAccessObjectInitializeTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var f : Action<boolean>;
 				var dao : DataAccessObject;
@@ -43,21 +40,18 @@ class DataAccessObjectTest extends UnitTestClass {
 				f = (b) => {
 					// Assert
 					this.isTrue(b);
-					DataAccessObject.clean();
+					DataAccessObject.clean((success) => UnitTestClass.done());
 				};
 
 				//Act
 				dao.initialize(f);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	DataAccessObjectInitializeTwiceTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var f : Action<boolean>;
 				var g : Action<boolean>;
@@ -68,7 +62,7 @@ class DataAccessObjectTest extends UnitTestClass {
 				g = (b) => {
 					// Assert
 					this.isTrue(b);
-					DataAccessObject.clean();
+					DataAccessObject.clean((success) => UnitTestClass.done());
 				};
 
 				f = (b) => {
@@ -78,8 +72,7 @@ class DataAccessObjectTest extends UnitTestClass {
 
 				// Act
 				dao.initialize(f);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 }

@@ -15,8 +15,6 @@ class TagDAOTest extends UnitTestClass {
 
 	tearDown() : void {
 		this._dao = null;
-
-		UnitTestClass.increaseDelay();
 	}
 
 	TagDAOLabelTest() : void {
@@ -51,10 +49,8 @@ class TagDAOTest extends UnitTestClass {
 	}
 
 	TagDAOAddTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var tag : TagDAO;
 
@@ -70,19 +66,16 @@ class TagDAOTest extends UnitTestClass {
 						this.areNotIdentical(tag.getId(), outcome.getId());
 						this.areIdentical(tag.getLabel(), outcome.getLabel());
 
-						DataAccessObject.clean();
+						DataAccessObject.clean((success) => UnitTestClass.done());
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	TagDAODeleteTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				// Arrange
 				var tag : TagDAO;
 
@@ -101,23 +94,20 @@ class TagDAOTest extends UnitTestClass {
 									(success) => {
 										// Assert
 										this.isTrue(success);
-										DataAccessObject.clean();
+										DataAccessObject.clean((success) => UnitTestClass.done());
 									}
 								);
 							}
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	TagDAOGetTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				var t1 : TagDAO, t2 : TagDAO;
 
 				t1 = new TagDAO();
@@ -147,7 +137,7 @@ class TagDAOTest extends UnitTestClass {
 												this.areIdentical(t2.getId(), outcome.getAt(1).getId());
 												this.areIdentical(t2.getLabel(), outcome.getAt(1).getLabel());
 
-												DataAccessObject.clean();
+												DataAccessObject.clean((success) => UnitTestClass.done());
 											}
 										);
 									}
@@ -157,16 +147,13 @@ class TagDAOTest extends UnitTestClass {
 					}
 				);
 				
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 
 	TagDAOSortByLabelAscTest() : void {
-		var timer : Timer;
-
-		timer = new Timer(
-			(o) => {
+		UnitTestClass.queue(
+			() => {
 				var t1 : TagDAO, t2 : TagDAO, t3 : TagDAO;
 
 				t1 = new TagDAO();
@@ -204,7 +191,7 @@ class TagDAOTest extends UnitTestClass {
 														this.areIdentical(t3.getLabel(), outcome.getAt(1).getLabel());
 														this.areIdentical(t1.getLabel(), outcome.getAt(2).getLabel());
 
-														DataAccessObject.clean();
+														DataAccessObject.clean((success) => UnitTestClass.done());
 													}
 												);
 											}
@@ -215,8 +202,7 @@ class TagDAOTest extends UnitTestClass {
 						);
 					}
 				);
-			},
-			UnitTestClass.getDelay()
+			}
 		);
 	}
 }
