@@ -76,9 +76,10 @@
 /// <reference path="presenters/utils/PresenterMediator.ts" />
 /// <reference path="presenters/IntroPresenter.ts" />
 /// <reference path="presenters/TourPresenter.ts" />
-/// <reference path="presenters/MainPresenter/IBookmarkFormMainPresenterSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/BookmarkFormMainPresenter.ts" />
+/// <reference path="presenters/MainPresenter/IBookmarkFormMainSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/BookmarkFormMain.ts" />
 /// <reference path="presenters/MainPresenter/MainPresenter.ts" />
+
 
 //grunt-start
 //grunt-end

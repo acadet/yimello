@@ -1,5 +1,8 @@
 /// <reference path="../../test_dependencies.ts" />
 
+/**
+ * Tests TagBusiness implementation
+ */
 class TagBusinessTest extends UnitTestClass {
 	private _business : TagBusiness;
 
@@ -16,6 +19,9 @@ class TagBusinessTest extends UnitTestClass {
 	tearDown() : void {
 	}
 
+	/**
+	 * Tests add list method
+	 */
 	TagBusinessAddListTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -45,13 +51,28 @@ class TagBusinessTest extends UnitTestClass {
 						this.areNotIdentical(t2.getId(), outcome.getAt(1).getId());
 						this.areIdentical(t2.getLabel(), outcome.getAt(1).getLabel());
 
-						DataAccessObject.clean((success) => UnitTestClass.done());
+						TagDAO.get(
+							(outcome) => {
+								this.isTrue(TSObject.exists(outcome));
+						
+								this.areIdentical(2, outcome.getLength());
+								this.areNotIdentical(t1.getId(), outcome.getAt(0).getId());
+								this.areIdentical(t1.getLabel(), outcome.getAt(0).getLabel());
+								this.areNotIdentical(t2.getId(), outcome.getAt(1).getId());
+								this.areIdentical(t2.getLabel(), outcome.getAt(1).getLabel());
+
+								DataAccessObject.clean((success) => UnitTestClass.done());
+							}
+						);
 					}
 				);
 			}
 		);
 	}
 
+	/**
+	 * Tests delete method
+	 */
 	TagBusinessDeleteTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -68,6 +89,7 @@ class TagBusinessTest extends UnitTestClass {
 				data2.add(t.getId());
 				data2.add('2');
 
+				// Add a tag, then create couples in tag-bookmark table
 				DataAccessObject.initialize(
 					(success) => {
 						ActiveRecordObject.insert(
@@ -116,13 +138,15 @@ class TagBusinessTest extends UnitTestClass {
 		);
 	}
 
+	/**
+	 * Tests merge method
+	 */
 	TagBusinessMergeTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
 				var t1 : TagDAO, t2 : TagDAO, t3 : TagDAO;
-				var tags : IList<TagDAO>;
-
+				
 				t1 = new TagDAO();
 				t1.setLabel('foo');
 				t2 = new TagDAO();
@@ -130,29 +154,35 @@ class TagBusinessTest extends UnitTestClass {
 				t3 = new TagDAO();
 				t3.setLabel('foobarbar');
 
-				tags = new ArrayList<TagDAO>();
-				tags.add(t1);
-				tags.add(t2);
-				tags.add(t3);
-
+				// First, add 2 tags into DB
 				t1.add(
 					(outcome) => {
 						t1 = outcome;
 						t2.add(
 							(outcome) => {
+								var tags : IList<TagDAO>;
+
 								t2 = outcome;
+
+								tags = new ArrayList<TagDAO>();
+								tags.add(t1);
+								tags.add(t2);
+								tags.add(t3);
+								
 								// Act
 								this._business.merge(
 									tags,
 									(outcome) => {
 										// Assert
+										// Result must contain two already existing tags
+										// and a new one
 										var u1 : TagDAO, u2 : TagDAO;
 
 										this.isTrue(TSObject.exists(outcome));
 										this.areIdentical(3, outcome.getLength());
 
-										u1 = outcome.findFirst(e => StringHelper.compare(e.getId(), t1.getId()));
-										u2 = outcome.findFirst(e => StringHelper.compare(e.getId(), t2.getId()));
+										u1 = outcome.findFirst(e => e.getId() === t1.getId());
+										u2 = outcome.findFirst(e => e.getId() === t2.getId());
 										this.isTrue(TSObject.exists(u1));
 										this.isTrue(TSObject.exists(u2));
 										this.areIdentical(t1.getLabel(), u1.getLabel());

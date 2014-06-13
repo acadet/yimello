@@ -1,5 +1,8 @@
 /// <reference path="../../test_dependencies.ts" />
 
+/**
+ * Tests BookmarkBusiness implementation
+ */
 class BookmarkBusinessTest extends UnitTestClass {
 	private _business : BookmarkBusiness;
 
@@ -15,6 +18,9 @@ class BookmarkBusinessTest extends UnitTestClass {
 
 	tearDown() : void {	}
 
+	/**
+	 * Tests createFromURL method
+	 */
 	BookmarkBusinessCreateFromURLTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -37,31 +43,37 @@ class BookmarkBusinessTest extends UnitTestClass {
 		);
 	}
 
+	/**
+	 * Tests bindTags method
+	 */
 	BookmarkBusinessBindTagsTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
 				var bookmark : BookmarkDAO;
 				var t1 : TagDAO, t2 : TagDAO;
-				var tags : IList<TagDAO>;
-
+				
 				bookmark = new BookmarkDAO();
-				bookmark.setId('1');
 				t1 = new TagDAO();
-				t1.setId('1');
 				t2 = new TagDAO();
-				t2.setId('2');
-				tags = new ArrayList<TagDAO>();
-				tags.add(t1);
-				tags.add(t2);
 
 				bookmark.add(
-					(success) => {
+					(outcome) => {
+						bookmark = outcome;
 						t1.add(
-							(success) => {
+							(outcome) => {
+								t1 = outcome;
 								t2.add(
-									(success) => {
+									(outcome) => {
 										// Act
+										var tags : IList<TagDAO>;
+
+										t2 = outcome;
+										
+										tags = new ArrayList<TagDAO>();
+										tags.add(t1);
+										tags.add(t2);
+
 										this._business.bindTags(
 											bookmark,
 											tags,
@@ -99,23 +111,29 @@ class BookmarkBusinessTest extends UnitTestClass {
 		);
 	}
 
+	/**
+	 * Tests delete method
+	 */
 	BookmarkBusinessDeleteTest() : void {
 		UnitTestClass.queue(
 			() => {
-				var bookmark : BookmarkDAO;
-				var data1 : IList<any>, data2 : IList<any>;
+				var bookmark : BookmarkDAO = new BookmarkDAO();
 
-				bookmark = new BookmarkDAO();
-				bookmark.setId('1');
-				data1 = new ArrayList<any>();
-				data1.add('1');
-				data1.add(bookmark.getId());
-				data2 = new ArrayList<any>();
-				data2.add('2');
-				data2.add(bookmark.getId());
+				bookmark.setTitle('test');
 
 				bookmark.add(
-					(success) => {
+					(outcome) => {
+						// Bind some random tags to current bookmark
+						var data1 : IList<any>, data2 : IList<any>;
+
+						bookmark = outcome;
+						data1 = new ArrayList<any>();
+						data1.add('1');
+						data1.add(bookmark.getId());
+						data2 = new ArrayList<any>();
+						data2.add('2');
+						data2.add(bookmark.getId());
+
 						ActiveRecordObject.insert(
 							DAOTables.TagBookmark,
 							data1,
@@ -155,6 +173,9 @@ class BookmarkBusinessTest extends UnitTestClass {
 		);
 	}
 
+	/**
+	 * Tests SortByTitleAscForTag method
+	 */
 	BookmarkBusinessSortByTitleAscForTagTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -174,6 +195,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 				t2 = new TagDAO();
 				t2.setLabel('another tag');
 
+				// First add bookmarks and tags
 				b1.add(
 					(outcome) => {
 						b1 = outcome;
@@ -195,6 +217,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 														data.add(t1.getId());
 														data.add(b1.getId());
 
+														// Then bind some tags to bookmarks
 														ActiveRecordObject.insert(
 															DAOTables.TagBookmark,
 															data,
@@ -253,14 +276,17 @@ class BookmarkBusinessTest extends UnitTestClass {
 		);
 	}
 
+	/**
+	 * Tests add method
+	 */
 	BookmarkBusinessAddTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
 				var b : BookmarkDAO;
-				var disarmURL : string = 'http://google.fr';
-				var disarmTitle : string = '&lt;script&gt;Google&lt;/script&gt;';
-				var disarmDescription : string = '&lt;p&gt;Trying to break down your app&lt;/p&gt;';
+				var disarmedURL : string = 'http://google.fr';
+				var disarmedTitle : string = '&lt;script&gt;Google&lt;/script&gt;';
+				var disarmedDescription : string = '&lt;p&gt;Trying to break down your app&lt;/p&gt;';
 
 				b = new BookmarkDAO();
 				b
@@ -274,17 +300,17 @@ class BookmarkBusinessTest extends UnitTestClass {
 					(outcome) => {
 						// Assert
 						this.isTrue(TSObject.exists(outcome));
-						this.areIdentical(disarmURL, outcome.getURL());
-						this.areIdentical(disarmTitle, outcome.getTitle());
-						this.areIdentical(disarmDescription, outcome.getDescription());
+						this.areIdentical(disarmedURL, outcome.getURL());
+						this.areIdentical(disarmedTitle, outcome.getTitle());
+						this.areIdentical(disarmedDescription, outcome.getDescription());
 
 						BookmarkDAO.get(
 							(outcome) => {
 								this.isTrue(TSObject.exists(outcome));
 								this.areIdentical(1, outcome.getLength());
-								this.areIdentical(disarmURL, outcome.getAt(0).getURL());
-								this.areIdentical(disarmTitle, outcome.getAt(0).getTitle());
-								this.areIdentical(disarmDescription, outcome.getAt(0).getDescription());
+								this.areIdentical(disarmedURL, outcome.getAt(0).getURL());
+								this.areIdentical(disarmedTitle, outcome.getAt(0).getTitle());
+								this.areIdentical(disarmedDescription, outcome.getAt(0).getDescription());
 
 								DataAccessObject.clean((success) => UnitTestClass.done());
 							}
@@ -295,6 +321,9 @@ class BookmarkBusinessTest extends UnitTestClass {
 		);
 	}
 
+	/**
+	 * Tests add method for an invalid URL
+	 */
 	BookmarkBusinessAddInvalidURLTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -305,6 +334,7 @@ class BookmarkBusinessTest extends UnitTestClass {
 				b.setURL('foobar');
 
 				// Act
+				Log.inform('An error about invalid url will occur below this message');
 				this._business.add(
 					b,
 					(outcome) => {

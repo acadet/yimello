@@ -61,12 +61,23 @@ class TagDAOTest extends UnitTestClass {
 				tag.add(
 					(outcome) => {
 						// Assert
+						var result : TagDAO = outcome;
 						this.isTrue(TSObject.exists(outcome));
 
 						this.areNotIdentical(tag.getId(), outcome.getId());
 						this.areIdentical(tag.getLabel(), outcome.getLabel());
 
-						DataAccessObject.clean((success) => UnitTestClass.done());
+						ActiveRecordObject.get<TagDAO>(
+							DAOTables.Tags,
+							(outcome) => {
+								this.isTrue(TSObject.exists(outcome));
+								this.areIdentical(1, outcome.getLength());
+								this.areIdentical(result.getId(), outcome.getAt(0).getId());
+
+								DataAccessObject.clean((success) => UnitTestClass.done());
+							},
+							TagDAO.fromObject
+						);
 					}
 				);
 			}
@@ -94,7 +105,17 @@ class TagDAOTest extends UnitTestClass {
 									(success) => {
 										// Assert
 										this.isTrue(success);
-										DataAccessObject.clean((success) => UnitTestClass.done());
+
+										ActiveRecordObject.get<TagDAO>(
+											DAOTables.Tags,
+											(outcome) => {
+												this.isTrue(TSObject.exists(outcome));
+												this.areIdentical(0, outcome.getLength());
+
+												DataAccessObject.clean((success) => UnitTestClass.done());
+											},
+											TagDAO.fromObject
+										);
 									}
 								);
 							}

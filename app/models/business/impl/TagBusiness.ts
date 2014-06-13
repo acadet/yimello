@@ -110,7 +110,7 @@ class TagBusiness implements ITagBusiness {
 				// Foreign key constraints do not work with webSQL
 				// Then, remove deps
 				ActiveRecordObject.executeSQL(
-					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = ' + id,
+					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = "' + id + '"',
 					(outcome) => {
 						if (callback !== null) {
 							callback(true);
@@ -142,33 +142,35 @@ class TagBusiness implements ITagBusiness {
 						var o : TagDAO;
 
 						// Find a tag with same name
-						o = outcome.findFirst(
-							(e) => {
-								return StringHelper.compare(e.getLabel(), tag.getLabel());
-							}
-						);
+						o = outcome.findFirst(e => e.getId() === tag.getId());
 
 						if (o !== null) {
 							// A tag with same is already existing, nothing to do
 							mergedList.add(o);
 						} else {
 							// New tag spotted
-							newOnes.add(o);
+							newOnes.add(tag);
 						}
 					}
 				);
 
-				// Add pending tags
-				this.addList(
-					newOnes,
-					(outcome) => {
-						outcome.forEach(e => mergedList.add(e));
+				if (newOnes.getLength() > 0) {
+					// Add pending tags
+					this.addList(
+						newOnes,
+						(outcome) => {
+							outcome.forEach(e => mergedList.add(e));
 
-						if (callback !== null) {
-							callback(mergedList);
+							if (callback !== null) {
+								callback(mergedList);
+							}
 						}
+					);
+				} else {
+					if (callback !== null) {
+						callback(mergedList);
 					}
-				);
+				}
 			}
 		);
 	}

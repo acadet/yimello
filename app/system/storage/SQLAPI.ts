@@ -121,7 +121,9 @@ class SQLDatabase {
 			displayName,
 			size,
 			(o) => {
-				callback(new SQLDatabase(o));
+				if (callback !== null) {
+					callback(new SQLDatabase(o));
+				}				
 			}
 		);
 

@@ -156,7 +156,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				// Foreign keys constraints are not working with webSQL
 				// Then, removing dependencies are needed
 				ActiveRecordObject.executeSQL(
-					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE bookmark_id = ' + id,
+					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE bookmark_id = "' + id + '"',
 					(outcome) => {
 						if (callback !== null) {
 							callback(true);

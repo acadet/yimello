@@ -1,6 +1,6 @@
 /// <reference path="../../dependencies.ts" />
 
-class BookmarkFormMainPresenter extends TSObject {
+class BookmarkFormMain extends TSObject {
 	//region Fields
 	
 	/**
@@ -43,13 +43,13 @@ class BookmarkFormMainPresenter extends TSObject {
 	/**
 	 * Subscriber to form event
 	 */
-	private _subscriber : IBookmarkFormMainPresenterSubscriber;
+	private _subscriber : IBookmarkFormMainSubscriber;
 
 	//endregion Fields
 	
 	//region Constructors
 	
-	constructor(wrapper : DOMElement, subscriber : IBookmarkFormMainPresenterSubscriber) {
+	constructor(wrapper : DOMElement, subscriber : IBookmarkFormMainSubscriber) {
 		super();
 
 		this._subscriber = subscriber;

@@ -27,6 +27,7 @@
 /// <reference path="../app/system/collections/impl/ArrayList.ts" />
 /// <reference path="../app/system/collections/IDictionary.ts" />
 /// <reference path="../app/system/collections/impl/Dictionary.ts" />
+/// <reference path="../app/system/collections/Queue.ts" />
 
 // Storage part
 
@@ -75,10 +76,10 @@
 /// <reference path="../app/presenters/utils/PresenterMediator.ts" />
 /// <reference path="../app/presenters/IntroPresenter.ts" />
 /// <reference path="../app/presenters/TourPresenter.ts" />
-/// <reference path="../app/presenters/MainPresenter/IBookmarkFormMainPresenterSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/BookmarkFormMainPresenter.ts" />
+/// <reference path="../app/presenters/MainPresenter/IBookmarkFormMainSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/BookmarkFormMain.ts" />
 /// <reference path="../app/presenters/MainPresenter/MainPresenter.ts" />
 
+
 //grunt-start
-/// <reference path="../app/system/collections/Queue.ts" />
 //grunt-end

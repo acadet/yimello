@@ -149,22 +149,14 @@ class DataAccessObject extends TSObject {
 	 * @param {Action<boolean> = null} callback Callback with a success arg
 	 */
 	static clean(callback : Action<boolean> = null) : void {
-		if (!DataAccessObject._initialized) {
-			Log.error(new DAOException('Unable to clean db: db has not been initialized'));
-			if (callback !== null) {
-				callback(false);
-			}
-			return;
-		}
-
 		ActiveRecordObject.executeSQL(
-			'DROP TABLE ' + DAOTables.Bookmarks,
+			'DROP TABLE IF EXISTS ' + DAOTables.Bookmarks,
 			(outcome) => {
 				ActiveRecordObject.executeSQL(
-					'DROP TABLE ' + DAOTables.Tags,
+					'DROP TABLE IF EXISTS ' + DAOTables.Tags,
 					(outcome) => {
 						ActiveRecordObject.executeSQL(
-							'DROP TABLE ' + DAOTables.TagBookmark,
+							'DROP TABLE IF EXISTS ' + DAOTables.TagBookmark,
 							(outcome) => {
 								DataAccessObject._initialized = false;
 								if (callback !== null) {

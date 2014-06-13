@@ -17,6 +17,10 @@ class UnitTestClass extends tsUnit.TestClass {
 	
 	//region Private Methods
 	
+	private static _executeQueueFunc(f : Action0) : void {
+		DataAccessObject.clean((s) => f());
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -40,7 +44,7 @@ class UnitTestClass extends tsUnit.TestClass {
 		test.showResults(document.getElementById('outcome'), test.run());
 		if (TSObject.exists(UnitTestClass._queue)) {
 			if (UnitTestClass._queue.getLength() > 0) {
-				UnitTestClass._queue.pop()();
+				UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
 			}
 		}
 	}
@@ -60,8 +64,9 @@ class UnitTestClass extends tsUnit.TestClass {
 		}
 
 		if (UnitTestClass._queue.getLength() > 0) {
-			var f : Action0 = UnitTestClass._queue.pop();
-			f();
+			UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
+		} else {
+			Log.inform('Last test was done');
 		}
 	}
 

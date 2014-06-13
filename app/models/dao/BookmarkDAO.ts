@@ -204,7 +204,7 @@ class BookmarkDAO extends DataAccessObject {
 	 * @param {Action<boolean> = null} callback Callback with a success arg
 	 */
 	delete(callback : Action<boolean> = null) : void {
-		if (!TSObject.exists(this.getId())) {
+		if (!TSObject.exists(this.getId()) || this.getId() === '') {
 			Log.error(new DAOException('Unable to delete: an id must be specify'));
 			if (callback !== null) {
 				callback(false);

@@ -120,7 +120,7 @@ class TagDAO extends DataAccessObject {
 	 * @param {Action<boolean> = null} callback Callback with succeed arg
 	 */
 	delete(callback : Action<boolean> = null) : void {
-		if (!TSObject.exists(this.getId())) {
+		if (!TSObject.exists(this.getId()) || this.getId() === '') {
 			Log.error(new DAOException('Failed to delete: an id must be provided'));
 			if (callback !== null) {
 				callback(false);

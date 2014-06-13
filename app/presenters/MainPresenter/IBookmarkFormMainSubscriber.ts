@@ -1,6 +1,6 @@
 /// <reference path="../../dependencies.ts" />
 
-interface IBookmarkFormMainPresenterSubscriber {
+interface IBookmarkFormMainSubscriber {
 	onCancel() : void;
 
 	onSave() : void;

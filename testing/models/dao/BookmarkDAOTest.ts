@@ -110,6 +110,8 @@ class BookmarkDAOTest extends UnitTestClass {
 				bookmark.add(
 					(outcome) => {
 						// Assert
+						var result : BookmarkDAO = outcome;
+
 						this.isTrue(TSObject.exists(outcome));
 
 						this.areNotIdentical(bookmark.getId(), outcome.getId());
@@ -118,7 +120,17 @@ class BookmarkDAOTest extends UnitTestClass {
 						this.areIdentical(bookmark.getDescription(), outcome.getDescription());
 						this.areIdentical(bookmark.getViews(), outcome.getViews());
 
-						DataAccessObject.clean((success) => UnitTestClass.done());
+						ActiveRecordObject.get<BookmarkDAO>(
+							DAOTables.Bookmarks,
+							(outcome) => {
+								this.isTrue(TSObject.exists(outcome));
+								this.areIdentical(1, outcome.getLength());
+								this.areIdentical(result.getId(), outcome.getAt(0).getId());
+
+								DataAccessObject.clean((success) => UnitTestClass.done());
+							},
+							BookmarkDAO.fromObject
+						);
 					}
 				);
 			}
@@ -146,7 +158,16 @@ class BookmarkDAOTest extends UnitTestClass {
 										// Assert
 										this.isTrue(outcome);
 
-										DataAccessObject.clean((success) => UnitTestClass.done());
+										ActiveRecordObject.get<BookmarkDAO>(
+											DAOTables.Bookmarks,
+											(outcome) => {
+												this.isTrue(TSObject.exists(outcome));
+												this.areIdentical(0, outcome.getLength());
+
+												DataAccessObject.clean((success) => UnitTestClass.done());
+											},
+											BookmarkDAO.fromObject
+										);
 									}
 								);
 							}

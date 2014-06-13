@@ -65,6 +65,14 @@ class ArrayList<T> extends TSObject implements IList<T> {
 	}
 
 	getAt(index: number) : T {
+		if (index < 0) {
+			throw new CollectionException('Negative index');
+		}
+
+		if (index >= this._content.length) {
+			throw new CollectionException('Unbound index');
+		}
+
 		return this._content[index];
 	}
 
