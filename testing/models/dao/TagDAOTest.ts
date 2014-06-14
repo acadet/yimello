@@ -172,6 +172,49 @@ class TagDAOTest extends UnitTestClass {
 		);
 	}
 
+	TagDAOFindTest() : void {
+		UnitTestClass.queue(
+			() => {
+				var t1 : TagDAO, t2 : TagDAO;
+
+				t1 = new TagDAO();
+				t1.setId('1');
+				t1.setLabel('foo');
+				t2 = new TagDAO();
+				t2.setId('2');
+				t2.setLabel('foobar');
+
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Tags,
+							t1.toList(),
+							(success) => {
+								ActiveRecordObject.insert(
+									DAOTables.Tags,
+									t2.toList(),
+									(success) => {
+										TagDAO.find(
+											'1',
+											(outcome) => {
+												this.isTrue(TSObject.exists(outcome));
+												this.areIdentical(t1.getId(), outcome.getId());
+												this.areIdentical(t1.getLabel(), outcome.getLabel());
+
+												DataAccessObject.clean((success) => UnitTestClass.done());
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+				
+			}
+		);
+	}
+
 	TagDAOSortByLabelAscTest() : void {
 		UnitTestClass.queue(
 			() => {

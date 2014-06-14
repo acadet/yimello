@@ -1,6 +1,6 @@
 /// <reference path="../../dependencies.ts" />
 
-class BookmarkFormMain extends TSObject {
+class BookmarkForm extends TSObject {
 	//region Fields
 	
 	/**
@@ -30,27 +30,30 @@ class BookmarkFormMain extends TSObject {
 
 	/**
 	 * DataList where tags are appended (suggested tags for user)
-	 * @type {DOMElement}
 	 */
 	private _tagDataList : DOMElement;
 
 	/**
 	 * List of current tags
-	 * @type {IList<TagDAO>}
 	 */
 	private _currentTags : IList<TagDAO>;
 
 	/**
 	 * Subscriber to form event
 	 */
-	private _subscriber : IBookmarkFormMainSubscriber;
+	private _subscriber : IBookmarkFormSubscriber;
+
+	private _isUpdating : boolean;
+
+	private _currentUpdatedBookmark : BookmarkDAO;
 
 	//endregion Fields
 	
 	//region Constructors
 	
-	constructor(wrapper : DOMElement, subscriber : IBookmarkFormMainSubscriber) {
+	constructor(subscriber : IBookmarkFormSubscriber) {
 		super();
+		var wrapper : DOMElement = DOMTree.findSingle('.js-bookmark-form-wrapper');
 
 		this._subscriber = subscriber;
 
@@ -68,7 +71,7 @@ class BookmarkFormMain extends TSObject {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._subscriber.onCancel();
+					this._subscriber.onFormCancel();
 				}
 			);
 
@@ -78,7 +81,11 @@ class BookmarkFormMain extends TSObject {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._onSave();
+					if (this._isUpdating) {
+						this._onUpdate();
+					} else {
+						this._onAdd();
+					}
 				}
 			);
 
@@ -95,7 +102,7 @@ class BookmarkFormMain extends TSObject {
 	/**
 	 * Called when user asks for saving
 	 */
-	private _onSave() : void {
+	private _onAdd() : void {
 		var b : BookmarkDAO;
 		var url : string = this._urlInput.getValue();
 		var title : string = this._titleInput.getValue();
@@ -112,8 +119,8 @@ class BookmarkFormMain extends TSObject {
 			return;
 		}
 
-		if (!FormHelper.isFilled(description)) {
-			alert('description field must be filled');
+		if (this._currentTags.getLength() < 1) {
+			alert('Tags must be specified');
 			return;
 		}
 
@@ -145,9 +152,66 @@ class BookmarkFormMain extends TSObject {
 										outcome,
 										(success) => {
 											if (success) {
-												this._subscriber.onSave();
+												this._subscriber.onFormSave();
 											} else {
 												alert('An error has occured while saving bookmark');
+											}
+										}
+									);
+							}
+						);
+				}
+			);
+	}
+
+	private _onUpdate() : void {
+		var url : string = this._urlInput.getValue();
+		var title : string = this._titleInput.getValue();
+		var description : string = this._descriptionInput.getValue();
+
+		// Test if all values have been provided
+		if (!FormHelper.isFilled(url)) {
+			alert('URL field must be filled');
+			return;
+		}
+
+		if (!FormHelper.isFilled(title)) {
+			alert('title field must be filled');
+			return;
+		}
+
+		if (this._currentTags.getLength() < 1) {
+			alert('Tags must be specified');
+			return;
+		}
+
+		this._currentUpdatedBookmark
+			.setURL(url)
+			.setTitle(title)
+			.setDescription(description);
+
+		PresenterMediator
+			.getBookmarkBusiness()
+			.update(
+				this._currentUpdatedBookmark,
+				(outcome) => {
+					this._currentUpdatedBookmark = outcome;
+
+					PresenterMediator
+						.getTagBusiness()
+						.merge(
+							this._currentTags,
+							(outcome) => {
+								PresenterMediator
+									.getBookmarkBusiness()
+									.updateTagBinding(
+										this._currentUpdatedBookmark,
+										outcome,
+										(success) => {
+											if (success) {
+												this._subscriber.onFormSave();
+											} else {
+												alert('An error occurend while updating bookmark');
 											}
 										}
 									);
@@ -165,6 +229,11 @@ class BookmarkFormMain extends TSObject {
 		var tag : TagDAO;
 		var e : DOMElement;
 		var test : TagDAO;
+
+		// Do nothing with empty strings
+		if (StringHelper.trim(value) === '') {
+			return;
+		}
 
 		// Avoid harmful values
 		value = SecurityHelper.disarm(value);
@@ -218,8 +287,8 @@ class BookmarkFormMain extends TSObject {
 			title = this._titleInput.getValue();
 			description = this._descriptionInput.getValue();
 
-			if (TSObject.exists(title) || title !== ''
-				|| TSObject.exists(description) || description !== '') {
+			if (!TSObject.exists(title) || title !== ''
+				|| !TSObject.exists(description) || description !== '') {
 				// Fill title and description only if they are not already
 				// filled
 				return;
@@ -250,19 +319,7 @@ class BookmarkFormMain extends TSObject {
 		);
 	}
 
-	//endregion Private Methods
-	
-	//region Public Methods
-	
-	/**
-	 * Resets whole form for a new input
-	 */
-	reset() : void {
-		// Reset all fields
-		this._urlInput.setValue('');
-		this._titleInput.setValue('');
-		this._descriptionInput.setValue('');
-
+	private _reset() : void {
 		// Reset current tag list
 		this._currentTags = new ArrayList<TagDAO>();
 		this._tagList.setHTML('');
@@ -281,6 +338,39 @@ class BookmarkFormMain extends TSObject {
 				);
 			}
 		);
+	}
+
+	//endregion Private Methods
+	
+	//region Public Methods
+	
+	resetToAdd() : void {
+		this._reset();
+		this._isUpdating = false;
+
+		// Reset all fields
+		this._urlInput.setValue('');
+		this._titleInput.setValue('');
+		this._descriptionInput.setValue('');
+	}
+
+	resetToUpdate(bookmark : BookmarkDAO) : void {
+		this._reset();
+		this._isUpdating = true;
+		this._currentUpdatedBookmark = bookmark;
+
+		this._urlInput.setValue(bookmark.getURL());
+		this._titleInput.setValue(bookmark.getTitle());
+		this._descriptionInput.setValue(bookmark.getDescription());
+
+		PresenterMediator
+			.getTagBusiness()
+			.sortByLabelAscForBookmark(
+				bookmark,
+				(outcome) => {
+					outcome.forEach(e => this._addTag(e.getLabel()));
+				}
+			);
 	}
 
 	//endregion Public Methods

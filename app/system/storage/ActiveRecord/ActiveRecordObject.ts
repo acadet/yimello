@@ -108,6 +108,58 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
+	static find<T>(
+		table : string,
+		selector : Pair<string, any>,
+		callback : Action<T>,
+		converter : Func<any, T> = null) : void {
+		
+		ActiveRecordObject._init();
+		ActiveRecordObject._currentDB.transaction(
+			(tx) => {
+				var request : StringBuffer;
+
+				request = new StringBuffer('SELECT * FROM ' + table);
+				request.append('WHERE ' + selector.getFirst() + ' ');
+				request.append(' = "' + selector.getSecond() + '"');
+
+				tx.execute(
+					'SELECT * FROM ' + table,
+					[],
+					(tx, outcome) => {
+						var s : SQLRowSet;
+
+						if (!TSObject.exists(outcome)) {
+							Log.error(new ActiveRecordException('An error has occurend when seeking data into DB'));
+							callback(null);
+							return;
+						}
+
+						s = outcome.getRows();
+
+						if (s.getLength() < 1) {
+							callback(null);
+							return;
+						}
+
+						if (converter !== null) {
+							callback(converter(s.item(0)));
+						} else {
+							callback(s.item(0));
+						}
+					},
+					(tx, e) => {
+						ActiveRecordHelper.executeErrorHandler(tx, e);
+						callback(null);
+
+						return false;
+					}
+				);
+			},
+			ActiveRecordHelper.transactionErrorHandler
+		);
+	}
+
 	/**
 	 * Execute an insert request with a single object
 	 */

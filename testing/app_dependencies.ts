@@ -76,8 +76,15 @@
 /// <reference path="../app/presenters/utils/PresenterMediator.ts" />
 /// <reference path="../app/presenters/IntroPresenter.ts" />
 /// <reference path="../app/presenters/TourPresenter.ts" />
-/// <reference path="../app/presenters/MainPresenter/IBookmarkFormMainSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/BookmarkFormMain.ts" />
+
+// Main presenter
+
+/// <reference path="../app/presenters/MainPresenter/IBookmarkFormSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/IBookmarkListSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/ITagListSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/TagList.ts" />
+/// <reference path="../app/presenters/MainPresenter/BookmarkForm.ts" />
+/// <reference path="../app/presenters/MainPresenter/BookmarkList.ts" />
 /// <reference path="../app/presenters/MainPresenter/MainPresenter.ts" />
 
 

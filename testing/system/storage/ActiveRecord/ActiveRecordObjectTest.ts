@@ -80,7 +80,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 	/**
 	 * Tests Get method with a converter
 	 */
-	ActiveRecordObjectGetWithConverterTest() : void {
+	ActiveRecordObjectGetTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
@@ -161,6 +161,79 @@ class ActiveRecordObjectTest extends UnitTestClass {
 	 */
 	ActiveRecordObjectGetWithoutConverterTest() : void {
 		// TODO
+		this.fail();
+	}
+
+	ActiveRecordObjectFindTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var createRequest : StringBuffer;
+				var insertRequest1 : StringBuffer, insertRequest2 : StringBuffer;
+
+				// Create fake table, insert data and check if 
+				// each entry is get
+				createRequest = new StringBuffer('CREATE TABLE people (');
+				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
+				createRequest.append('firstName VARCHAR(255), ');
+				createRequest.append('lastName VARCHAR(255))');
+
+				insertRequest1 = new StringBuffer('INSERT INTO people VALUES(');
+				insertRequest1.append('1, "Al", "Pacino")');
+
+				insertRequest2 = new StringBuffer('INSERT INTO people VALUES(');
+				insertRequest2.append('2, "Sean", "Connery")');
+
+				ActiveRecordObject.executeSQL(
+					'DROP TABLE IF EXISTS people',
+					(r) => {
+						ActiveRecordObject.executeSQL(
+							createRequest.toString(),
+							(r) => {
+								ActiveRecordObject.executeSQL(
+									insertRequest1.toString(),
+									(r) => {
+										ActiveRecordObject.executeSQL(
+											insertRequest2.toString(),
+											(r) => {
+												// Act
+												ActiveRecordObject.find(
+													'people',
+													new Pair<string, any>('id', 1),
+													(outcome) => {
+														// Assert
+														var p : ActiveRecordObjectTestUtils.Person;
+
+														this.isTrue(TSObject.exists(outcome));
+
+														p = new ActiveRecordObjectTestUtils.Person();
+														p.id = 1;
+														p.firstName = 'Al';
+														p.lastName = 'Pacino';
+														this.isTrue(p.equals(outcome));
+
+														ActiveRecordObject.executeSQL(
+															'DROP TABLE people',
+															(outcome) => {
+																UnitTestClass.done();
+															}
+														);
+													},
+													ActiveRecordObjectTestUtils.Person.toPerson
+												);
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
+	ActiveRecordObjectFindWithoutConverterTest() : void {
 		this.fail();
 	}
 

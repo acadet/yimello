@@ -101,8 +101,9 @@ class DataAccessObject extends TSObject {
 			// Create tag table
 			tagRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');
 			tagRequest.append(DAOTables.Tags + ' (');
-			tagRequest.append('id VARCHAR(36) PRIMARY KEY NOT NULL, ');
-			tagRequest.append('label VARCHAR(255))');
+			tagRequest.append('id VARCHAR(36) NOT NULL, ');
+			tagRequest.append('label VARCHAR(255) NOT NULL, ');
+			tagRequest.append('PRIMARY KEY (id, label))');
 
 			// Create bookmark table
 			bookmarkRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');

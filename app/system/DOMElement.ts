@@ -141,6 +141,17 @@ class DOMElement extends TSObject {
 		return this.getTop(relative) + this.getHeight();
 	}
 
+	getChildren(selector : string = null) : IList<DOMElement> {
+		var outcome : any = this._element.children(selector);
+		var list : IList<DOMElement> = new ArrayList<DOMElement>();
+
+		outcome.each((i, e) => {
+			list.add(DOMElement.fromJS(e));
+		});
+
+		return list;
+	}
+
 	getData(key : string) : string {
 		return this._element.attr('data-' + key);
 	}
@@ -183,6 +194,10 @@ class DOMElement extends TSObject {
 
 	getWidth(actual = false) : number {
 		return this._element.outerWidth(actual);
+	}
+
+	hasClass(c : string) : boolean {
+		return this._element.hasClass(c);
 	}
 
 	horizontalCenterize(reference = new DOMElement($('body'))) : void {

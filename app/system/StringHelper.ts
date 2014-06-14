@@ -10,4 +10,8 @@ class StringHelper {
 
 		return e1 === e2;
 	}
+
+	static trim(s : string) : string {
+		return s.trim();
+	}
 }

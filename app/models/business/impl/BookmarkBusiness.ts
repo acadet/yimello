@@ -58,6 +58,12 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		);
 	}
 
+	private _disarmBookmark(bookmark : BookmarkDAO) : void {
+		bookmark.setURL(SecurityHelper.disarm(bookmark.getURL()));
+		bookmark.setTitle(SecurityHelper.disarm(bookmark.getTitle()));
+		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -128,7 +134,61 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		this._bindTags(bookmark, tags, 0, callback);
+		DataAccessObject.initialize(
+			(success) => {
+				this._bindTags(bookmark, tags, 0, callback);
+			}
+		);
+	}
+
+	updateTagBinding(bookmark : BookmarkDAO, tags : IList<TagDAO>, callback : Action<boolean> = null) {
+		var request : StringBuffer;
+
+		if (!TSObject.exists(bookmark)) {
+			Log.error(new BusinessException('Unable to update tag binding: bookmark is null'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+
+		if (!TSObject.exists(tags)) {
+			Log.error(new BusinessException('Unable to update tag binding: tag list is null'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+
+		if (tags.getLength() < 1) {
+			Log.warn('No update was done: list is empty');
+			if (callback !== null) {
+				callback(true);
+			}
+			return;
+		}
+
+		request = new StringBuffer('DELETE FROM ' + DAOTables.TagBookmark + ' ');
+		request.append('WHERE bookmark_id = "' + bookmark.getId() + '"');
+
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(success) => {
+						if (!success) {
+							Log.error(new BusinessException('Failed to remove entries from DB'));
+							if (callback !== null) {
+								callback(false);
+							}
+							return;
+						}
+
+						this.bindTags(bookmark, tags, callback);
+					}
+				);
+			}
+		);
 	}
 
 	delete(bookmark : BookmarkDAO, callback : Action<boolean> = null) : void {
@@ -203,12 +263,29 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		// Apply security operation
-		bookmark.setURL(SecurityHelper.disarm(bookmark.getURL()));
-		bookmark.setTitle(SecurityHelper.disarm(bookmark.getTitle()));
-		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));
+		this._disarmBookmark(bookmark);
 
 		bookmark.add(
+			(outcome) => {
+				if (callback !== null) {
+					callback(outcome);
+				}
+			}
+		);
+	}
+
+	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
+		if (!URLHelper.isValid(bookmark.getURL())) {
+			Log.error(new BusinessException('Failed to save: url is not valid'));
+			if (callback !== null) {
+				callback(null);
+			}
+			return;
+		}
+
+		this._disarmBookmark(bookmark);
+
+		bookmark.update(
 			(outcome) => {
 				if (callback !== null) {
 					callback(outcome);

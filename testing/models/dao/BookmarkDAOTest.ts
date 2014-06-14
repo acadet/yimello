@@ -137,6 +137,53 @@ class BookmarkDAOTest extends UnitTestClass {
 		);
 	}
 
+	BookmarkUpdateTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b : BookmarkDAO;
+				var id : string = '1';
+
+				b = new BookmarkDAO();
+				b.setId(id);
+				b.setTitle('foo');
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Bookmarks,
+							b.toList(),
+							(success) => {
+								b.setTitle('foobar');
+
+								// Act
+								b.update(
+									(outcome) => {
+										// Assert
+										this.isTrue(TSObject.exists(outcome));
+										this.areIdentical(b.getId(), outcome.getId());
+										this.areIdentical(b.getTitle(), outcome.getTitle());
+
+										ActiveRecordObject.get<BookmarkDAO>(
+											DAOTables.Bookmarks,
+											(outcome) => {
+												this.areIdentical(1, outcome.getLength());
+												this.areIdentical(b.getId(), outcome.getAt(0).getId());
+												this.areIdentical(b.getTitle(), outcome.getAt(0).getTitle());
+
+												DataAccessObject.clean((s) => UnitTestClass.done());
+											},
+											BookmarkDAO.fromObject
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
 	BookmarkDAODeleteTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -212,6 +259,51 @@ class BookmarkDAOTest extends UnitTestClass {
 												this.areIdentical(b1.getTitle(), outcome.getAt(0).getTitle());
 												this.areIdentical(b2.getId(), outcome.getAt(1).getId());
 												this.areIdentical(b2.getTitle(), outcome.getAt(1).getTitle());
+
+												DataAccessObject.clean((success) => UnitTestClass.done());
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
+	BookmarkDaoFindTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b1 : BookmarkDAO, b2 : BookmarkDAO;
+
+				b1 = new BookmarkDAO();
+				b1.setId('1');
+				b1.setTitle('foo');
+				b2 = new BookmarkDAO();
+				b2.setId('2');
+				b2.setTitle('foobar');
+
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Bookmarks,
+							b1.toList(),
+							(success) => {
+								ActiveRecordObject.insert(
+									DAOTables.Bookmarks,
+									b2.toList(),
+									(success) => {
+										// Act
+										BookmarkDAO.find(
+											'1',
+											(outcome) => {
+												// Assert
+												this.isTrue(TSObject.exists(outcome));
+												this.areIdentical(b1.getId(), outcome.getId());
+												this.areIdentical(b1.getTitle(), outcome.getTitle());
 
 												DataAccessObject.clean((success) => UnitTestClass.done());
 											}

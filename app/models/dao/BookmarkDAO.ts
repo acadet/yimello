@@ -184,20 +184,43 @@ class BookmarkDAO extends DataAccessObject {
 		);
 	}
 
-	// // TODO : test
-	// update(callback : Action<boolean> = null) : void {
-	// 	var dict : IDictionary<string, any>;
-	// 	var selector : Pair<string, string>;
+	update(callback : Action<BookmarkDAO> = null) : void {
+		var dict : IDictionary<string, any>;
+		var selector : Pair<string, any>;
 
-	// 	dict = new Dictionary<string, any>();
-	// 	selector = new Pair<string, string>('id', this.getId());
+		if (!TSObject.exists(this.getId()) || this.getId() === '') {
+			Log.error(new DAOException('Unable to update: no id was specified'));
+			if (callback !== null) {
+				callback(null);
+			}
+		}
 
-	// 	dict.add('title', this.getTitle());
-	// 	dict.add('url', this.getURL());
-	// 	dict.add('description', this.getDescription());
+		dict = new Dictionary<string, any>();
+		dict.add('url', this.getURL());
+		dict.add('title', this.getTitle());
+		dict.add('description', this.getDescription());
+		dict.add('views', this.getViews());
 
-	// 	ActiveRecordObject.update(DAOTables.Bookmarks, selector, dict, callback);
-	// }
+		selector = new Pair<string, any>('id', this.getId());
+
+		ActiveRecordObject.update(
+			DAOTables.Bookmarks,
+			selector,
+			dict,
+			(success) => {
+				if (success) {
+					if (callback !== null) {
+						callback(this);
+					}
+				} else {
+					Log.error(new DAOException('An error occurend when updating bookmark'));
+					if (callback !== null) {
+						callback(this);
+					}
+				}
+			}
+		);
+	}
 
 	/**
 	 * Deletes a bookmark from DB
@@ -236,6 +259,19 @@ class BookmarkDAO extends DataAccessObject {
 			(success) => {
 				ActiveRecordObject.get(
 					DAOTables.Bookmarks,
+					callback,
+					BookmarkDAO.fromObject
+				);
+			}
+		);
+	}
+
+	static find(id : string, callback : Action<BookmarkDAO>) : void {
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.find(
+					DAOTables.Bookmarks,
+					new Pair<string, any>('id', id),
 					callback,
 					BookmarkDAO.fromObject
 				);

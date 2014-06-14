@@ -82,6 +82,7 @@ class TagBusinessTest extends UnitTestClass {
 
 				t = new TagDAO();
 				t.setId('1');
+				t.setLabel('foo');
 				data1 = new ArrayList<any>();
 				data1.add(t.getId());
 				data1.add('1');
@@ -189,6 +190,91 @@ class TagBusinessTest extends UnitTestClass {
 										this.areIdentical(t2.getLabel(), u2.getLabel());
 
 										DataAccessObject.clean((success) => UnitTestClass.done());
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
+	TagBusinessSortByLabelAscForBookmarkTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b : BookmarkDAO;
+				var t1 : TagDAO, t2 : TagDAO, t3 : TagDAO;
+
+				b = new BookmarkDAO();
+				b.setTitle('foo');
+				t1 = new TagDAO();
+				t1.setLabel('C');
+				t2 = new TagDAO();
+				t2.setLabel('A');
+				t3 = new TagDAO();
+				t3.setLabel('B');
+
+				b.add(
+					(outcome) => {
+						b = outcome;
+						t1.add(
+							(outcome) => {
+								t1 = outcome;
+								t2.add(
+									(outcome) => {
+										t2 = outcome;
+										t3.add(
+											(outcome) => {
+												var data : IList<any>;
+												t3 = outcome;
+												data = new ArrayList<any>();
+												data.add(t1.getId());
+												data.add(b.getId());
+
+												ActiveRecordObject.insert(
+													DAOTables.TagBookmark,
+													data,
+													(success) => {
+														var data : IList<any> = new ArrayList<any>();
+														data.add(t2.getId());
+														data.add(b.getId());
+
+														ActiveRecordObject.insert(
+															DAOTables.TagBookmark,
+															data,
+															(success) => {
+																var data : IList<any> = new ArrayList<any>();
+																data.add(t3.getId());
+																data.add(b.getId());
+
+																ActiveRecordObject.insert(
+																	DAOTables.TagBookmark,
+																	data,
+																	(success) => {
+																		// Act
+																		this._business.sortByLabelAscForBookmark(
+																			b,
+																			(outcome) => {
+																				// Assert
+																				this.isTrue(TSObject.exists(outcome));
+																				this.areIdentical(3, outcome.getLength());
+																				this.areIdentical(t2.getId(), outcome.getAt(0).getId());
+																				this.areIdentical(t3.getId(), outcome.getAt(1).getId());
+																				this.areIdentical(t1.getId(), outcome.getAt(2).getId());
+
+																				DataAccessObject.clean((s) => UnitTestClass.done());
+																			}
+																		);
+																	}
+																);
+															}
+														);
+													}
+												);
+											}
+										);
 									}
 								);
 							}

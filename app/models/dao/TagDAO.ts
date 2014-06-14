@@ -115,6 +115,19 @@ class TagDAO extends DataAccessObject {
 		);
 	}
 
+	static find(id : string, callback : Action<TagDAO>) : void {
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.find(
+					DAOTables.Tags,
+					new Pair<string, any>('id', id),
+					callback,
+					TagDAO.fromObject
+				);
+			}
+		);
+	}
+
 	/**
 	 * Deletes tag from DB
 	 * @param {Action<boolean> = null} callback Callback with succeed arg

@@ -13,14 +13,19 @@ class Presenter extends TSObject {
 
 		PresenterMediator.setInstance(this);
 
-		this._onStart();
-
 		NodeWindow.on(NodeWindowEvents.Blur, this._onPause);
 		NodeWindow.on(NodeWindowEvents.Focus, this._onResume);
 		NodeWindow.on(NodeWindowEvents.Close, this._onDestroy);
 		NodeWindow.on(NodeWindowEvents.Move, () => {
 			PresenterMediator.getInstance().onDestroy.call(PresenterMediator.getInstance());
 		});
+
+		var timer : Timer = new Timer(
+			(o) => {
+				this._onStart();
+			},
+			10
+		);
 	}
 
 	//endregion Constructors

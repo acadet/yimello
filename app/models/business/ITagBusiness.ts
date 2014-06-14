@@ -20,9 +20,11 @@ interface ITagBusiness {
 
 	/**
 	 * From specified tag list, adds new ones into DB and do nothing
-	 * with other ones
+	 * with other ones. Used labels to compare
 	 * @param {IList<TagDAO>}         tags     [description]
 	 * @param {Action<IList<TagDAO>>} callback Callback with new tags updated. All tags are into DB
 	 */
 	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>>) : void;
+
+	sortByLabelAscForBookmark(bookmark : BookmarkDAO, callback : Action<IList<TagDAO>>) : void;
 }

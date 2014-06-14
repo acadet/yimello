@@ -37,7 +37,7 @@ class Log {
 
 	static inform(msg : string) : void {
 		if (this._currentLevel <= LogLevel.Test) {
-			console.log('%cINFORM: ' + msg, 'color: LightSkyBlue;');
+			console.log('%cINFORM: ' + msg, 'color: DeepSkyBlue;');
 		}
 	}
 

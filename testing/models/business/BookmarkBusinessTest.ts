@@ -55,7 +55,9 @@ class BookmarkBusinessTest extends UnitTestClass {
 				
 				bookmark = new BookmarkDAO();
 				t1 = new TagDAO();
+				t1.setLabel('foo');
 				t2 = new TagDAO();
+				t2.setLabel('foobar');
 
 				bookmark.add(
 					(outcome) => {
@@ -97,6 +99,95 @@ class BookmarkBusinessTest extends UnitTestClass {
 														this.areIdentical(bookmark.getId(), r2.bookmark_id);
 
 														DataAccessObject.clean((success) => UnitTestClass.done());
+													}
+												);
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
+	BookmarkBusinessUpdateTagBindingTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b : BookmarkDAO;
+				var t1 : TagDAO, t2 : TagDAO, t3 : TagDAO;
+
+				b = new BookmarkDAO();
+				b.setTitle('foo');
+				t1 = new TagDAO();
+				t1.setLabel('bar');
+				t2 = new TagDAO();
+				t2.setLabel('foobar');
+				t3 = new TagDAO();
+				t3.setLabel('foobarbar');
+
+				b.add(
+					(outcome) => {
+						b = outcome;
+						t1.add(
+							(outcome) => {
+								t1 = outcome;
+								t2.add(
+									(outcome) => {
+										t2 = outcome;
+										t3.add(
+											(outcome) => {
+												var oldTags : IList<TagDAO>;
+
+												t3 = outcome;
+												oldTags = new ArrayList<TagDAO>();
+												oldTags.add(t1);
+												oldTags.add(t2);
+
+												this._business.bindTags(
+													b,
+													oldTags,
+													(success) => {
+														var newTags : IList<TagDAO>;
+														newTags = new ArrayList<TagDAO>();
+														newTags.add(t1);
+														newTags.add(t3);
+
+														// Act
+														this._business.updateTagBinding(
+															b,
+															newTags,
+															(success) => {
+																// Assert
+																this.isTrue(success);
+
+																ActiveRecordObject.get(
+																	DAOTables.TagBookmark,
+																	(outcome) => {
+																		var o1 : any, o2 : any;
+																		this.areIdentical(2, outcome.getLength());
+
+																		o1 = outcome.getAt(0);
+																		o2 = outcome.getAt(1);
+																		this.areIdentical(b.getId(), o1.bookmark_id);
+																		this.areIdentical(b.getId(), o2.bookmark_id);
+
+																		if (o1.tag_id === t1.getId()) {
+																			this.areIdentical(t3.getId(), o2.tag_id);
+																		} else if (o1.tag_id === t3.getId()) {
+																			this.areIdentical(t1.getId(), o2.tag_id);
+																		} else {
+																			this.fail();
+																		}
+
+																		DataAccessObject.clean((s) => UnitTestClass.done());
+																	}
+																);
+															}
+														);
 													}
 												);
 											}
@@ -347,6 +438,80 @@ class BookmarkBusinessTest extends UnitTestClass {
 								this.areIdentical(0, outcome.getLength());
 
 								DataAccessObject.clean((success) => UnitTestClass.done());
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
+	BookmarkBusinessUpdateTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b : BookmarkDAO;
+				b = new BookmarkDAO();
+				b.setTitle('foo');
+
+				b.add(
+					(outcome) => {
+						b = outcome;
+
+						b.setURL('http://google.fr');
+						b.setTitle('<script>Harmful</script>');
+						b.setDescription('<script>Harmful</script>');
+
+						// Act
+						this._business.update(
+							b,
+							(outcome) => {
+								// Assert
+								this.isTrue(TSObject.exists(outcome));
+								this.areIdentical('&lt;script&gt;Harmful&lt;/script&gt;', outcome.getTitle());
+								this.areIdentical('&lt;script&gt;Harmful&lt;/script&gt;', outcome.getDescription());
+
+								DataAccessObject.clean(s => UnitTestClass.done());
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
+	BookmarkBusinessUpdateInvalidURLTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b : BookmarkDAO;
+				b = new BookmarkDAO();
+				b.setTitle('foo');
+
+				b.add(
+					(outcome) => {
+						b = outcome;
+
+						b.setURL('foobar');
+						b.setTitle('<script>Harmful</script>');
+						b.setDescription('<script>Harmful</script>');
+						Log.inform('An error about invalid url will occur below this message');
+
+						// Act
+						this._business.update(
+							b,
+							(outcome) => {
+								// Assert
+								this.areIdentical(null, outcome);
+
+								BookmarkDAO.get(
+									(outcome) => {
+										this.areIdentical(1, outcome.getLength());
+										this.areIdentical('foo', outcome.getAt(0).getTitle());
+
+										DataAccessObject.clean(s => UnitTestClass.done());
+									}
+								);
 							}
 						);
 					}

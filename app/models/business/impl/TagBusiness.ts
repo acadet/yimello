@@ -142,7 +142,7 @@ class TagBusiness implements ITagBusiness {
 						var o : TagDAO;
 
 						// Find a tag with same name
-						o = outcome.findFirst(e => e.getId() === tag.getId());
+						o = outcome.findFirst(e => StringHelper.compare(e.getLabel(), tag.getLabel()));
 
 						if (o !== null) {
 							// A tag with same is already existing, nothing to do
@@ -171,6 +171,26 @@ class TagBusiness implements ITagBusiness {
 						callback(mergedList);
 					}
 				}
+			}
+		);
+	}
+
+	sortByLabelAscForBookmark(bookmark : BookmarkDAO, callback : Action<IList<TagDAO>>) : void {
+		var request : StringBuffer;
+
+		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' WHERE id IN (');
+		request.append('SELECT tag_id FROM ' + DAOTables.TagBookmark + ' WHERE ');
+		request.append('bookmark_id = "' + bookmark.getId() + '") ');
+		request.append('ORDER BY label ASC');
+
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(outcome) => {
+						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, TagDAO.fromObject));
+					}
+				);
 			}
 		);
 	}
