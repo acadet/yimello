@@ -28,9 +28,39 @@ class URLHelper extends TSObject {
 	static isValid(url : string) : boolean {
 		var e : Regex;
 
-		e = new Regex('http\:\/\/.*\..*', [RegexFlags.Insensitive]);
+		e = new Regex('http(s?)\:\/\/.*\..*', [RegexFlags.Insensitive]);
 
 		return e.test(url);
+	}
+
+	static buildAbsolute(s : string, url : string) : string {
+		var editedURL : string;
+
+		if (!TSObject.exists(s) || s === '') {
+			Log.warn('Unable to build absolute URL: no string provided');
+			return '';
+		}
+
+		if (!URLHelper.isValid(url)) {
+			Log.error(new Exception('Unable to build absolute URL: provided url is invalid'));
+			return null;
+		}
+
+		if (url.charAt(url.length - 1) !== '/') {
+			editedURL = url + '/';
+		} else {
+			editedURL = url;
+		}
+
+		if (s.length < 7) {
+			return editedURL + s;
+		}
+
+		if (s.substring(0, 7) === 'http://') {
+			return s;
+		} else {
+			return editedURL + s;
+		}
 	}
 
 	//endregion Public Methods

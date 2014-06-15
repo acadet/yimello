@@ -33,6 +33,10 @@ class BookmarkForm extends TSObject {
 	 */
 	private _tagDataList : DOMElement;
 
+	private _deleteButton : DOMElement;
+
+	private _bookmarkIcon : DOMElement;
+
 	/**
 	 * List of current tags
 	 */
@@ -64,11 +68,13 @@ class BookmarkForm extends TSObject {
 		this._tagsInput = wrapper.findSingle('input[name="tags"]');
 		this._tagList = wrapper.findSingle('.js-form-tag-list');
 		this._tagDataList = wrapper.findSingle('.js-tag-suggestions');
+		this._deleteButton = wrapper.findSingle('.js-delete-button');
+		this._bookmarkIcon = wrapper.findSingle('.js-bookmark-icon');
 
 		// Cancel button
-		wrapper
-			.findSingle('.js-cancel-button')
-			.on(
+		var cancelTrigger : DOMElement = wrapper.findSingle('.js-cancel-trigger');
+		cancelTrigger.verticalCenterizeWithMargin();
+		cancelTrigger.on(
 				DOMElementEvents.Click,
 				(e) => {
 					this._subscriber.onFormCancel();
@@ -229,6 +235,7 @@ class BookmarkForm extends TSObject {
 		var tag : TagDAO;
 		var e : DOMElement;
 		var test : TagDAO;
+		var s : StringBuffer;
 
 		// Do nothing with empty strings
 		if (StringHelper.trim(value) === '') {
@@ -254,9 +261,25 @@ class BookmarkForm extends TSObject {
 		tag.setLabel(value);
 		this._currentTags.add(tag);
 
-		e = DOMElement.fromString('<li>' + tag.getLabel() + '</li>');
+		s = new StringBuffer('<li><p>' + tag.getLabel() + '</p>');
+		s.append('<img src="assets/img/x-mark-icon-2.png" data-label="' + tag.getLabel() + '" /></li>');
+		e = DOMElement.fromString(s.toString());
+
+		e
+			.findSingle('img')
+			.on(
+				DOMElementEvents.Click,
+				(arg) => {
+					this._deleteTag(arg.getTarget().getData('label'));
+					e.remove();
+				}
+			);
 
 		this._tagList.append(e);
+	}
+
+	private _deleteTag(tagLabel : string) : void {
+		this._currentTags.removeIf(e => StringHelper.compare(tagLabel, e.getLabel()));
 	}
 
 	/**
@@ -300,6 +323,8 @@ class BookmarkForm extends TSObject {
 				(title, description) => {
 					this._titleInput.setValue(title);
 					this._descriptionInput.setValue(description);
+
+					this._setBookmarkIcon(e.getTarget().getValue());
 				},
 				(type, error) => {
 					// TODO
@@ -322,10 +347,10 @@ class BookmarkForm extends TSObject {
 	private _reset() : void {
 		// Reset current tag list
 		this._currentTags = new ArrayList<TagDAO>();
-		this._tagList.setHTML('');
+		this._tagList.getChildren().forEach(e => e.remove());
 
 		// Reset tag suggestions
-		this._tagDataList.setHTML('');
+		this._tagDataList.getChildren().forEach(e => e.remove());
 		TagDAO.sortByLabelAsc(
 			(outcome) => {
 				outcome.forEach(
@@ -338,6 +363,20 @@ class BookmarkForm extends TSObject {
 				);
 			}
 		);
+
+		this._deleteButton.setCss({display : 'none'});
+	}
+
+	private _resetBookmarkIcon() : void {
+		this._bookmarkIcon.setAttribute('src', 'assets/img/default-bookmark-icon.png');
+	}
+
+	private _setBookmarkIcon(url : string) : void {
+		if (Environment.isOnline()) {
+			this._bookmarkIcon.setAttribute('src', 'http://g.etfv.co/' + url);
+		} else {
+			this._resetBookmarkIcon();
+		}
 	}
 
 	//endregion Private Methods
@@ -352,6 +391,8 @@ class BookmarkForm extends TSObject {
 		this._urlInput.setValue('');
 		this._titleInput.setValue('');
 		this._descriptionInput.setValue('');
+
+		this._resetBookmarkIcon();
 	}
 
 	resetToUpdate(bookmark : BookmarkDAO) : void {
@@ -362,6 +403,9 @@ class BookmarkForm extends TSObject {
 		this._urlInput.setValue(bookmark.getURL());
 		this._titleInput.setValue(bookmark.getTitle());
 		this._descriptionInput.setValue(bookmark.getDescription());
+
+		this._deleteButton.setCss({display : 'inline-block'});
+		this._setBookmarkIcon(bookmark.getURL());
 
 		PresenterMediator
 			.getTagBusiness()

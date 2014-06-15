@@ -120,11 +120,11 @@ class ActiveRecordObject extends TSObject {
 				var request : StringBuffer;
 
 				request = new StringBuffer('SELECT * FROM ' + table);
-				request.append('WHERE ' + selector.getFirst() + ' ');
+				request.append(' WHERE ' + selector.getFirst());
 				request.append(' = "' + selector.getSecond() + '"');
 
 				tx.execute(
-					'SELECT * FROM ' + table,
+					request.toString(),
 					[],
 					(tx, outcome) => {
 						var s : SQLRowSet;

@@ -63,6 +63,8 @@ interface IList<T> {
 	 */
 	remove(t : T) : void;
 
+	removeIf(f : Func<T, boolean>) : void;
+
 	/**
 	 * Casts list to an array
 	 * @return {Array<T>} [description]

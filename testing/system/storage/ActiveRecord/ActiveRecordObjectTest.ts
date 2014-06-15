@@ -199,7 +199,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 												// Act
 												ActiveRecordObject.find(
 													'people',
-													new Pair<string, any>('id', 1),
+													new Pair<string, any>('id', 2),
 													(outcome) => {
 														// Assert
 														var p : ActiveRecordObjectTestUtils.Person;
@@ -207,9 +207,9 @@ class ActiveRecordObjectTest extends UnitTestClass {
 														this.isTrue(TSObject.exists(outcome));
 
 														p = new ActiveRecordObjectTestUtils.Person();
-														p.id = 1;
-														p.firstName = 'Al';
-														p.lastName = 'Pacino';
+														p.id = 2;
+														p.firstName = 'Sean';
+														p.lastName = 'Connery';
 														this.isTrue(p.equals(outcome));
 
 														ActiveRecordObject.executeSQL(

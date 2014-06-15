@@ -116,6 +116,20 @@ class ArrayList<T> extends TSObject implements IList<T> {
 		}
 	}
 
+	removeIf(f : Func<T, boolean>) : void {
+		var a : Array<T> = new Array<T>();
+
+		this.forEach(
+			(e) => {
+				if (!f(e)) {
+					a.push(e);
+				}
+			}
+		);
+
+		this._content = a;
+	}
+
 	toArray() : Array<T> {
 		return this._content;
 	}

@@ -57,31 +57,37 @@
 
         <!-- Bookmark form -->
         <div class="bookmark-form-wrapper js-bookmark-form-wrapper">
-            <form action="#" method="post">
-                <p>
-                    <input type="text" name="url" placeholder="http://" />
-                </p>
-                <p>
-                    <input type="text" name="title" placeholder="An awesome title" />
-                </p>
-                <p>
-                    <textarea name="description" placeholder="Write something useful about your bookmark"></textarea>
-                </p>
-                <p>
-                    <ul class="tags js-form-tag-list">
-                        
-                    </ul>
-                </p>
-                <p>
-                    <input type="text" name="tags" placeholder="Press Enter to end a tag" list="tag-suggestions" />
-                    <datalist id="tag-suggestions" class="js-tag-suggestions">
-                    </datalist>
-                </p>
-                <p>
-                    <button type="button" class="js-cancel-button">Cancel</button>
-                    <button type="button" class="js-save-button">Save</button>
-                </p>
-            </form>
+            <ul class="bookmark-form-wrapper-list">
+                <li class="column">
+                    <img src="assets/img/right-arrow-icon.png" class="cancel-trigger js-cancel-trigger" />
+                </li>
+                <li>
+                    <form action="#" method="post">
+                        <img src="assets/img/default-bookmark-icon.png" class="js-bookmark-icon" />
+                        <p>
+                            <input type="text" name="url" placeholder="http://" />
+                        </p>
+                        <p>
+                            <input type="text" name="title" placeholder="An awesome title" />
+                        </p>
+                        <p>
+                            <textarea name="description" placeholder="Write something useful about your bookmark"></textarea>
+                        </p>
+                        <ul class="tag-list js-form-tag-list">
+                            
+                        </ul>
+                        <p>
+                            <input type="text" name="tags" placeholder="Press Enter to end a tag" list="tag-suggestions" />
+                            <datalist id="tag-suggestions" class="js-tag-suggestions">
+                            </datalist>
+                        </p>
+                        <p>
+                            <button type="button" class="save-button js-save-button">Save</button>
+                            <button type="button" class="delete-button js-delete-button">Delete</button>
+                        </p>
+                    </form>
+                </li>
+                <li class="column"></li>
         </div>
     </body>
 </html>

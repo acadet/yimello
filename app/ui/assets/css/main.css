@@ -1,1 +1,370 @@
-@font-face{font-family:"modern_sans_regular";src:url("../fonts/MODERNE SANS.eot");src:url("../fonts/MODERNE SANS.eot?#iefix") format("embedded-opentype"),url("../fonts/MODERNE SANS.woff") format("woff"),url("../fonts/MODERNE SANS.ttf") format("truetype"),url("../fonts/MODERNE SANS.svg#bcb65e5f871894c6b949303cede8fd32") format("svg");font-style:normal;font-weight:400}@font-face{font-family:"montserrat_regular";src:url("../fonts/Montserrat-Regular.eot");src:url("../fonts/Montserrat-Regular.eot?#iefix") format("embedded-opentype"),url("../fonts/Montserrat-Regular.woff") format("woff"),url("../fonts/Montserrat-Regular.ttf") format("truetype"),url("../fonts/Montserrat-Regular.svg#95d90f2cd2aa64bdfee0e9f34c516e71") format("svg");font-style:normal;font-weight:400}@font-face{font-family:"pt_sans_regular";src:url("../fonts/PTS55F.eot");src:url("../fonts/PTS55F.eot?#iefix") format("embedded-opentype"),url("../fonts/PTS55F.woff") format("woff"),url("../fonts/PTS55F.ttf") format("truetype"),url("../fonts/PTS55F.svg#f39585f1b656e5f9297b79e526233403") format("svg");font-style:normal;font-weight:400}body{position:absolute;top:0px;left:0px;width:100%;height:100%;margin:0;overflow:hidden;opacity:0}body *{font-weight:400;font-style:normal}a{text-decoration:none;color:inherit}a:hover{text-decoration:none}a:visited{color:inherit}.main-view-wrapper{position:absolute;top:0px;left:0px;width:100%;height:100%}.panel-wrapper{position:absolute;top:0px;left:0px;width:25%;height:100%;background-color:#333}.panel-wrapper .icon-wrapper,.panel-wrapper .tag-list{display:inline-block}.panel-wrapper .icon-wrapper{width:100%;padding:10px 0px;border-bottom:3px solid rgba(0,0,0,0.2)}.panel-wrapper .tag-list{width:100%;margin:30px 0 0 0}.panel-wrapper .icon-wrapper .icons{margin:0;padding:0;list-style-type:none;text-align:center}.panel-wrapper .icon-wrapper .icons .icon{display:inline-block;vertical-align:middle;padding:5px 10px;cursor:pointer}.panel-wrapper .tag-list .tags{list-style-type:none;margin:0;padding:0px 0px 0px 15px}.panel-wrapper .tag-list .tags li{font-family:"pt_sans_regular";font-size:1em;margin:10px 0px;color:white;cursor:pointer}.bookmark-wrapper{position:absolute;top:0px;left:25%;width:75%;height:90%;background-color:white}.search-wrapper{position:absolute;top:90%;left:25%;width:75%;height:10%;background-color:#0c7cbb}.search-wrapper img,.search-wrapper form{display:inline-block;vertical-align:middle}.search-wrapper img{margin:10px 20px}.search-wrapper form{height:100%;width:505px}.search-wrapper form input::-webkit-input-placeholder{color:rgba(255,255,255,0.5)}.search-wrapper form input::-moz-placeholder{color:rgba(255,255,255,0.5)}.search-wrapper form input:-moz-placeholder{color:rgba(255,255,255,0.5)}.search-wrapper form input:-ms-placeholder{color:rgba(255,255,255,0.5)}.search-wrapper form input{width:100%;height:100%;padding:5px 10px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;-o-box-sizing:border-box;box-sizing:border-box;font-family:"pt_sans_regular";font-size:1em;outline:none;border:none;background:none;color:white}.bookmark-form-wrapper{position:absolute;top:0;left:100%;width:100%;height:100%}.bookmark-form-wrapper form{margin:15px auto;padding:0 25px;width:400px;text-align:center}.bookmark-form-wrapper form p{margin:1em 0}.bookmark-form-wrapper form input{width:300px;height:20px;padding:5px 10px;outline:none}.bookmark-form-wrapper form textarea{width:300px;height:50px;padding:5px 10px;outline:none}.bookmark-form-wrapper form .tags{margin:0;padding:0;list-style-type:none}.bookmark-form-wrapper form .tags li{vertical-align:middle;padding:0;margin:0;display:inline-block}.bookmark-form-wrapper form .save-buton{width:200px;height:20px;padding:5px 10px;outline:none;background-color:#22a8e8;color:white}
+@font-face {
+  font-family: "modern_sans_regular";
+  src: url("../fonts/MODERNE SANS.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/MODERNE SANS.eot?#iefix") format("embedded-opentype"), url("../fonts/MODERNE SANS.woff") format("woff"), url("../fonts/MODERNE SANS.ttf") format("truetype"), url("../fonts/MODERNE SANS.svg#bcb65e5f871894c6b949303cede8fd32") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "montserrat_regular";
+  src: url("../fonts/Montserrat-Regular.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/Montserrat-Regular.eot?#iefix") format("embedded-opentype"), url("../fonts/Montserrat-Regular.woff") format("woff"), url("../fonts/Montserrat-Regular.ttf") format("truetype"), url("../fonts/Montserrat-Regular.svg#95d90f2cd2aa64bdfee0e9f34c516e71") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "pt_sans_regular";
+  src: url("../fonts/PTS55F.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/PTS55F.eot?#iefix") format("embedded-opentype"), url("../fonts/PTS55F.woff") format("woff"), url("../fonts/PTS55F.ttf") format("truetype"), url("../fonts/PTS55F.svg#f39585f1b656e5f9297b79e526233403") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 400;
+}
+body {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+body * {
+  font-weight: 400;
+  font-style: normal;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:hover {
+  text-decoration: none;
+}
+a:visited {
+  color: inherit;
+}
+
+.main-view-wrapper {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.panel-wrapper {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 25%;
+  height: 100%;
+  background-color: #333333;
+}
+.panel-wrapper .icon-wrapper, .panel-wrapper .tag-list {
+  display: inline-block;
+}
+.panel-wrapper .icon-wrapper {
+  width: 100%;
+  padding: 10px 0px;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.2);
+}
+.panel-wrapper .tag-list {
+  width: 100%;
+  margin: 30px 0 0 0;
+}
+
+.panel-wrapper .icon-wrapper .icons {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-align: center;
+}
+.panel-wrapper .icon-wrapper .icons .icon {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.panel-wrapper .tag-list .tags {
+  list-style-type: none;
+  margin: 0;
+  padding: 0px 0px 0px 15px;
+}
+.panel-wrapper .tag-list .tags li {
+  font-family: "pt_sans_regular";
+  font-size: 1em;
+  margin: 10px 0px;
+  color: white;
+  cursor: pointer;
+}
+
+.bookmark-wrapper {
+  position: absolute;
+  top: 0px;
+  left: 25%;
+  width: 75%;
+  height: 90%;
+  background-color: white;
+}
+.bookmark-wrapper ul {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  list-style-type: none;
+  overflow: auto;
+}
+.bookmark-wrapper ul li {
+  vertical-align: middle;
+  display: inline-block;
+  padding: 10px 15px;
+  width: 33.3%;
+  height: 33.3%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  text-align: center;
+  cursor: pointer;
+  -webkit-transition: background-color 0.5s ease 0;
+  -moz-transition: background-color 0.5s ease 0;
+  -ms-transition: background-color 0.5s ease 0;
+  -o-transition: background-color 0.5s ease 0;
+  transition: background-color 0.5s ease 0;
+}
+.bookmark-wrapper ul li:hover {
+  background-color: #eee;
+}
+
+.bookmark-wrapper ul li h3 {
+  margin: 0;
+  font-size: 1em;
+  font-family: "pt_sans_regular";
+  color: #333333;
+}
+.bookmark-wrapper ul li p {
+  font-size: 0.8em;
+  font-family: "pt_sans_regular";
+  text-align: justify;
+  color: #ccc;
+}
+
+.search-wrapper {
+  position: absolute;
+  top: 90%;
+  left: 25%;
+  width: 75%;
+  height: 10%;
+  background-color: #0c7cbb;
+}
+.search-wrapper img, .search-wrapper form {
+  display: inline-block;
+  vertical-align: middle;
+}
+.search-wrapper img {
+  margin: 10px 20px;
+}
+.search-wrapper form {
+  height: 100%;
+  width: 505px;
+}
+.search-wrapper form input::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.search-wrapper form input::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.search-wrapper form input:-moz-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.search-wrapper form input:-ms-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-wrapper form input {
+  width: 100%;
+  height: 100%;
+  padding: 5px 10px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: "pt_sans_regular";
+  font-size: 1em;
+  outline: none;
+  border: none;
+  background: none;
+  color: white;
+}
+
+.bookmark-form-wrapper {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 100%;
+  height: 100%;
+  background-color: #333333;
+}
+.bookmark-form-wrapper ul {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  list-style-type: none;
+}
+.bookmark-form-wrapper ul li {
+  padding: 0;
+  display: inline-block;
+  height: 100%;
+  vertical-align: top;
+}
+.bookmark-form-wrapper ul li.column {
+  width: 32px;
+  padding: 0 20px;
+  text-align: center;
+}
+.bookmark-form-wrapper form {
+  margin: 15px 0;
+  padding: 0 25px;
+  width: 656px;
+  text-align: center;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.bookmark-form-wrapper form p {
+  margin: 1em 0;
+}
+
+.bookmark-form-wrapper .cancel-trigger {
+  opacity: 0.5;
+  cursor: pointer;
+  -webkit-transition: opacity 0.5s ease 0;
+  -moz-transition: opacity 0.5s ease 0;
+  -ms-transition: opacity 0.5s ease 0;
+  -o-transition: opacity 0.5s ease 0;
+  transition: opacity 0.5s ease 0;
+}
+.bookmark-form-wrapper .cancel-trigger:hover {
+  opacity: 1;
+}
+
+.bookmark-form-wrapper .save-button {
+  min-width: 200px;
+  min-height: 30px;
+  padding: 10px 15px;
+  font-family: "montserrat_regular";
+  font-size: 1em;
+  color: white;
+  background-color: #7eb530;
+  border: 1px solid #71a02e;
+  cursor: pointer;
+  outline: none;
+  text-align: center;
+}
+.bookmark-form-wrapper .save-button:active {
+  background-color: #71a02e;
+}
+
+.bookmark-form-wrapper .delete-button {
+  min-width: 200px;
+  min-height: 30px;
+  padding: 10px 15px;
+  font-family: "montserrat_regular";
+  font-size: 1em;
+  color: white;
+  background-color: #dd381d;
+  border: 1px solid #b52c17;
+  cursor: pointer;
+  outline: none;
+  text-align: center;
+}
+.bookmark-form-wrapper .delete-button:active {
+  background-color: #b52c17;
+}
+
+.bookmark-form-wrapper form input,
+.bookmark-form-wrapper form textarea {
+  width: 300px;
+  padding: 5px 10px;
+  font-family: "pt_sans_regular";
+  font-size: 1em;
+  outline: none;
+  border: 2px solid #555;
+  background-color: #333333;
+  color: white;
+  -webkit-transition: border-color 0.5s ease 0;
+  -moz-transition: border-color 0.5s ease 0;
+  -ms-transition: border-color 0.5s ease 0;
+  -o-transition: border-color 0.5s ease 0;
+  transition: border-color 0.5s ease 0;
+}
+.bookmark-form-wrapper form input:focus,
+.bookmark-form-wrapper form textarea:focus {
+  border-color: #22a8e8;
+}
+
+.bookmark-form-wrapper form input {
+  height: 20px;
+}
+
+.bookmark-form-wrapper form textarea {
+  height: 80px;
+}
+
+.bookmark-form-wrapper form .tag-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+.bookmark-form-wrapper form .tag-list li {
+  vertical-align: middle;
+  padding: 5px;
+  margin: 5px 10px;
+  display: inline-block;
+  background-color: #ccc;
+  -webkit-transition: opacity 0.5s ease 0;
+  -moz-transition: opacity 0.5s ease 0;
+  -ms-transition: opacity 0.5s ease 0;
+  -o-transition: opacity 0.5s ease 0;
+  transition: opacity 0.5s ease 0;
+}
+.bookmark-form-wrapper form .tag-list li:hover {
+  opacity: 0.5;
+}
+.bookmark-form-wrapper form .tag-list li p, .bookmark-form-wrapper form .tag-list li img {
+  display: inline-block;
+  vertical-align: middle;
+}
+.bookmark-form-wrapper form .tag-list li p {
+  margin: 0;
+  font-family: "montserrat_regular";
+  font-size: 0.8em;
+  color: #333333;
+  cursor: default;
+}
+.bookmark-form-wrapper form .tag-list li img {
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.bookmark-form-wrapper form .save-buton {
+  width: 200px;
+  height: 20px;
+  padding: 5px 10px;
+  outline: none;
+  background-color: #22a8e8;
+  color: white;
+}

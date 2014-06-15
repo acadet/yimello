@@ -25,10 +25,23 @@ class BookmarkList {
 	
 	private _buildDOMBookmark(bookmark : BookmarkDAO) : DOMElement {
 		var e : DOMElement;
+		var s : StringBuffer;
+		var truncatedDescription : string;
 
-		e = DOMElement.fromString('<li>' + bookmark.getTitle() + '</li>');
+		s = new StringBuffer('<li>');
+
+		if (Environment.isOnline()) {
+			s.append('<img src="http://g.etfv.co/' + bookmark.getURL() + '" />');
+		} else {
+			s.append('<img src="assets/img/default-bookmark-icon.png" />');
+		}
+
+		s.append('<h3>' + bookmark.getTitle() + '</p>');
+		truncatedDescription = StringHelper.truncate(bookmark.getDescription(), 50);
+		s.append('<p>' + truncatedDescription + '</p>');
+
+		e = DOMElement.fromString(s.toString());
 		e.setData('id', bookmark.getId());
-
 
 		return e;
 	}
@@ -49,12 +62,26 @@ class BookmarkList {
 	}
 
 	private _reset() : void {
+		this._hide();
 		this._destList.getChildren().forEach(e => e.off(DOMElementEvents.Click));
-		this._destList.setHTML('');
+		this._destList.getChildren().forEach(e => e.remove());
 	}
 
 	private _setDefaultContent() : void {
 		this._destList.setHTML('<p>No bookmarks to display :(</p>');
+	}
+
+	private _hide() : void {
+		this._destList.setCss({opacity : 0});
+	}
+
+	private _show() : void {
+		this._destList.animate(
+			{
+				opacity : 1
+			},
+			500
+		);
 	}
 
 	//endregion Private Methods
@@ -75,6 +102,7 @@ class BookmarkList {
 						}
 					);
 					this._subscribeTriggers();
+					this._show();
 				}
 			}
 		);
@@ -97,6 +125,7 @@ class BookmarkList {
 							}
 						);
 						this._subscribeTriggers();
+						this._show();
 					}
 				}
 			);

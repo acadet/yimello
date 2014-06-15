@@ -17,8 +17,17 @@ class ActiveRecordHelper extends TSObject {
 	 * specified converter
 	 */
 	static getListFromSQLResultSet<T>(set : SQLResultSet, converter : Func<any, T> = null) : IList<T> {
-		var s : SQLRowSet = set.getRows();
-		var outcome : IList<T> = new ArrayList<T>();
+		var s : SQLRowSet;
+		var outcome : IList<T>;
+
+		outcome = new ArrayList<T>();
+
+		if (!TSObject.exists(set)) {
+			Log.warn('Unable to build a list: no data were returned');
+			return outcome;
+		}
+
+		s = set.getRows();
 
 		for (var i = 0; i < s.getLength(); i++) {
 			if (converter !== null) {

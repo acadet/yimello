@@ -36,6 +36,48 @@ class URLHelperTest extends UnitTestClass {
 		// Assert
 		this.isFalse(isValid);
 	}
+
+	URLHelperBuildAbsoluteTest() : void {
+		// Arrange
+		var url : string = 'http://google.fr/';
+		var s : string = 'favicon.ico';
+		var expected : string = 'http://google.fr/favicon.ico';
+		var outcome : string;
+
+		// Act
+		outcome = URLHelper.buildAbsolute(s, url);
+
+		// Assert
+		this.areIdentical(expected, outcome);
+	}
+
+	URLHelperBuildAbsoluteWithoutSlashTest() : void {
+		// Arrange
+		var url : string = 'http://google.fr';
+		var s : string = 'favicon.ico';
+		var expected : string = 'http://google.fr/favicon.ico';
+		var outcome : string;
+
+		// Act
+		outcome = URLHelper.buildAbsolute(s, url);
+
+		// Assert
+		this.areIdentical(expected, outcome);
+	}
+
+	URLHelperBuildAbsoluteAlreadyAbsoluteTest() : void {
+		// Arrange
+		var url : string = 'http://google.fr/';
+		var s : string = 'http://google.fr/favicon.ico';
+		var expected : string = 'http://google.fr/favicon.ico';
+		var outcome : string;
+
+		// Act
+		outcome = URLHelper.buildAbsolute(s, url);
+
+		// Assert
+		this.areIdentical(expected, outcome);
+	}
 }
 
 UnitTestClass.handle(new URLHelperTest());
