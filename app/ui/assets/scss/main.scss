@@ -11,6 +11,8 @@ $lightBlue : #22A8E8;
 
 	width: 100%;
 	height: 100%;
+
+	z-index : 1;
 }
 
 .panel-wrapper {
@@ -51,13 +53,19 @@ $lightBlue : #22A8E8;
 		vertical-align: middle;
 		padding: 5px 10px;
 		cursor: pointer;
+
+		@include transition(opacity, 0.5s, ease);
+
+		&:hover {
+			opacity : 0.8;
+		}
 	}
 }
 
 .panel-wrapper .tag-list .tags {
 	list-style-type: none;
 	margin: 0;
-	padding: 0px 0px 0px 15px;
+	padding: 0;
 
 	li {
 		font: {
@@ -65,10 +73,21 @@ $lightBlue : #22A8E8;
 			size: 1em;
 		}
 
-		margin: 10px 0px;
+		margin: 0;
+		padding : 5px 15px;
 
 		color: white;
 		cursor: pointer;
+
+		@include transition(background-color, 0.5s, ease);
+
+		&.active {
+			background-color : $lightBlue;
+		}
+
+		&:hover:not(.active) {
+			background-color : #484848;
+		}
 	}
 }
 
@@ -260,11 +279,11 @@ $lightBlue : #22A8E8;
 	}
 }
 
-.bookmark-form-wrapper .save-button {
+form .save-button {
 	@include flat-button(#7EB530, #71a02e);
 }
 
-.bookmark-form-wrapper .delete-button {
+form .delete-button, form .cancel-button {
 	@include flat-button(#DD381D, #B52C17);
 }
 
@@ -346,4 +365,81 @@ $lightBlue : #22A8E8;
 	outline: none;
 	background-color: #22a8e8;
 	color: white;
+}
+
+.overlay {
+	position : absolute;
+	top : 0;
+	left: 0;
+
+	width : 100%;
+	height : 100%;
+	display : none;
+
+	z-index : 0;
+	background : rgba(0, 0, 0, 0.6);
+	opacity : 0;
+}
+
+.overlay .tag-form-wrapper, .overlay .menu-pannel {
+	position : absolute;
+
+	padding : 10px 0;
+	display : none;
+
+	background-color : $black;
+	@include border-radius(10px);
+}
+
+.overlay .menu-pannel {
+	ul {
+		list-style-type: none;
+		margin : 0;
+		padding : 0;
+
+		li {
+			padding : 10px 20px;
+
+			font : {
+				family : $montserrat;
+				size : 1em;
+			}
+
+			color : white;
+			cursor : pointer;
+		}
+	}
+}
+
+.overlay .tag-form-wrapper {
+	form {
+		margin : 10px 20px;
+
+		p {
+			margin : 0;
+
+			&:first-child {
+				margin-bottom : 1em;
+			}
+		}
+
+		input {
+			padding : 5px 10px;
+			width : 100%;
+			min-height : 40px;
+			@include box-sizing(border-box);
+
+			font : {
+				family : $ptSans;
+				size : 1em;
+			}
+
+			outline : none;
+			border : none;
+		}
+
+		button {
+			margin : 0;
+		}
+	}
 }

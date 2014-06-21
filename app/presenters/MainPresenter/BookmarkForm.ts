@@ -33,9 +33,9 @@ class BookmarkForm extends TSObject {
 	 */
 	private _tagDataList : DOMElement;
 
-	private _deleteButton : DOMElement;
-
 	private _bookmarkIcon : DOMElement;
+
+	private _deleteButton : DOMElement;
 
 	/**
 	 * List of current tags
@@ -94,6 +94,14 @@ class BookmarkForm extends TSObject {
 					}
 				}
 			);
+
+		// Delete button
+		this._deleteButton.on(
+			DOMElementEvents.Click,
+			(e) => {
+				this._onDelete();
+			}
+		);
 
 		this._prepareTagsInput();
 		this._prepareURLInput();
@@ -227,6 +235,26 @@ class BookmarkForm extends TSObject {
 			);
 	}
 
+	private _onDelete() : void {
+		if (!this._isUpdating) {
+			return;
+		}
+
+		PresenterMediator
+			.getBookmarkBusiness()
+			.delete(
+				this._currentUpdatedBookmark,
+				(success) => {
+					if (success) {
+						this._subscriber.onFormDelete();
+					} else {
+						// TODO
+						alert('An error occured while removing bookmark');
+					}
+				}
+			);
+	}
+
 	/**
 	 * Called when a new tag is added by user
 	 * @param {string} value [description]
@@ -324,7 +352,7 @@ class BookmarkForm extends TSObject {
 					this._titleInput.setValue(title);
 					this._descriptionInput.setValue(description);
 
-					this._setBookmarkIcon(e.getTarget().getValue());
+					this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(e.getTarget().getValue()));
 				},
 				(type, error) => {
 					// TODO
@@ -367,18 +395,6 @@ class BookmarkForm extends TSObject {
 		this._deleteButton.setCss({display : 'none'});
 	}
 
-	private _resetBookmarkIcon() : void {
-		this._bookmarkIcon.setAttribute('src', 'assets/img/default-bookmark-icon.png');
-	}
-
-	private _setBookmarkIcon(url : string) : void {
-		if (Environment.isOnline()) {
-			this._bookmarkIcon.setAttribute('src', 'http://g.etfv.co/' + url);
-		} else {
-			this._resetBookmarkIcon();
-		}
-	}
-
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -392,7 +408,7 @@ class BookmarkForm extends TSObject {
 		this._titleInput.setValue('');
 		this._descriptionInput.setValue('');
 
-		this._resetBookmarkIcon();
+		this._bookmarkIcon.setAttribute('src', FaviconHelper.getDefaultSrc());
 	}
 
 	resetToUpdate(bookmark : BookmarkDAO) : void {
@@ -405,7 +421,7 @@ class BookmarkForm extends TSObject {
 		this._descriptionInput.setValue(bookmark.getDescription());
 
 		this._deleteButton.setCss({display : 'inline-block'});
-		this._setBookmarkIcon(bookmark.getURL());
+		this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(bookmark.getURL()));
 
 		PresenterMediator
 			.getTagBusiness()

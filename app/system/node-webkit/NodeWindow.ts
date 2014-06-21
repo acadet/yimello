@@ -85,6 +85,10 @@ class NodeWindow {
 		NodeWindow.getInstance().window.location = page;
 	}
 
+	static close() : void {
+		gui.Window.get().close();
+	}
+
 	//endregion Public Methods
 	
 	//endregion Methods

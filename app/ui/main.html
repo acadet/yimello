@@ -14,7 +14,7 @@
         </script>
         <script type="text/javascript">
             var _mainClass = 'MainPresenter';
-            var _libs = ['jquery'];
+            var _libs = ['jquery', 'jqueryUI'];
         </script>
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
@@ -24,13 +24,13 @@
             <div class="panel-wrapper">
                 <div class="icon-wrapper">
                     <ul class="icons">
-                        <li class="icon">
+                        <li class="icon js-menu-trigger">
                             <img src="assets/img/menu-icon.png" />
                         </li>
                         <li class="icon js-bookmark-add-trigger">
                             <img src="assets/img/bookmark-icon.png" />
                         </li>
-                        <li class="icon">
+                        <li class="icon js-tag-form-trigger">
                             <img src="assets/img/tag-icon.png" />
                         </li>
                     </ul>
@@ -88,6 +88,26 @@
                     </form>
                 </li>
                 <li class="column"></li>
+        </div>
+
+        <div class="overlay js-overlay">
+            <div class="tag-form-wrapper js-tag-form-wrapper">
+                <form action="#" method="post">
+                    <p><input type="text" name="tag" placeholder="My amazing tag" /></p>
+                    <p>
+                        <button type="button" class="save-button js-save-tag-button">Save</button>
+                        <button type="button" class="cancel-button js-cancel-tag-button">Cancel</button>
+                    </p>
+                </form>
+            </div>
+
+            <div class="menu-pannel js-menu-pannel">
+                <ul>
+                    <li class="js-tour-trigger">Get a tour again</li>
+                    <li>Import from web browser</li>
+                    <li class="js-close-trigger">Close</li>
+                </ul>
+            </div>
         </div>
     </body>
 </html>

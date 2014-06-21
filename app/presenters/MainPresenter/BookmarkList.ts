@@ -30,12 +30,7 @@ class BookmarkList {
 
 		s = new StringBuffer('<li>');
 
-		if (Environment.isOnline()) {
-			s.append('<img src="http://g.etfv.co/' + bookmark.getURL() + '" />');
-		} else {
-			s.append('<img src="assets/img/default-bookmark-icon.png" />');
-		}
-
+		s.append(FaviconHelper.getImgTag(bookmark.getURL()).toString());
 		s.append('<h3>' + bookmark.getTitle() + '</p>');
 		truncatedDescription = StringHelper.truncate(bookmark.getDescription(), 50);
 		s.append('<p>' + truncatedDescription + '</p>');

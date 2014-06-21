@@ -12,6 +12,10 @@ require.config({
 	}
 });
 
+define('jqueryUI', ['jquery'], function() {
+	require(['libs/jquery-ui-1.10.4.min']);
+});
+
 require(_libs, function() {
 	var _bootClass = eval('new ' + _mainClass + '()');
 });

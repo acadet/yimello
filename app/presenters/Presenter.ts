@@ -53,7 +53,7 @@ class Presenter extends TSObject {
 
 	private _onDestroy() : void {
 		PresenterMediator.getInstance().onDestroy.call(PresenterMediator.getInstance());
-		gui.Window.get().close();
+		NodeWindow.close();
 	}
 
 	//endregion Private Methods

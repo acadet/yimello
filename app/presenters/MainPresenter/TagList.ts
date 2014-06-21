@@ -6,6 +6,7 @@ class TagList {
 	private _destList : DOMElement;
 	private _mostPopularTrigger : DOMElement;
 	private _subscriber : ITagListSubscriber;
+	private _currentSelectedTag : DOMElement;
 
 	//endregion Fields
 	
@@ -33,6 +34,15 @@ class TagList {
 		return e;
 	}
 
+	private _setActive(e : DOMElement) : void {
+		if (TSObject.exists(this._currentSelectedTag)) {
+			this._currentSelectedTag.removeClass('active');
+		}
+
+		e.addClass('active');
+		this._currentSelectedTag = e;
+	}
+
 	private _subscribeTriggers() : void {
 		this._destList
 			.getChildren()
@@ -43,6 +53,7 @@ class TagList {
 							DOMElementEvents.Click,
 							(arg) => {
 								this._subscriber.onMostPopularSelection();
+								this._setActive(e);
 							}
 						);
 					} else {
@@ -50,6 +61,7 @@ class TagList {
 							DOMElementEvents.Click,
 							(arg) => {
 								this._subscriber.onTagSelection(e.getData('id'));
+								this._setActive(e);
 							}
 						);
 					}
@@ -79,6 +91,8 @@ class TagList {
 				this._subscribeTriggers();
 			}
 		);
+
+		this._setActive(this._mostPopularTrigger);
 	}
 
 	//endregion Public Methods

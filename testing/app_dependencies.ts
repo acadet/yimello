@@ -89,4 +89,5 @@
 
 
 //grunt-start
+/// <reference path="../app/system/Environment.ts" />
 //grunt-end

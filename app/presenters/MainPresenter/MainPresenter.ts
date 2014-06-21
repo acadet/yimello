@@ -23,6 +23,7 @@ class MainPresenter
 	private _bookmarkForm : BookmarkForm;
 	private _tagList : TagList;
 	private _bookmarkList : BookmarkList;
+	private _menu : MenuControl;
 
 	//endregion Fields
 	
@@ -34,6 +35,7 @@ class MainPresenter
 		this._bookmarkForm = new BookmarkForm(this);
 		this._tagList = new TagList(this);
 		this._bookmarkList = new BookmarkList(this);
+		this._menu = new MenuControl();
 	}
 
 	//endregion Constructors
@@ -112,6 +114,12 @@ class MainPresenter
 	}
 
 	onFormSave() : void {
+		this._tagList.reset();
+		this._bookmarkList.displayMostPopular();
+		this._switchFromBookmarkForm();
+	}
+
+	onFormDelete() : void {
 		this._tagList.reset();
 		this._bookmarkList.displayMostPopular();
 		this._switchFromBookmarkForm();

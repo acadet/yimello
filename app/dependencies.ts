@@ -1,4 +1,7 @@
+// Libs part
+
 /// <reference path="libs/jquery.d.ts" />
+/// <reference path="libs/jqueryui.d.ts" />
 
 // System part
 
@@ -89,5 +92,7 @@
 
 
 //grunt-start
+/// <reference path="helpers/FaviconHelper.ts" />
+/// <reference path="presenters/MainPresenter/MenuControl.ts" />
 /// <reference path="system/Environment.ts" />
 //grunt-end

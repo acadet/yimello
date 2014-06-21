@@ -22,6 +22,16 @@ interface IBookmarkBusiness {
 	updateTagBinding(bookmark : BookmarkDAO, tags : IList<TagDAO>, callback : Action<boolean>) : void;
 
 	/**
+	 * Adds a new bookmark into DB. 
+	 * Applies security operation on it
+	 * @param {BookmarkDAO}         bookmark [description]
+	 * @param {Action<BookmarkDAO>} callback Callback with new bookmark as argument
+	 */
+	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO>) : void;
+
+	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO>) : void;
+
+	/**
 	 * Deletes a bookmark from DB
 	 * @param {BookmarkDAO}     bookmark [description]
 	 * @param {Action<boolean>} callback Callback with a success arg
@@ -34,14 +44,4 @@ interface IBookmarkBusiness {
 	 * @param {Action<IList<BookmarkDAO>>} callback [description]
 	 */
 	sortByTitleAscForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void;
-
-	/**
-	 * Adds a new bookmark into DB. 
-	 * Applies security operation on it
-	 * @param {BookmarkDAO}         bookmark [description]
-	 * @param {Action<BookmarkDAO>} callback Callback with new bookmark as argument
-	 */
-	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO>) : void;
-
-	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO>) : void;
 }
