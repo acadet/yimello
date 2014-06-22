@@ -29,7 +29,7 @@ class BookmarkDAO extends DataAccessObject {
 	//endregion Fields
 	
 	//region Constructors
-	
+
 	//endregion Constructors
 	
 	//region Methods
@@ -145,6 +145,13 @@ class BookmarkDAO extends DataAccessObject {
 		return b;
 	}
 
+	hydrateBookmark(out : BookmarkDAO) : void {
+		out.setId(this.getId());
+		out.setTitle(this.getTitle());
+		out.setDescription(this.getDescription());
+		out.setViews(this.getViews());
+	}
+
 	/**
 	 * Adds a new bookmark into DB
 	 * @param {Action<BookmarkDAO> = null} callback Callback with new built bookmark. Id is filled
@@ -213,7 +220,7 @@ class BookmarkDAO extends DataAccessObject {
 						callback(this);
 					}
 				} else {
-					Log.error(new DAOException('An error occurend when updating bookmark'));
+					Log.error(new DAOException('An error occured when updating bookmark'));
 					if (callback !== null) {
 						callback(this);
 					}
@@ -288,6 +295,25 @@ class BookmarkDAO extends DataAccessObject {
 
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' ');
 		request.append('ORDER BY views DESC, title ASC');
+
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(outcome) => {
+						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, BookmarkDAO.fromObject));
+					}
+				);
+			}
+		);
+	}
+
+	// TODO : test
+	static sortByTitleAsc(callback : Action<IList<BookmarkDAO>>) : void {
+		var request : StringBuffer;
+
+		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' ');
+		request.append('ORDER BY title ASC');
 
 		DataAccessObject.initialize(
 			(success) => {

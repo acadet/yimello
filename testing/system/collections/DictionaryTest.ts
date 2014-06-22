@@ -78,7 +78,7 @@ class DictionaryTest extends UnitTestClass {
 		this._dict.add(p.lastName, p);
 
 		// Act
-		b = this._dict.containsKey(p.lastName);
+		b = this._dict.containsKey('Pacino');
 
 		// Assert
 		this.isTrue(b);

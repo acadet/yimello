@@ -61,4 +61,35 @@ class StringHelper {
 
 		return s;
 	}
+
+	// TODO : test
+	static extractWords(s : string) : IList<string> {
+		var list : IList<string>;
+		var tmp : string;
+
+		if (!TSObject.exists(s)) {
+			Log.error(new Exception('Unable to extract: specified string is null'));
+			return null;
+		}
+
+		list = new ArrayList<string>();
+
+		if (s.length < 1) {
+			Log.warn('Nothing to extract, string is empty');
+			return list;
+		}
+
+		tmp = '';
+		for (var i = 0; i < s.length; i++) {
+			var e : string = s.charAt(i);
+			if (e === ' ') {
+				list.add(tmp);
+				tmp = '';
+			} else {
+				tmp += e;
+			}
+		}
+
+		return list;
+	}
 }

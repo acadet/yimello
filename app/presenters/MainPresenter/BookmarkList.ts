@@ -6,6 +6,11 @@ class BookmarkList {
 	private _subscriber : IBookmarkListSubscriber;
 
 	private _destList : DOMElement;
+	private _wrapper : DOMElement;
+
+	private _defaultContent : DOMElement;
+	private _isDefaultContentCurrent : boolean;
+	private _isPressingMetaKey : boolean;
 
 	//endregion Fields
 	
@@ -13,8 +18,25 @@ class BookmarkList {
 	
 	constructor(sub : IBookmarkListSubscriber) {
 		this._subscriber = sub;
+		this._wrapper = DOMTree.findSingle('.js-bookmark-wrapper');
+		this._destList = this._wrapper.findSingle('.js-bookmark-list');
+		this._defaultContent = this._wrapper.findSingle('.js-default-content');
+		this._isDefaultContentCurrent = false;
+		this._isPressingMetaKey = false;
 
-		this._destList = DOMTree.findSingle('.js-bookmark-list');
+		DOMTree.getDocument().on(
+			DOMElementEvents.KeyDown,
+			(e) => {
+				this._isPressingMetaKey = e.isMetaKey();
+			}
+		);
+
+		DOMTree.getDocument().on(
+			DOMElementEvents.KeyUp,
+			(e) => {
+				this._isPressingMetaKey = false;
+			}
+		);
 	}
 
 	//endregion Constructors
@@ -31,7 +53,7 @@ class BookmarkList {
 		s = new StringBuffer('<li>');
 
 		s.append(FaviconHelper.getImgTag(bookmark.getURL()).toString());
-		s.append('<h3>' + bookmark.getTitle() + '</p>');
+		s.append('<h3>' + bookmark.getTitle() + '</h3>');
 		truncatedDescription = StringHelper.truncate(bookmark.getDescription(), 50);
 		s.append('<p>' + truncatedDescription + '</p>');
 
@@ -49,7 +71,18 @@ class BookmarkList {
 					e.on(
 						DOMElementEvents.Click,
 						(arg) => {
-							this._subscriber.onBookmarkSelection(e.getData('id'));
+							if (this._isPressingMetaKey) {
+								BookmarkDAO.find(
+									e.getData('id'),
+									(outcome) => {
+										outcome.setViews(outcome.getViews() + 1);
+										outcome.update();
+										NodeWindow.openExternal(outcome.getURL());
+									}
+								);
+							} else {
+								this._subscriber.onBookmarkSelection(e.getData('id'));
+							}
 						}
 					);
 				}
@@ -63,15 +96,31 @@ class BookmarkList {
 	}
 
 	private _setDefaultContent() : void {
-		this._destList.setHTML('<p>No bookmarks to display :(</p>');
+		if (this._isDefaultContentCurrent) {
+			return;
+		}
+
+		this._destList.setCss({ display : 'none' });
+		this._defaultContent.setCss({ display : 'block' });
+		this._isDefaultContentCurrent = true;
+	}
+
+	private _removeDefaultContent() : void {
+		if (!this._isDefaultContentCurrent) {
+			return;
+		}
+
+		this._destList.setCss({ display : 'block' });
+		this._defaultContent.setCss({ display : 'none' });
+		this._isDefaultContentCurrent = false;
 	}
 
 	private _hide() : void {
-		this._destList.setCss({opacity : 0});
+		this._wrapper.setCss({opacity : 0});
 	}
 
 	private _show() : void {
-		this._destList.animate(
+		this._wrapper.animate(
 			{
 				opacity : 1
 			},
@@ -91,14 +140,15 @@ class BookmarkList {
 				if (outcome.getLength() < 1) {
 					this._setDefaultContent();
 				} else {
+					this._removeDefaultContent();
 					outcome.forEach(
 						(e) => {
 							this._destList.append(this._buildDOMBookmark(e));
 						}
 					);
 					this._subscribeTriggers();
-					this._show();
 				}
+				this._show();
 			}
 		);
 	}
@@ -114,16 +164,21 @@ class BookmarkList {
 					if (outcome.getLength() < 1) {
 						this._setDefaultContent();
 					} else {
+						this._removeDefaultContent();
 						outcome.forEach(
 							(e) => {
 								this._destList.append(this._buildDOMBookmark(e));
 							}
 						);
 						this._subscribeTriggers();
-						this._show();
 					}
+					this._show();
 				}
 			);
+	}
+
+	unfocus() : void {
+		this._isPressingMetaKey = false;
 	}
 
 	//endregion Public Methods

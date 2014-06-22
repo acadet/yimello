@@ -22,6 +22,7 @@
 /// <reference path="system/MathHelper.ts" />
 /// <reference path="system/StringHelper.ts" />
 /// <reference path="helpers/FormHelper.ts" />
+/// <reference path="system/Environment.ts" />
 
 // Collections parts
 
@@ -55,6 +56,7 @@
 /// <reference path="helpers/URLHelper.ts" />
 /// <reference path="helpers/URLDetailsProvider.ts" />
 /// <reference path="helpers/SecurityHelper.ts" />
+/// <reference path="helpers/FaviconHelper.ts" />
 
 // DAO part
 
@@ -85,14 +87,17 @@
 /// <reference path="presenters/MainPresenter/IBookmarkFormSubscriber.ts" />
 /// <reference path="presenters/MainPresenter/IBookmarkListSubscriber.ts" />
 /// <reference path="presenters/MainPresenter/ITagListSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/Menu/IMenuControlSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/Menu/ISubMenuOwner.ts" />
 /// <reference path="presenters/MainPresenter/TagList.ts" />
 /// <reference path="presenters/MainPresenter/BookmarkForm.ts" />
 /// <reference path="presenters/MainPresenter/BookmarkList.ts" />
 /// <reference path="presenters/MainPresenter/MainPresenter.ts" />
-
+/// <reference path="presenters/MainPresenter/Menu/SubMenu.ts" />
+/// <reference path="presenters/MainPresenter/Menu/TagFormSubMenu.ts" />
+/// <reference path="presenters/MainPresenter/Menu/MenuSubMenu.ts" />
+/// <reference path="presenters/MainPresenter/Menu/MenuControl.ts" />
 
 //grunt-start
-/// <reference path="helpers/FaviconHelper.ts" />
-/// <reference path="presenters/MainPresenter/MenuControl.ts" />
-/// <reference path="system/Environment.ts" />
+/// <reference path="models/business/utils/ScoredBookmarkDAO.ts" />
 //grunt-end

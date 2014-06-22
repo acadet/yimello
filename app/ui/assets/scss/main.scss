@@ -68,16 +68,8 @@ $lightBlue : #22A8E8;
 	padding: 0;
 
 	li {
-		font: {
-			family: $ptSans;
-			size: 1em;
-		}
-
 		margin: 0;
 		padding : 5px 15px;
-
-		color: white;
-		cursor: pointer;
 
 		@include transition(background-color, 0.5s, ease);
 
@@ -87,6 +79,41 @@ $lightBlue : #22A8E8;
 
 		&:hover:not(.active) {
 			background-color : #484848;
+		}
+
+		&:hover {
+			img {
+				opacity : 1;
+			}
+		}
+
+		p, img {
+			cursor : pointer;
+		}
+
+		p {
+			margin : 0;
+			width : 100px;
+
+			font: {
+				family: $ptSans;
+				size: 1em;
+			}
+			word-break : break-word;
+
+			color: white;
+		}
+
+		img {
+			float : right;
+			margin : 0 5px;
+
+			opacity : 0;
+			@include transition(opacity, 0.5s, ease);
+
+			&:hover {
+				opacity : 0.8;
+			}
 		}
 	}
 }
@@ -117,6 +144,7 @@ $lightBlue : #22A8E8;
 			padding: 10px 15px;
 			width: 33.3%;
 			height: 33.3%;
+			overflow : hidden;
 			@include box-sizing(border-box);
 
 			text-align : center;
@@ -132,6 +160,10 @@ $lightBlue : #22A8E8;
 }
 
 .bookmark-wrapper ul li {
+	h3, p {
+		word-wrap : break-word;
+	}
+
 	h3 {
 		margin: 0;
 
@@ -152,6 +184,18 @@ $lightBlue : #22A8E8;
 
 		color: #ccc;
 	}
+}
+
+.bookmark-wrapper .default-content {
+	display : none;
+
+	font : {
+		family : $ptSans;
+		size : 1.5em;
+	}
+	text-align : center;
+
+	color : #eee;
 }
 
 .search-wrapper {
@@ -207,6 +251,10 @@ $lightBlue : #22A8E8;
 	height: 100%;
 
 	background-color : $black;
+
+	.bookmark-icon {
+		cursor : pointer;
+	}
 
 	ul {
 		margin: 0;

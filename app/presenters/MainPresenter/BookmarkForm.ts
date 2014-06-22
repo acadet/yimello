@@ -103,6 +103,17 @@ class BookmarkForm extends TSObject {
 			}
 		);
 
+		this._bookmarkIcon.on(
+			DOMElementEvents.Click,
+			(e) => {
+				if (this._isUpdating) {
+					this._currentUpdatedBookmark.setViews(this._currentUpdatedBookmark.getViews() + 1);
+					this._currentUpdatedBookmark.update();
+					NodeWindow.openExternal(this._currentUpdatedBookmark.getURL());
+				}
+			}
+		);
+
 		this._prepareTagsInput();
 		this._prepareURLInput();
 	}
@@ -236,7 +247,14 @@ class BookmarkForm extends TSObject {
 	}
 
 	private _onDelete() : void {
+		var isOk : boolean;
+
 		if (!this._isUpdating) {
+			return;
+		}
+
+		isOk = confirm('Do you want to remove this bookmark?');
+		if (!isOk) {
 			return;
 		}
 
@@ -391,6 +409,12 @@ class BookmarkForm extends TSObject {
 				);
 			}
 		);
+
+		// Reset inputs
+		this._urlInput.setValue('');
+		this._titleInput.setValue('');
+		this._descriptionInput.setValue('');
+		this._tagsInput.setValue('');
 
 		this._deleteButton.setCss({display : 'none'});
 	}

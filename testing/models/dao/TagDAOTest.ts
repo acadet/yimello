@@ -84,6 +84,59 @@ class TagDAOTest extends UnitTestClass {
 		);
 	}
 
+	TagDAOUpdateTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				DataAccessObject.initialize(
+					(success) => {
+						var tag : TagDAO;
+
+						tag = new TagDAO();
+						tag.setId('1');
+						tag.setLabel('foo');
+
+						ActiveRecordObject.insert(
+							DAOTables.Tags,
+							tag.toList(),
+							(success) => {
+								ActiveRecordObject.get<TagDAO>(
+									DAOTables.Tags,
+									(outcome) => {
+										tag.setLabel('foobar');
+										// Act
+										tag.update(
+											(outcome) => {
+												// Assert
+												this.isTrue(TSObject.exists(outcome));
+												this.areIdentical(tag.getId(), outcome.getId());
+												this.areIdentical(tag.getLabel(), outcome.getLabel());
+
+												ActiveRecordObject.get<TagDAO>(
+													DAOTables.Tags,
+													(outcome) => {
+														this.isTrue(TSObject.exists(outcome));
+														this.areIdentical(1, outcome.getLength());
+														this.areIdentical(tag.getId(), outcome.getAt(0).getId());
+														this.areIdentical(tag.getLabel(), outcome.getAt(0).getLabel());
+
+														DataAccessObject.clean(s => UnitTestClass.done());
+													},
+													TagDAO.fromObject
+												);
+											}
+										);
+									},
+									TagDAO.fromObject
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
+
 	TagDAODeleteTest() : void {
 		UnitTestClass.queue(
 			() => {
@@ -200,6 +253,49 @@ class TagDAOTest extends UnitTestClass {
 												this.isTrue(TSObject.exists(outcome));
 												this.areIdentical(t1.getId(), outcome.getId());
 												this.areIdentical(t1.getLabel(), outcome.getLabel());
+
+												DataAccessObject.clean((success) => UnitTestClass.done());
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+				
+			}
+		);
+	}
+
+	TagDAOFindByLabelTest() : void {
+		UnitTestClass.queue(
+			() => {
+				var t1 : TagDAO, t2 : TagDAO;
+
+				t1 = new TagDAO();
+				t1.setId('1');
+				t1.setLabel('foo');
+				t2 = new TagDAO();
+				t2.setId('2');
+				t2.setLabel('foobar');
+
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Tags,
+							t1.toList(),
+							(success) => {
+								ActiveRecordObject.insert(
+									DAOTables.Tags,
+									t2.toList(),
+									(success) => {
+										TagDAO.findByLabel(
+											'foobar',
+											(outcome) => {
+												this.isTrue(TSObject.exists(outcome));
+												this.areIdentical(t2.getId(), outcome.getId());
+												this.areIdentical(t2.getLabel(), outcome.getLabel());
 
 												DataAccessObject.clean((success) => UnitTestClass.done());
 											}

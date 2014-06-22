@@ -89,6 +89,10 @@ class NodeWindow {
 		gui.Window.get().close();
 	}
 
+	static openExternal(url : string) : void {
+		gui.Shell.openExternal(url);
+	}
+
 	//endregion Public Methods
 	
 	//endregion Methods

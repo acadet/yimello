@@ -2,7 +2,11 @@
 
 class MainPresenter
 	extends Presenter
-	implements IBookmarkFormSubscriber, ITagListSubscriber, IBookmarkListSubscriber {
+	implements 
+		IBookmarkFormSubscriber,
+		ITagListSubscriber,
+		IBookmarkListSubscriber,
+		IMenuControlSubscriber {
 	//region Fields
 	
 	/**
@@ -35,7 +39,7 @@ class MainPresenter
 		this._bookmarkForm = new BookmarkForm(this);
 		this._tagList = new TagList(this);
 		this._bookmarkList = new BookmarkList(this);
-		this._menu = new MenuControl();
+		this._menu = new MenuControl(this);
 	}
 
 	//endregion Constructors
@@ -107,6 +111,10 @@ class MainPresenter
 		this._bookmarkList.displayMostPopular();
 	}
 
+	onPause() : void {
+		this._bookmarkList.unfocus();
+	}
+
 	//region IBookmarkFormSubscriber
 
 	onFormCancel() : void {
@@ -142,6 +150,19 @@ class MainPresenter
 		);
 	}
 
+	onTagUpdate(tagId : string) : void {
+		TagDAO.find(
+			tagId,
+			(outcome) => {
+				this._menu.updateTag(outcome);
+			}
+		);
+	}
+
+	onTagDeletion() : void {
+		this._bookmarkList.displayMostPopular();
+	}
+
 	//endregion ITagListSubscriber
 
 	//region IBookmarkListSubscriber
@@ -157,6 +178,15 @@ class MainPresenter
 	}
 
 	//endregion IBookmarkListSubscriber
+
+	//region IMenuControlSubscriber
+
+	tagUpdated() : void {
+		this._tagList.reset();
+		this._bookmarkList.displayMostPopular();
+	}
+
+	//endregion IMenuControlSubscriber
 
 	//endregion Public Methods
 	

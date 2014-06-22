@@ -4,4 +4,8 @@ interface ITagListSubscriber {
 	onMostPopularSelection() : void;
 
 	onTagSelection(tagId : string) : void;
+
+	onTagDeletion() : void;
+
+	onTagUpdate(tagId : string) : void;
 }

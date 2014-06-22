@@ -25,13 +25,36 @@ class TagList {
 	
 	//region Private Methods
 	
-	private _buildDOMTag(tag : TagDAO) : DOMElement {
+	private _buildDOMTag(tag : TagDAO, mostPop : boolean = false) : DOMElement {
+		var s : StringBuffer;
 		var e : DOMElement;
 
-		e = DOMElement.fromString('<li>' + tag.getLabel() + '</li>');
-		e.setData('id', tag.getId());
+		s = new StringBuffer('<li>');
+		if (!mostPop) {
+			s.append('<img class="js-tag-delete" src="assets/img/trash-icon.png" />');
+			s.append('<img class="js-tag-edit" src="assets/img/edit-icon.png" />');
+		}
+		s.append('<p>');
+		if (mostPop) {
+			s.append('Most popular');
+		} else {
+			s.append(tag.getLabel());
+		}
+		s.append('</p>');
+		s.append('</li>');
+
+		e = DOMElement.fromString(s.toString());
+		if (mostPop) {
+			e.addClass('js-most-popular');
+		} else {
+			e.setData('id', tag.getId());
+		}
 
 		return e;
+	}
+
+	private _buildMostPopularTag() : DOMElement {
+		return this._buildDOMTag(null, true);
 	}
 
 	private _setActive(e : DOMElement) : void {
@@ -48,8 +71,12 @@ class TagList {
 			.getChildren()
 			.forEach(
 				(e) => {
+					var target : DOMElement;
+
+					target = e.findSingle('> p');
+
 					if (e.hasClass('js-most-popular')) {
-						e.on(
+						target.on(
 							DOMElementEvents.Click,
 							(arg) => {
 								this._subscriber.onMostPopularSelection();
@@ -57,16 +84,62 @@ class TagList {
 							}
 						);
 					} else {
-						e.on(
+						target.on(
 							DOMElementEvents.Click,
 							(arg) => {
 								this._subscriber.onTagSelection(e.getData('id'));
 								this._setActive(e);
 							}
 						);
+
+						e
+							.findSingle('.js-tag-delete')
+							.on(
+								DOMElementEvents.Click,
+								(arg) => {
+									this._deleteTag(e.getData('id'));
+								}
+							);
+						e
+							.findSingle('.js-tag-edit')
+							.on(
+								DOMElementEvents.Click,
+								(arg) => {
+									this._subscriber.onTagUpdate(e.getData('id'));
+								}
+							);
 					}
 				}
 			);
+	}
+
+	private _unsubscribeTriggers() : void {
+		this._destList
+			.getChildren()
+			.forEach(
+				(e) => {
+					e
+						.findSingle('> p')
+						.off(DOMElementEvents.Click);
+				}
+			);
+	}
+
+	private _deleteTag(id : string) : void {
+		var tag : TagDAO;
+		var isOk : boolean;
+
+		isOk = confirm('Do you want to remove this tag?');
+		if (!isOk) {
+			return;
+		}
+
+		tag = new TagDAO();
+		tag.setId(id);
+		// TODO : test success
+		tag.delete();
+		this.reset();
+		this._subscriber.onTagDeletion();
 	}
 
 	//endregion Private Methods
@@ -74,11 +147,10 @@ class TagList {
 	//region Public Methods
 	
 	reset() : void {
-		this._destList.getChildren().forEach(e => e.off(DOMElementEvents.Click));
-		this._destList.setHTML('');
+		this._unsubscribeTriggers();
+		this._destList.getChildren().forEach(e => e.remove());
 
-		this._mostPopularTrigger = DOMElement.fromString('<li>Most popular</li>');
-		this._mostPopularTrigger.addClass('js-most-popular');
+		this._mostPopularTrigger = this._buildMostPopularTag();
 		this._destList.append(this._mostPopularTrigger);
 
 		TagDAO.sortByLabelAsc(

@@ -64,6 +64,19 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));
 	}
 
+	private _addInScoredList(target : ScoredBookmarkDAO, list : IList<ScoredBookmarkDAO>) : void {
+		for (var i = 0; i < list.getLength(); i++) {
+			var e : ScoredBookmarkDAO = list.getAt(i);
+
+			if (target.getScore() > e.getScore()) {
+				list.insertAt(i, target);
+				return;
+			}
+		}
+
+		list.add(target);
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -191,6 +204,46 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		);
 	}
 
+	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
+		if (!URLHelper.isValid(bookmark.getURL())) {
+			Log.error(new BusinessException('Failed to save: url is not valid'));
+			if (callback !== null) {
+				callback(null);
+			}
+			return;
+		}
+
+		this._disarmBookmark(bookmark);
+
+		bookmark.add(
+			(outcome) => {
+				if (callback !== null) {
+					callback(outcome);
+				}
+			}
+		);
+	}
+
+	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
+		if (!URLHelper.isValid(bookmark.getURL())) {
+			Log.error(new BusinessException('Failed to save: url is not valid'));
+			if (callback !== null) {
+				callback(null);
+			}
+			return;
+		}
+
+		this._disarmBookmark(bookmark);
+
+		bookmark.update(
+			(outcome) => {
+				if (callback !== null) {
+					callback(outcome);
+				}
+			}
+		);
+	}
+
 	delete(bookmark : BookmarkDAO, callback : Action<boolean> = null) : void {
 		var id : string;
 
@@ -254,42 +307,114 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		);
 	}
 
-	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
-		if (!URLHelper.isValid(bookmark.getURL())) {
-			Log.error(new BusinessException('Failed to save: url is not valid'));
-			if (callback !== null) {
-				callback(null);
-			}
-			return;
-		}
+	// TODO : test
+	sortByTitleWithBoundTags(callback : Action<IDictionary<BookmarkDAO, IList<TagDAO>>>) : void {
+		var request : StringBuffer;
 
-		this._disarmBookmark(bookmark);
+		request = new StringBuffer('SELECT bk.id AS id, bk.title AS title, bk.description AS description, ');
+		request.append('bk.views AS views, outcome.tagId as tagId, outcome.tagLabel as tagLabel ');
+		request.append('FROM ' + DAOTables.Bookmarks + ' AS bk ');
+		request.append('INNER JOIN (');
+		request.append('SELECT t.id AS tagId, t.label AS tagLabel, tbk.bookmark_id AS bkId FROM ');
+		request.append(DAOTables.Tags + ' AS t INNER JOIN ');
+		request.append(DAOTables.TagBookmark + ' AS tbk ON ');
+		request.append('t.id = tbk.tag_id) AS outcome');
+		request.append('ON bk.id = outcome.bkId ');
+		request.append('ORDER BY bk.title ASC');
 
-		bookmark.add(
-			(outcome) => {
-				if (callback !== null) {
-					callback(outcome);
-				}
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.executeSQL(
+					request.toString(),
+					(set) => {
+						var dict : IDictionary<BookmarkDAO, IList<TagDAO>>;
+						var bk : BookmarkDAO = null;
+						var l : IList<TagDAO>;
+						var outcome : SQLRowSet;
+
+						dict = new Dictionary<BookmarkDAO, IList<TagDAO>>();
+						outcome = set.getRows();
+
+						for (var i = 0; i < outcome.getLength(); i++) {
+							var t : TagDAO;
+							var item : any = outcome.item(i);
+
+							if (bk === null || bk.getId() !== item.id) {
+								if (bk !== null) {
+									dict.add(bk, l);
+								}
+
+								bk = new BookmarkDAO();
+								bk.setId(item.id);
+								bk.setTitle(item.title);
+								bk.setDescription(item.description);
+								bk.setViews(item.views);
+
+								l = new ArrayList<TagDAO>();
+							}
+
+							t = new TagDAO();
+							t.setId(item.tagId);
+							t.setLabel(item.tagLabel);
+							l.add(t);
+						}
+
+						callback(dict);
+					}
+				);
 			}
 		);
 	}
 
-	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
-		if (!URLHelper.isValid(bookmark.getURL())) {
-			Log.error(new BusinessException('Failed to save: url is not valid'));
-			if (callback !== null) {
-				callback(null);
-			}
-			return;
-		}
-
-		this._disarmBookmark(bookmark);
-
-		bookmark.update(
+	// TODO : test
+	search(input : string, callback : Action<IList<ScoredBookmarkDAO>>) : void {
+		this.sortByTitleWithBoundTags(
 			(outcome) => {
-				if (callback !== null) {
-					callback(outcome);
-				}
+				var max : number;
+				var list : IList<ScoredBookmarkDAO>;
+				var keywords : IList<string>;
+
+				max = 0;
+				list = new ArrayList<ScoredBookmarkDAO>();
+				keywords = StringHelper.extractWords(input);
+
+				outcome.forEach(
+					(bk, tagList) => {
+						var sbk : ScoredBookmarkDAO;
+						var currentScore;
+
+						sbk = new ScoredBookmarkDAO();
+						bk.hydrateBookmark(sbk);
+						currentScore = 0;
+
+						keywords.forEach(
+							(key) => {
+								var r : Regex = new Regex(key, [RegexFlags.Insensitive]);
+
+								if (r.test(sbk.getTitle())) {
+									currentScore += 20;
+								}
+								if (r.test(sbk.getDescription())) {
+									currentScore += 2;
+								}
+
+								tagList.forEach(
+									(tag) => {
+										if (r.test(tag.getLabel())) {
+											currentScore += 10;
+										}
+									}
+								);
+							}
+						);
+
+						max = (currentScore > max) ? currentScore : max;
+						sbk.setScore(currentScore / max * 100);
+						this._addInScoredList(sbk, list);
+					}
+				);
+
+				callback(list);
 			}
 		);
 	}

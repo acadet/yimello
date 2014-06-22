@@ -1,4 +1,7 @@
+// Libs part
+
 /// <reference path="../app/libs/jquery.d.ts" />
+/// <reference path="../app/libs/jqueryui.d.ts" />
 
 // System part
 
@@ -19,6 +22,7 @@
 /// <reference path="../app/system/MathHelper.ts" />
 /// <reference path="../app/system/StringHelper.ts" />
 /// <reference path="../app/helpers/FormHelper.ts" />
+/// <reference path="../app/system/Environment.ts" />
 
 // Collections parts
 
@@ -52,6 +56,7 @@
 /// <reference path="../app/helpers/URLHelper.ts" />
 /// <reference path="../app/helpers/URLDetailsProvider.ts" />
 /// <reference path="../app/helpers/SecurityHelper.ts" />
+/// <reference path="../app/helpers/FaviconHelper.ts" />
 
 // DAO part
 
@@ -82,12 +87,16 @@
 /// <reference path="../app/presenters/MainPresenter/IBookmarkFormSubscriber.ts" />
 /// <reference path="../app/presenters/MainPresenter/IBookmarkListSubscriber.ts" />
 /// <reference path="../app/presenters/MainPresenter/ITagListSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/IMenuControlSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/ISubMenuOwner.ts" />
 /// <reference path="../app/presenters/MainPresenter/TagList.ts" />
 /// <reference path="../app/presenters/MainPresenter/BookmarkForm.ts" />
 /// <reference path="../app/presenters/MainPresenter/BookmarkList.ts" />
 /// <reference path="../app/presenters/MainPresenter/MainPresenter.ts" />
-
+/// <reference path="../app/presenters/MainPresenter/Menu/SubMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/TagFormSubMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/MenuSubMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/MenuControl.ts" />
 
 //grunt-start
-/// <reference path="../app/system/Environment.ts" />
 //grunt-end

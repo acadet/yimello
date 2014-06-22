@@ -4,6 +4,7 @@ class DOMElementEvents {
 	static Blur : string = 'blur';
 	static Click : string = 'click';
 	static KeyDown : string = 'keydown';
+	static KeyUp : string = 'keyup';
 	static MouseEnter : string = 'mouseenter';
 	static MouseLeave : string = 'mouseleave';
 	static Submit : string = 'submit';
@@ -19,6 +20,7 @@ class DOMElementEventObject extends TSObject {
 		this._pageX = eventObject.pageX;
 		this._pageY = eventObject.pageY;
 		this._which = eventObject.which;
+		this._isMetaKey = eventObject.metaKey;
 	}
 
 	getTarget() : DOMElement {
@@ -41,11 +43,16 @@ class DOMElementEventObject extends TSObject {
 		this._eventObject.preventDefault();
 	}
 
+	isMetaKey() : boolean {
+		return this._isMetaKey;
+	}
+
 	private _eventObject : any;
 	private _target : DOMElement;
 	private _pageX : number;
 	private _pageY : number;
 	private _which : number;
+	private _isMetaKey : boolean;
 }
 
 interface DOMElementEventHandler {
@@ -126,6 +133,10 @@ class DOMElement extends TSObject {
 
 	findSingle(criterion : string) : DOMElement {
 		return new DOMElement(this._element.find(criterion).first());
+	}
+
+	focus() : void {
+		this._element.focus();
 	}
 
 	static fromJS(o : any) : DOMElement {

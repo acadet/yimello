@@ -92,13 +92,52 @@ class TagDAO extends DataAccessObject {
 
 				f = (success) => {
 					if (success) {
-						callback(t);
+						if (callback !== null) {
+							callback(t);
+						}
 					} else {
-						callback(null);
+						if (callback !== null) {
+							callback(null);
+						}
 					}
 				};
 
 				ActiveRecordObject.insert(DAOTables.Tags, data, f);
+			}
+		);
+	}
+
+	update(callback : Action<TagDAO> = null) : void {
+		var dict : IDictionary<string, any>;
+		var selector : Pair<string, any>;
+
+		if (!TSObject.exists(this.getId()) || this.getId() === '') {
+			Log.error(new DAOException('Unable to update: no id was specified'));
+			if (callback !== null) {
+				callback(null);
+			}
+		}
+
+		dict = new Dictionary<string, any>();
+		dict.add('label', this.getLabel());
+
+		selector = new Pair<string, any>('id', this.getId());
+
+		ActiveRecordObject.update(
+			DAOTables.Tags,
+			selector,
+			dict,
+			(success) => {
+				if (success) {
+					if (callback !== null) {
+						callback(this);
+					}
+				} else {
+					Log.error(new DAOException('An error occured when updating bookmark'));
+					if (callback !== null) {
+						callback(this);
+					}
+				}
 			}
 		);
 	}
@@ -121,6 +160,19 @@ class TagDAO extends DataAccessObject {
 				ActiveRecordObject.find(
 					DAOTables.Tags,
 					new Pair<string, any>('id', id),
+					callback,
+					TagDAO.fromObject
+				);
+			}
+		);
+	}
+
+	static findByLabel(label : string, callback : Action<TagDAO>) : void {
+		DataAccessObject.initialize(
+			(success) => {
+				ActiveRecordObject.find(
+					DAOTables.Tags,
+					new Pair<string, any>('label', label),
 					callback,
 					TagDAO.fromObject
 				);

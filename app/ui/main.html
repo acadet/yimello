@@ -38,13 +38,18 @@
 
                 <div class="tag-list">
                     <ul class="tags js-tag-list">
-                        <li class="js-most-popular">Most popular</li>
+                        <li>
+                            <p class="js-most-popular">Most popular</p>
+                            <img src="assets/img/edit-icon.png" />
+                            <img src="assets/img/trash-icon.png" />
+                        </li>
                     </ul>
                 </div>
             </div>
 
-            <div class="bookmark-wrapper">
+            <div class="bookmark-wrapper js-bookmark-wrapper">
                 <ul class="js-bookmark-list"></ul>
+                <p class="default-content js-default-content">No bookmarks to display :(</p>
             </div>
 
             <div class="search-wrapper">
@@ -63,7 +68,7 @@
                 </li>
                 <li>
                     <form action="#" method="post">
-                        <img src="assets/img/default-bookmark-icon.png" class="js-bookmark-icon" />
+                        <img src="assets/img/default-bookmark-icon.png" class="bookmark-icon js-bookmark-icon" />
                         <p>
                             <input type="text" name="url" placeholder="http://" />
                         </p>
