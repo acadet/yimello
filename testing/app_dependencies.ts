@@ -99,4 +99,5 @@
 /// <reference path="../app/presenters/MainPresenter/Menu/MenuControl.ts" />
 
 //grunt-start
+/// <reference path="../app/models/business/utils/ScoredBookmarkDAO.ts" />
 //grunt-end

@@ -63,22 +63,24 @@ class StringHelper {
 	}
 
 	// TODO : test
-	static extractWords(s : string) : IList<string> {
+	static extractWords(sentence : string) : IList<string> {
 		var list : IList<string>;
 		var tmp : string;
+		var s : string;
 
-		if (!TSObject.exists(s)) {
+		if (!TSObject.exists(sentence)) {
 			Log.error(new Exception('Unable to extract: specified string is null'));
 			return null;
 		}
 
 		list = new ArrayList<string>();
 
-		if (s.length < 1) {
+		if (sentence.length < 1) {
 			Log.warn('Nothing to extract, string is empty');
 			return list;
 		}
 
+		s = StringHelper.trim(sentence);
 		tmp = '';
 		for (var i = 0; i < s.length; i++) {
 			var e : string = s.charAt(i);

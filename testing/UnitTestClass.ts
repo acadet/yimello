@@ -44,7 +44,7 @@ class UnitTestClass extends tsUnit.TestClass {
 		test.showResults(document.getElementById('outcome'), test.run());
 		if (TSObject.exists(UnitTestClass._queue)) {
 			if (UnitTestClass._queue.getLength() > 0) {
-				Log.inform('Starting async thests. ' + UnitTestClass._queue.getLength() + ' tests to run');
+				Log.inform('Starting async tests. ' + UnitTestClass._queue.getLength() + ' tests to run');
 				UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
 			}
 		}

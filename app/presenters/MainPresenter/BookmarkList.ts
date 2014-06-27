@@ -80,6 +80,7 @@ class BookmarkList {
 										NodeWindow.openExternal(outcome.getURL());
 									}
 								);
+								this._isPressingMetaKey = false;
 							} else {
 								this._subscriber.onBookmarkSelection(e.getData('id'));
 							}

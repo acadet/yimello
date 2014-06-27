@@ -307,32 +307,37 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		);
 	}
 
-	// TODO : test
-	sortByTitleWithBoundTags(callback : Action<IDictionary<BookmarkDAO, IList<TagDAO>>>) : void {
+	sortByTitleWithBoundTags(callback : Action<IList<Pair<BookmarkDAO, IList<TagDAO>>>>) : void {
 		var request : StringBuffer;
 
 		request = new StringBuffer('SELECT bk.id AS id, bk.title AS title, bk.description AS description, ');
-		request.append('bk.views AS views, outcome.tagId as tagId, outcome.tagLabel as tagLabel ');
+		request.append('bk.views AS views, outcome.tagId AS tagId, outcome.tagLabel AS tagLabel ');
 		request.append('FROM ' + DAOTables.Bookmarks + ' AS bk ');
-		request.append('INNER JOIN (');
+		request.append('LEFT JOIN (');
 		request.append('SELECT t.id AS tagId, t.label AS tagLabel, tbk.bookmark_id AS bkId FROM ');
 		request.append(DAOTables.Tags + ' AS t INNER JOIN ');
 		request.append(DAOTables.TagBookmark + ' AS tbk ON ');
-		request.append('t.id = tbk.tag_id) AS outcome');
+		request.append('t.id = tbk.tag_id) AS outcome ');
 		request.append('ON bk.id = outcome.bkId ');
-		request.append('ORDER BY bk.title ASC');
+		request.append('ORDER BY bk.title ASC, outcome.tagLabel ASC');
 
 		DataAccessObject.initialize(
 			(success) => {
 				ActiveRecordObject.executeSQL(
 					request.toString(),
 					(set) => {
-						var dict : IDictionary<BookmarkDAO, IList<TagDAO>>;
+						var pairList : IList<Pair<BookmarkDAO, IList<TagDAO>>>;
 						var bk : BookmarkDAO = null;
 						var l : IList<TagDAO>;
 						var outcome : SQLRowSet;
 
-						dict = new Dictionary<BookmarkDAO, IList<TagDAO>>();
+						pairList = new ArrayList<Pair<BookmarkDAO, IList<TagDAO>>>();
+
+						if (set === null) {
+							callback(pairList);
+							return;
+						}
+
 						outcome = set.getRows();
 
 						for (var i = 0; i < outcome.getLength(); i++) {
@@ -341,7 +346,9 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 							if (bk === null || bk.getId() !== item.id) {
 								if (bk !== null) {
-									dict.add(bk, l);
+									var p : Pair<BookmarkDAO, IList<TagDAO>>;
+									p = new Pair<BookmarkDAO, IList<TagDAO>>(bk, l);
+									pairList.add(p);
 								}
 
 								bk = new BookmarkDAO();
@@ -353,13 +360,21 @@ class BookmarkBusiness implements IBookmarkBusiness {
 								l = new ArrayList<TagDAO>();
 							}
 
-							t = new TagDAO();
-							t.setId(item.tagId);
-							t.setLabel(item.tagLabel);
-							l.add(t);
+							if (TSObject.exists(item.tagId)) {
+								t = new TagDAO();
+								t.setId(item.tagId);
+								t.setLabel(item.tagLabel);
+								l.add(t);
+							}
 						}
 
-						callback(dict);
+						if (bk !== null) {
+							var p : Pair<BookmarkDAO, IList<TagDAO>>;
+							p = new Pair<BookmarkDAO, IList<TagDAO>>(bk, l);
+							pairList.add(p);
+						}
+
+						callback(pairList);
 					}
 				);
 			}
@@ -379,9 +394,11 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				keywords = StringHelper.extractWords(input);
 
 				outcome.forEach(
-					(bk, tagList) => {
+					(pair) => {
 						var sbk : ScoredBookmarkDAO;
-						var currentScore;
+						var currentScore : number;
+						var bk : BookmarkDAO = pair.getFirst();
+						var tagList : IList<TagDAO> = pair.getSecond();
 
 						sbk = new ScoredBookmarkDAO();
 						bk.hydrateBookmark(sbk);
@@ -409,8 +426,14 @@ class BookmarkBusiness implements IBookmarkBusiness {
 						);
 
 						max = (currentScore > max) ? currentScore : max;
-						sbk.setScore(currentScore / max * 100);
+						sbk.setScore(currentScore);
 						this._addInScoredList(sbk, list);
+					}
+				);
+
+				list.forEach(
+					(e) => {
+						e.setScore(e.getScore() / max * 100);
 					}
 				);
 

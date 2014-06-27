@@ -519,6 +519,117 @@ class BookmarkBusinessTest extends UnitTestClass {
 			}
 		);
 	}
+
+	BookmarkSortByTitleWithBoundTagsTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b1 : BookmarkDAO, b2 : BookmarkDAO, b3 : BookmarkDAO;
+				var t1 : TagDAO, t2 : TagDAO;
+
+				b1 = new BookmarkDAO();
+				b1.setTitle('foo');
+				b2 = new BookmarkDAO();
+				b2.setTitle('bar');
+				b3 = new BookmarkDAO();
+				b3.setTitle('foobar');
+				t1 = new TagDAO();
+				t1.setLabel('aaa');
+				t2 = new TagDAO();
+				t2.setLabel('bbb');
+
+				b1.add(
+					(outcome) => {
+						b1 = outcome;
+						b2.add(
+							(outcome) => {
+								b2 = outcome;
+								b3.add(
+									(outcome) => {
+										b3 = outcome;
+										t1.add(
+											(outcome) => {
+												t1 = outcome;
+												t2.add(
+													(outcome) => {
+														var data : IList<any> = new ArrayList<any>();
+														t2 = outcome;
+
+														data.add(t1.getId());
+														data.add(b1.getId());
+														ActiveRecordObject.insert(
+															DAOTables.TagBookmark,
+															data,
+															(success) => {
+																data = new ArrayList<any>();
+																data.add(t2.getId())
+																data.add(b1.getId());
+
+																ActiveRecordObject.insert(
+																	DAOTables.TagBookmark,
+																	data,
+																	(success) => {
+																		data = new ArrayList<any>();
+																		data.add(t2.getId());
+																		data.add(b2.getId());
+
+																		ActiveRecordObject.insert(
+																			DAOTables.TagBookmark,
+																			data,
+																			(success) => {
+																				// Act
+																				this._business.sortByTitleWithBoundTags(
+																					(list) => {
+																						// Assert
+																						var p : Pair<BookmarkDAO, IList<TagDAO>>;
+																						var l : IList<TagDAO>;
+
+																						this.isTrue(TSObject.exists(list));
+																						this.areIdentical(3, list.getLength());
+
+																						p = list.getAt(0);
+																						this.isTrue(TSObject.exists(p));
+																						this.areIdentical(b2.getId(), p.getFirst().getId());
+																						l = p.getSecond();
+																						this.areIdentical(1, l.getLength());
+																						this.areIdentical(t2.getId(), l.getAt(0).getId());
+
+																						p = list.getAt(1);
+																						this.isTrue(TSObject.exists(p));
+																						this.areIdentical(b1.getId(), p.getFirst().getId());
+																						l = p.getSecond();
+																						this.areIdentical(2, l.getLength());
+																						this.areIdentical(t1.getId(), l.getAt(0).getId());
+																						this.areIdentical(t2.getId(), l.getAt(1).getId());
+
+																						p = list.getAt(2);
+																						this.isTrue(TSObject.exists(p));
+																						this.areIdentical(b3.getId(), p.getFirst().getId());
+																						l = p.getSecond();
+																						this.areIdentical(0, l.getLength());
+
+																						DataAccessObject.clean(s => UnitTestClass.done());
+																					}
+																				);
+																			}
+																		);
+																	}
+																);
+															}
+														);
+													}
+												);
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
 }
 
 UnitTestClass.handle(new BookmarkBusinessTest());
