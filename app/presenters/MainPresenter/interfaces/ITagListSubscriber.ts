@@ -1,11 +1,13 @@
-/// <reference path="../../dependencies.ts" />
+/// <reference path="../../../dependencies.ts" />
 
 interface ITagListSubscriber {
 	onMostPopularSelection() : void;
 
 	onTagSelection(tagId : string) : void;
 
+	onSearchTabSelection() : void;
+
 	onTagDeletion() : void;
 
-	onTagUpdate(tagId : string) : void;
+	askingForTagUpdate(tagId : string) : void;
 }

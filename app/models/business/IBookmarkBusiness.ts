@@ -44,4 +44,8 @@ interface IBookmarkBusiness {
 	 * @param {Action<IList<BookmarkDAO>>} callback [description]
 	 */
 	sortByTitleAscForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void;
+
+	sortByTitleWithBoundTags(callback : Action<IList<Pair<BookmarkDAO, IList<TagDAO>>>>) : void;
+
+	search(input : string, callback : Action<IList<ScoredBookmarkDAO>>) : void;
 }

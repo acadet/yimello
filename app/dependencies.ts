@@ -72,6 +72,7 @@
 /// <reference path="models/business/impl/BookmarkBusiness.ts" />
 /// <reference path="models/business/ITagBusiness.ts" />
 /// <reference path="models/business/impl/TagBusiness.ts" />
+/// <reference path="models/business/utils/ScoredBookmarkDAO.ts" />
 
 // Presenters part
 
@@ -84,11 +85,11 @@
 
 // Main presenter
 
-/// <reference path="presenters/MainPresenter/IBookmarkFormSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/IBookmarkListSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/ITagListSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/Menu/IMenuControlSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/Menu/ISubMenuOwner.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/Menu/interfaces/IMenuControlSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/Menu/interfaces/ISubMenuOwner.ts" />
 /// <reference path="presenters/MainPresenter/TagList.ts" />
 /// <reference path="presenters/MainPresenter/BookmarkForm.ts" />
 /// <reference path="presenters/MainPresenter/BookmarkList.ts" />
@@ -99,5 +100,5 @@
 /// <reference path="presenters/MainPresenter/Menu/MenuControl.ts" />
 
 //grunt-start
-/// <reference path="models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="system/Random.ts" />
 //grunt-end

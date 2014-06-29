@@ -22,7 +22,8 @@ class TagFormSubMenu extends SubMenu {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._hide();
+					this.hide();
+					this.getOwner().onTagCancellation();
 				}
 			);
 
@@ -58,11 +59,6 @@ class TagFormSubMenu extends SubMenu {
 	//region Methods
 	
 	//region Private Methods
-	
-	private _hide() : void {
-		this.hide();
-		this.getOwner().hide();
-	}
 
 	private _add() : void {
 		var label : string;
@@ -75,6 +71,7 @@ class TagFormSubMenu extends SubMenu {
 
 		label = SecurityHelper.disarm(label);
 
+		// TODO : create business method
 		TagDAO.findByLabel(
 			label,
 			(outcome) => {
@@ -86,8 +83,8 @@ class TagFormSubMenu extends SubMenu {
 
 					// TODO : handle errors when adding
 					tag.add();
-					this._hide();
-					this.getOwner().tagUpdated();
+					this.hide();
+					this.getOwner().onTagAddition();
 				}
 			}
 		);
@@ -106,10 +103,12 @@ class TagFormSubMenu extends SubMenu {
 		
 		if (StringHelper.compare(label, this._currentUpdatedTag.getLabel())) {
 			// Tag has not been edited, do nothing
-			this._hide();
+			this.hide();
+			this.getOwner().onTagUpdate();
 			return;
 		}
 
+		// TODO : create business method
 		TagDAO.findByLabel(
 			label,
 			(outcome) => {
@@ -119,8 +118,8 @@ class TagFormSubMenu extends SubMenu {
 					this._currentUpdatedTag.setLabel(label);
 					// TODO : handle errors when updating
 					this._currentUpdatedTag.update();
-					this._hide();
-					this.getOwner().tagUpdated();
+					this.hide();
+					this.getOwner().onTagUpdate();
 				}
 			}
 		);

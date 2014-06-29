@@ -92,6 +92,8 @@ class StringHelper {
 			}
 		}
 
+		list.add(tmp);
+
 		return list;
 	}
 }

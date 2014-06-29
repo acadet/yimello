@@ -2,7 +2,7 @@
 
 class MainPresenter
 	extends Presenter
-	implements 
+	implements
 		IBookmarkFormSubscriber,
 		ITagListSubscriber,
 		IBookmarkListSubscriber,
@@ -24,10 +24,14 @@ class MainPresenter
 	 */
 	private _bookmarkAddTrigger : DOMElement;
 
+	private _searchField : DOMElement;
+
 	private _bookmarkForm : BookmarkForm;
 	private _tagList : TagList;
 	private _bookmarkList : BookmarkList;
 	private _menu : MenuControl;
+
+	private _searchTimer : Timer;
 
 	//endregion Fields
 	
@@ -80,6 +84,24 @@ class MainPresenter
 		);
 	}
 
+	private _afterBookmarkEdition() : void {
+		this._tagList.resetList();
+		if (this._tagList.isMostPopularSelected()) {
+			this._bookmarkList.displayMostPopular();
+		} else if (this._tagList.isSearchTabSelected()) {
+			this._bookmarkList.displayForSeachInput(this._searchField.getValue());
+		} else {
+			this.onTagSelection(this._tagList.getCurrentTagId());
+		}
+
+		this._switchFromBookmarkForm();
+		this._searchField.setValue('');
+	}
+
+	private _afterTagEdition() : void {
+		this._tagList.resetList();
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -88,6 +110,7 @@ class MainPresenter
 		this._mainViewWrapper = DOMTree.findSingle('.js-main-view-wrapper');
 		this._bookmarkAddTrigger = DOMTree.findSingle('.js-bookmark-add-trigger');
 		this._bookmarkFormWrapper = DOMTree.findSingle('.js-bookmark-form-wrapper');
+		this._searchField = DOMTree.findSingle('.js-search-engine form input[name="searchField"]');
 
 		DOMTree
 			.find('form')
@@ -107,7 +130,38 @@ class MainPresenter
 			this._switchToBookmarkForm();
 		});
 
-		this._tagList.reset();
+		this._searchField.on(
+			DOMElementEvents.KeyUp,
+			(arg) => {
+				var value : string = this._searchField.getValue();
+
+				if (TSObject.exists(this._searchTimer)) {
+					this._searchTimer.stop();
+				}
+
+				if (value.length >= 3) {
+					this._searchTimer = new Timer(
+						(o) => {
+							this._tagList.enableSearchTab();
+							this._bookmarkList.displayForSeachInput(value);
+						},
+						500
+					);
+				} else if (value === '') {
+					this._tagList.disableSearchTab();
+					if (this._tagList.isMostPopularSelected() || this._tagList.isSearchTabSelected()) {
+						this._bookmarkList.displayMostPopular();
+						this._tagList.selectMostPopular();
+					} else {
+						this.onTagSelection(this._tagList.getCurrentTagId());
+					}
+					this._tagList.resetList();
+				}
+			}
+		);
+
+		this._tagList.resetList();
+		this._tagList.selectMostPopular();
 		this._bookmarkList.displayMostPopular();
 	}
 
@@ -117,20 +171,20 @@ class MainPresenter
 
 	//region IBookmarkFormSubscriber
 
-	onFormCancel() : void {
+	onBookmarkCancellation() : void {
 		this._switchFromBookmarkForm();
 	}
 
-	onFormSave() : void {
-		this._tagList.reset();
-		this._bookmarkList.displayMostPopular();
-		this._switchFromBookmarkForm();
+	onBookmarkAddition() : void {
+		this._afterBookmarkEdition();
 	}
 
-	onFormDelete() : void {
-		this._tagList.reset();
-		this._bookmarkList.displayMostPopular();
-		this._switchFromBookmarkForm();
+	onBookmarkUpdate() : void {
+		this._afterBookmarkEdition();
+	}
+
+	onBookmarkDeletion() : void {
+		this._afterBookmarkEdition();
 	}
 
 	//endregion IBookmarkFormSubscriber
@@ -150,17 +204,24 @@ class MainPresenter
 		);
 	}
 
-	onTagUpdate(tagId : string) : void {
-		TagDAO.find(
-			tagId,
-			(outcome) => {
-				this._menu.updateTag(outcome);
-			}
-		);
+	onSearchTabSelection() : void {
+		this._bookmarkList.displayForSeachInput(this._searchField.getValue());
 	}
 
 	onTagDeletion() : void {
 		this._bookmarkList.displayMostPopular();
+		this._tagList.resetList();
+		this._tagList.selectMostPopular();
+		this._searchField.setValue('');
+	}
+
+	askingForTagUpdate(tagId : string) : void {
+		TagDAO.find(
+			tagId,
+			(outcome) => {
+				this._menu.prepareForTagUpdate(outcome);
+			}
+		);
 	}
 
 	//endregion ITagListSubscriber
@@ -181,9 +242,16 @@ class MainPresenter
 
 	//region IMenuControlSubscriber
 
-	tagUpdated() : void {
-		this._tagList.reset();
-		this._bookmarkList.displayMostPopular();
+	onTagAddition() : void {
+		this._afterTagEdition();
+	}
+
+	onTagUpdate() : void {
+		this._afterTagEdition();
+	}
+
+	onTagCancellation() : void {
+		// Nothing to do
 	}
 
 	//endregion IMenuControlSubscriber

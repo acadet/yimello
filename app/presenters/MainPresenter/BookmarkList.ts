@@ -63,6 +63,40 @@ class BookmarkList {
 		return e;
 	}
 
+	private _buildDOMSearchResult(bookmark : ScoredBookmarkDAO) : DOMElement {
+		var e : DOMElement;
+		var s : StringBuffer;
+		var score : string;
+
+		score = NumberHelper.toString(bookmark.getScore() * 100);
+
+		s = new StringBuffer('<li class="search-result">');
+		s.append('<div class="details-wrapper">');
+		s.append('<div class="header-wrapper">');
+		s.append(FaviconHelper.getImgTag(bookmark.getURL()).toString());
+		s.append('<h3>' + bookmark.getTitle() + '</h3></div>');
+		s.append('<p>' + bookmark.getDescription() + '</p>');
+		s.append('</div><div class="score-wrapper">');
+		s.append('<h4 class="');
+		if (bookmark.getScore() >= 0.9) {
+			s.append('accurate');
+		} else if (0.75 <= bookmark.getScore() && bookmark.getScore() < 0.9) {
+			s.append('high');
+		} else if (0.5 <= bookmark.getScore() && bookmark.getScore() < 0.75) {
+			s.append('medium');
+		} else {
+			s.append('low');
+		}
+		s.append('">' + score + '%</h4></div>');
+		s.append('</li>');
+
+
+		e = DOMElement.fromString(s.toString());
+		e.setData('id', bookmark.getId());
+
+		return e;
+	}
+
 	private _subscribeTriggers() : void {
 		this._destList
 			.getChildren()
@@ -169,6 +203,30 @@ class BookmarkList {
 						outcome.forEach(
 							(e) => {
 								this._destList.append(this._buildDOMBookmark(e));
+							}
+						);
+						this._subscribeTriggers();
+					}
+					this._show();
+				}
+			);
+	}
+
+	displayForSeachInput(value : string) : void {
+		this._reset();
+
+		PresenterMediator
+			.getBookmarkBusiness()
+			.search(
+				value,
+				(outcome) => {
+					if (outcome.getLength() < 1) {
+						this._setDefaultContent();
+					} else {
+						this._removeDefaultContent();
+						outcome.forEach(
+							(e) => {
+								this._destList.append(this._buildDOMSearchResult(e));
 							}
 						);
 						this._subscribeTriggers();

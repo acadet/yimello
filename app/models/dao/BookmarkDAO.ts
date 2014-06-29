@@ -147,6 +147,7 @@ class BookmarkDAO extends DataAccessObject {
 
 	hydrateBookmark(out : BookmarkDAO) : void {
 		out.setId(this.getId());
+		out.setURL(this.getURL());
 		out.setTitle(this.getTitle());
 		out.setDescription(this.getDescription());
 		out.setViews(this.getViews());

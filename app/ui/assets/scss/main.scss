@@ -3,6 +3,9 @@
 $black: #333333;
 $blue: #0c7cbb;
 $lightBlue : #22A8E8;
+$orange : #EB6841;
+$red : #DD381D;
+$green : #7EB530;
 
 .main-view-wrapper {
 	position: absolute;
@@ -186,6 +189,76 @@ $lightBlue : #22A8E8;
 	}
 }
 
+.bookmark-wrapper ul li.search-result {
+	padding : 5px 10px;
+	margin : 10px 15px;
+	width : auto;
+	height : auto;
+	display : block;
+
+	border : 2px solid #eee;
+
+	.details-wrapper, .score-wrapper {
+		display : inline-block;
+		vertical-align : middle;
+	}
+
+	.details-wrapper {
+		width : 75%;
+
+		.header-wrapper, p {
+			display : block;
+		}
+
+		.header-wrapper {
+			text-align : left;
+
+			img, h3 {
+				display : inline-block;
+				vertical-align : middle;
+			}
+
+			img {
+				margin : 0 10px 5px 0;
+			}
+
+			h3 {
+				max-width : 300px;
+			}
+		}
+	}
+
+	.score-wrapper {
+		width : 25%;
+
+		h4 {
+			display : inline;
+
+			font: {
+				size : 1em;
+				family : $ptSans;
+			}
+			text-align : center;
+
+			&.accurate {
+				color : $green;
+			}
+
+			&.high {
+				color : $lightBlue;
+			}
+
+			&.medium {
+				color : $orange;
+			}
+
+			&.low {
+				color : $red;
+			}
+		}
+	}
+}
+
 .bookmark-wrapper .default-content {
 	display : none;
 
@@ -328,11 +401,11 @@ $lightBlue : #22A8E8;
 }
 
 form .save-button {
-	@include flat-button(#7EB530, #71a02e);
+	@include flat-button($green, #71a02e);
 }
 
 form .delete-button, form .cancel-button {
-	@include flat-button(#DD381D, #B52C17);
+	@include flat-button($red, #B52C17);
 }
 
 .bookmark-form-wrapper form input,

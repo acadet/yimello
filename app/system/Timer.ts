@@ -38,7 +38,7 @@ class Timer extends TSObject {
 	
 	//region Public Methods
 	
-	clear() : void {
+	stop() : void {
 		if (this._hasIntervals) {
 			clearInterval(this._timer);
 		} else {

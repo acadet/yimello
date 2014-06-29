@@ -77,7 +77,7 @@ class BookmarkForm extends TSObject {
 		cancelTrigger.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._subscriber.onFormCancel();
+					this._subscriber.onBookmarkCancellation();
 				}
 			);
 
@@ -177,7 +177,7 @@ class BookmarkForm extends TSObject {
 										outcome,
 										(success) => {
 											if (success) {
-												this._subscriber.onFormSave();
+												this._subscriber.onBookmarkAddition();
 											} else {
 												alert('An error has occured while saving bookmark');
 											}
@@ -234,7 +234,7 @@ class BookmarkForm extends TSObject {
 										outcome,
 										(success) => {
 											if (success) {
-												this._subscriber.onFormSave();
+												this._subscriber.onBookmarkUpdate();
 											} else {
 												alert('An error occurend while updating bookmark');
 											}
@@ -264,9 +264,8 @@ class BookmarkForm extends TSObject {
 				this._currentUpdatedBookmark,
 				(success) => {
 					if (success) {
-						this._subscriber.onFormDelete();
+						this._subscriber.onBookmarkDeletion();
 					} else {
-						// TODO
 						alert('An error occured while removing bookmark');
 					}
 				}

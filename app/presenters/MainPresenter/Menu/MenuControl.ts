@@ -100,16 +100,23 @@ class MenuControl implements ISubMenuOwner {
 	//endregion Private Methods
 	
 	//region Public Methods
-	
-	hide() : void {
+
+	onTagAddition() : void {
 		this._hideOverlay();
+		this._subscriber.onTagAddition();
 	}
 
-	tagUpdated() : void {
-		this._subscriber.tagUpdated();
+	onTagUpdate() : void {
+		this._hideOverlay();
+		this._subscriber.onTagUpdate();
 	}
 
-	updateTag(tag : TagDAO) : void {
+	onTagCancellation() : void {
+		this._hideOverlay();
+		this._subscriber.onTagCancellation();
+	}
+
+	prepareForTagUpdate(tag : TagDAO) : void {
 		this._showOverlay();
 		this._tagForm.showToUpdate(tag);
 	}

@@ -310,7 +310,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	sortByTitleWithBoundTags(callback : Action<IList<Pair<BookmarkDAO, IList<TagDAO>>>>) : void {
 		var request : StringBuffer;
 
-		request = new StringBuffer('SELECT bk.id AS id, bk.title AS title, bk.description AS description, ');
+		request = new StringBuffer('SELECT bk.id AS id, bk.url as url, bk.title AS title, bk.description AS description, ');
 		request.append('bk.views AS views, outcome.tagId AS tagId, outcome.tagLabel AS tagLabel ');
 		request.append('FROM ' + DAOTables.Bookmarks + ' AS bk ');
 		request.append('LEFT JOIN (');
@@ -353,6 +353,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 								bk = new BookmarkDAO();
 								bk.setId(item.id);
+								bk.setURL(item.url);
 								bk.setTitle(item.title);
 								bk.setDescription(item.description);
 								bk.setViews(item.views);
@@ -431,12 +432,13 @@ class BookmarkBusiness implements IBookmarkBusiness {
 					}
 				);
 
-				list.forEach(
-					(e) => {
-						e.setScore(e.getScore() / max * 100);
-					}
-				);
-
+				if (max !== 0) {
+					list.forEach(
+						(e) => {
+							e.setScore(e.getScore() / max);
+						}
+					);
+				}
 				callback(list);
 			}
 		);
