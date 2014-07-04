@@ -52,6 +52,20 @@ class MainPresenter
 	
 	//region Private Methods
 	
+	private _setTagListHeight() : void {
+		var e : DOMElement, f : DOMElement;
+
+		e = DOMTree.findSingle('.js-icon-wrapper');
+		f = DOMTree.findSingle('.js-panel-wrapper');
+
+		DOMTree
+			.findSingle('.js-tag-list-wrapper')
+			.setCss({
+				top : 30 + e.getHeight(),
+				height : f.getHeight() - 30 - e.getHeight()
+			});
+	}
+
 	private _switchToBookmarkForm() : void {
 		this._mainViewWrapper.animate(
 			{
@@ -111,6 +125,8 @@ class MainPresenter
 		this._bookmarkAddTrigger = DOMTree.findSingle('.js-bookmark-add-trigger');
 		this._bookmarkFormWrapper = DOMTree.findSingle('.js-bookmark-form-wrapper');
 		this._searchField = DOMTree.findSingle('.js-search-engine form input[name="searchField"]');
+
+		this._setTagListHeight();
 
 		DOMTree
 			.find('form')

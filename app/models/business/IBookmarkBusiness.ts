@@ -48,4 +48,6 @@ interface IBookmarkBusiness {
 	sortByTitleWithBoundTags(callback : Action<IList<Pair<BookmarkDAO, IList<TagDAO>>>>) : void;
 
 	search(input : string, callback : Action<IList<ScoredBookmarkDAO>>) : void;
+
+	importFromBrowser(dataTransfer : any, callback : Action<boolean>) : void;
 }

@@ -3,12 +3,16 @@
 class MenuSubMenu extends SubMenu {
 	//region Fields
 	
+	private _dragFileArea : DragFileArea;
+
 	//endregion Fields
 	
 	//region Constructors
 	
 	constructor(overlay : DOMElement, owner : ISubMenuOwner) {
 		super(overlay.findSingle('.js-menu-pannel'), owner);
+
+		this._dragFileArea = new DragFileArea();
 
 		this
 			.getTarget()
@@ -26,6 +30,17 @@ class MenuSubMenu extends SubMenu {
 				DOMElementEvents.Click,
 				(e) => {
 					NodeWindow.close();
+				}
+			);
+
+		this
+			.getTarget()
+			.findSingle('.js-import-browser')
+			.on(
+				DOMElementEvents.Click,
+				(e) => {
+					this._dragFileArea.show();
+					this.hide();
 				}
 			);
 	}

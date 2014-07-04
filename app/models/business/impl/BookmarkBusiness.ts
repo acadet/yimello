@@ -77,6 +77,89 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		list.add(target);
 	}
 
+	private _browseDLNode(
+		node : DOMElement,
+		currentTags : IList<TagDAO>,
+		collection : IList<Pair<BookmarkDAO, IList<TagDAO>>>)
+		: void
+	{
+		var i : number;
+		var collectedTags : IList<TagDAO>;
+
+		node
+			.find('> DT > A')
+			.forEach(
+				(a) => {
+					var b : BookmarkDAO;
+
+					b = new BookmarkDAO();
+					b.setURL(a.getAttribute('href'));
+					b.setTitle(a.getText());
+
+					collection.add(new Pair<BookmarkDAO, IList<TagDAO>>(b, currentTags));
+				}
+			);
+
+		collectedTags = new ArrayList<TagDAO>();
+		node
+			.find('> DT > H3')
+			.forEach(
+				(e) => {
+					var t : TagDAO;
+					t = new TagDAO();
+					t.setLabel(e.getText());
+					collectedTags.add(t);
+				}
+			);
+
+		i = 0;
+		node
+			.find('> DT > DL')
+			.forEach(
+				(e) => {
+					var l : IList<TagDAO>;
+
+					l = currentTags.clone();
+					l.add(collectedTags.getAt(i));
+					this._browseDLNode(e, l, collection);
+					i++;
+				}
+			);
+	}
+
+	private _addRecursiveBookmark(coll : IList<Pair<BookmarkDAO, IList<TagDAO>>>, callback : Action<boolean>) : void {
+		var p : Pair<BookmarkDAO, IList<TagDAO>>;
+
+		if (coll.getLength() === 0) {
+			callback(true);
+			return;
+		}
+
+		p = coll.getAt(0);
+		coll.remove(p);
+		BusinessMediator
+			.getTagBusiness()
+			.merge(
+				p.getSecond(),
+				(outcome) => {
+					var tags : IList<TagDAO> = outcome;
+
+					this.add(
+						p.getFirst(),
+						(outcome) => {
+							this.bindTags(
+								outcome,
+								tags,
+								(success) => {
+									this._addRecursiveBookmark(coll, callback);
+								}
+							);
+						}
+					);
+				}
+			);
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -211,6 +294,14 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				callback(null);
 			}
 			return;
+		}
+
+		if (!TSObject.exists(bookmark.getTitle()) || bookmark.getTitle() === '') {
+			bookmark.setTitle('Default title');
+		}
+
+		if (!TSObject.exists(bookmark.getDescription())) {
+			bookmark.setDescription('');
 		}
 
 		this._disarmBookmark(bookmark);
@@ -442,6 +533,49 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				callback(list);
 			}
 		);
+	}
+
+	// TODO : test
+	importFromBrowser(dataTransfer : any, callback : Action<boolean> = null) : void {
+		var reader : FileReader;
+
+		if (dataTransfer.files.length < 1) {
+			Log.error(new BusinessException('No import: there is no file'));
+			if (callback !== null) {
+				callback(false);
+			}
+			return;
+		}
+
+		reader = new FileReader();
+		reader.onload =
+			(e) => {
+				var dlRoot : DOMElement;
+				var coll : IList<Pair<BookmarkDAO, IList<TagDAO>>>;
+				var tags : IList<TagDAO>;
+				var defaultTag : TagDAO;
+
+				defaultTag = new TagDAO();
+				defaultTag.setLabel('Imported');
+				tags = new ArrayList<TagDAO>();
+				tags.add(defaultTag);
+
+				dlRoot =
+					DOMElement
+						.fromString('<ROOT>' + reader.result + '</ROOT>')
+						.findSingle('> DL');
+				coll = new ArrayList<Pair<BookmarkDAO, IList<TagDAO>>>();
+				this._browseDLNode(dlRoot, tags, coll);
+				this._addRecursiveBookmark(
+					coll,
+					(success) => {
+						if (callback !== null) {
+							callback(success);
+						}
+					}
+				);
+			};
+		reader.readAsText(dataTransfer.files[0]);
 	}
 
 	//endregion Public Methods

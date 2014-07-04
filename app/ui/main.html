@@ -21,8 +21,8 @@
     <body>
         <div class="main-view-wrapper js-main-view-wrapper">
 
-            <div class="panel-wrapper">
-                <div class="icon-wrapper">
+            <div class="panel-wrapper js-panel-wrapper">
+                <div class="icon-wrapper js-icon-wrapper">
                     <ul class="icons">
                         <li class="icon js-menu-trigger">
                             <img src="assets/img/menu-icon.png" />
@@ -36,7 +36,7 @@
                     </ul>
                 </div>
 
-                <div class="tag-list">
+                <div class="tag-list js-tag-list-wrapper">
                     <ul class="tags js-tag-list">
                         <li class="js-search-tab">
                             <p>Search results</p>
@@ -110,10 +110,15 @@
             <div class="menu-pannel js-menu-pannel">
                 <ul>
                     <li class="js-tour-trigger">Get a tour again</li>
-                    <li>Import from web browser</li>
+                    <li class="js-import-browser">Import from web browser</li>
                     <li class="js-close-trigger">Close</li>
                 </ul>
             </div>
+        </div>
+
+        <div class="drag-area js-drag-area">
+            <h1>Drag your file here</h1>
+            <h2>Otherwise, just click</h2>
         </div>
     </body>
 </html>

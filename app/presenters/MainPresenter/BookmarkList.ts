@@ -68,7 +68,7 @@ class BookmarkList {
 		var s : StringBuffer;
 		var score : string;
 
-		score = NumberHelper.toString(bookmark.getScore() * 100);
+		score = NumberHelper.toString(Math.round(bookmark.getScore() * 100));
 
 		s = new StringBuffer('<li class="search-result">');
 		s.append('<div class="details-wrapper">');

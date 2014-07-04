@@ -100,5 +100,7 @@
 /// <reference path="presenters/MainPresenter/Menu/MenuControl.ts" />
 
 //grunt-start
+/// <reference path="models/business/utils/BusinessMediator.ts" />
+/// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 /// <reference path="system/Random.ts" />
 //grunt-end

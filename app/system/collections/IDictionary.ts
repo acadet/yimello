@@ -39,4 +39,6 @@ interface IDictionary<T, U> {
 	get(key : T) : U;
 
 	getLength() : number;
+
+	remove(key : T) : void;
 }

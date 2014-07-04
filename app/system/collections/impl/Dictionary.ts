@@ -88,6 +88,20 @@ class Dictionary<T, U> extends TSObject implements IDictionary<T, U> {
 		return this._keys.length;
 	}
 
+	// TODO : test
+	remove(key : T) : void {
+		var index : number;
+
+		index = this._keys.indexOf(key);
+
+		if (index > -1) {
+			this._keys.splice(index, 1);
+			this._values.splice(index, 1);
+		} else {
+			throw new CollectionException('Unable to remove: item not found');
+		}
+	}
+
 	//endregion Public Methods
 	
 	//endregion Methods

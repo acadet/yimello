@@ -3,6 +3,9 @@
 class DOMElementEvents {
 	static Blur : string = 'blur';
 	static Click : string = 'click';
+	static DragOver : string = 'dragover';
+	static DragEnd : string = 'dragend';
+	static Drop : string = 'drop';
 	static KeyDown : string = 'keydown';
 	static KeyUp : string = 'keyup';
 	static MouseEnter : string = 'mouseenter';
@@ -37,6 +40,10 @@ class DOMElementEventObject extends TSObject {
 
 	getWhich() : number {
 		return this._which;
+	}
+
+	getOriginalEvent() : any {
+		return this._eventObject.originalEvent;
 	}
 
 	preventDefault() : void {
