@@ -1,5 +1,13 @@
 /// <reference path="../dependencies.ts" />
 
+enum TourPresenterSlides {
+	Hello,
+	Guidelines,
+	URL,
+	Tags,
+	End
+}
+
 class TourPresenter extends YimelloPresenter {
 	//region Fields
 	
@@ -30,6 +38,8 @@ class TourPresenter extends YimelloPresenter {
 
 	private _tagInput : DOMElement;
 
+	private _urlInput : DOMElement;
+
 	private _currentBookmark : BookmarkDAO;
 	private _currentTags : IList<TagDAO>;
 
@@ -45,9 +55,9 @@ class TourPresenter extends YimelloPresenter {
 	
 	/**
 	 * Swaps to another slide
-	 * @param {number} id Targeted slide
+	 * @param {TourPresenterSlides} id Targeted slide
 	 */
-	private _swapSlide(id : number) : void {
+	private _swapSlide(id : TourPresenterSlides) : void {
 		var currentId : number;
 		var newSlide : DOMElement;
 
@@ -108,6 +118,12 @@ class TourPresenter extends YimelloPresenter {
 		var tag : DOMElement;
 		var img : DOMElement;
 		var tagObj : TagDAO;
+
+		value = StringHelper.trim(value);
+		if (!TSObject.exists(value) || value === '') {
+			// No value provided
+			return;
+		}
 
 		value = SecurityHelper.disarm(value);
 
@@ -216,125 +232,62 @@ class TourPresenter extends YimelloPresenter {
 		);
 	}
 
+	private _saveURLInput() : void {
+		var url : string;
+
+		url = this._urlInput.getValue();
+		this._urlInput.removeClass('success');
+		this._urlInput.removeClass('error');
+
+		if (url !== '') {
+			PresenterMediator
+				.getBookmarkBusiness()
+				.createFromURL(
+					url,
+					(bookmark) => {
+						if (bookmark === null) {
+							var e : DOMElement;
+							var timer : Timer;
+
+							alert('Provided error is wrong');
+							this._urlInput.addClass('error');
+						} else {
+							var timer : Timer;
+
+							this._currentBookmark = bookmark;
+							this._urlInput.addClass('success');
+
+							timer = new Timer(
+								(o) => {
+									this._swapSlide(TourPresenterSlides.Tags);
+								},
+								2000
+							);
+						}
+					}
+				);
+		} else {
+			this._urlInput.addClass('error');
+		}
+	}
+
 	private _prepareURLForm() : void {
-		var urlInput : DOMElement;
-
-		urlInput = this._slides.findSingle('.js-slide .js-url-form input[name="url"]');
-
 		this._slides
 			.findSingle('.js-slide .js-url-form .js-save-url-trigger')
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					var url : string;
-
-					url = urlInput.getValue();
-
-					urlInput.removeClass('success');
-					urlInput.removeClass('error');
-
-					if (url !== '') {
-						PresenterMediator
-							.getBookmarkBusiness()
-							.createFromURL(
-								url,
-								(bookmark) => {
-									if (bookmark === null) {
-										var e : DOMElement;
-										var timer : Timer;
-
-										e = DOMElement.fromString('<div>Provided url is wrong</div>');
-										e.addClass('error-bubble');
-										e.setCss({
-											top : urlInput.getBottom(),
-											left : (urlInput.getWidth() - e.getWidth()) / 2,
-											opacity : 0
-										});
-
-										DOMTree.append(e);
-										e.animate(
-											{
-												opacity : 1
-											},
-											500
-										);
-
-										timer = new Timer(
-											(o) => {
-												e.animate(
-													{
-														opacity : 0
-													},
-													500,
-													(e) => {
-														e.remove();
-													}
-												);
-											},
-											2000
-										);
-
-										urlInput.addClass('error');
-									} else {
-										var timer : Timer;
-
-										this._currentBookmark = bookmark;
-										urlInput.addClass('success');
-
-										timer = new Timer(
-											(o) => {
-												this._swapSlide(3);
-											},
-											2000
-										);
-									}
-								}
-							);
-					} else {
-						urlInput.addClass('error');
-					}
+					this._saveURLInput();
 				}
 			);
-	}
-
-	private _displayTagError(msg : string) : void {
-		var e : DOMElement;
-		var timer : Timer;
-
-		e = DOMElement.fromString('<div>' + msg + '</div>');
-		e.addClass('error-bubble');
-		e.setCss(
-			{
-				top : this._tagInput.getBottom(),
-				left : (this._tagInput.getWidth() - e.getWidth()) / 2,
-				opacity : 0
+		this._urlInput.on(
+			DOMElementEvents.KeyDown,
+			(e) => {
+				if (e.getWhich() === 13) {
+					this._saveURLInput();
+				}
 			}
 		);
-
-		DOMTree.append(e);
-		e.animate(
-			{
-				opacity : 1
-			},
-			500
-		);
-
-		timer = new Timer(
-			(o) => {
-				e.animate(
-					{
-						opacity : 0
-					},
-					500,
-					() => {
-						e.remove();
-					}
-				);
-			},
-			2000
-		);
-
-		this._tagInput.addClass('error');
 	}
 
 	private _prepareTagForm() : void {
@@ -368,27 +321,32 @@ class TourPresenter extends YimelloPresenter {
 
 														timer = new Timer(
 															(o) => {
-																this._swapSlide(4);
+																this._swapSlide(TourPresenterSlides.End);
 															},
 															2000
 														);
 													} else {
-														this._displayTagError('An intern error has occured. Please try again');
+														alert('An intern error has occured. Please try again');
+														this._tagInput.addClass('error');
 														Log.error(new PresenterException('Failed to bind tags to bookmark'));
 													}
 												}
 											);
 									} else {
-										this._displayTagError('An intern error has occured. Please try again');
+										alert('An intern error has occured. Please try again');
+										this._tagInput.addClass('error');
 										Log.error(new PresenterException('Failed to add tags'));
 									}
 								}
 							);
 					} else {
-						this._displayTagError('You must add some tags before saving');
+						alert('You must add some tags before saving');
+						this._tagInput.addClass('error');
 					}
 				} else {
-					this._displayTagError('You must add some tags before saving');
+					alert('You must specify a boomark before saving');
+					this._urlInput.addClass('error');
+					this._swapSlide(TourPresenterSlides.URL);
 				}
 			}
 		);
@@ -402,6 +360,7 @@ class TourPresenter extends YimelloPresenter {
 		// First, get UI elements
 		this._slides = DOMTree.findSingle('.js-slide-list');
 		this._slideCursors = DOMTree.findSingle('.js-slide-cursor-list');
+		this._urlInput = this._slides.findSingle('.js-slide .js-url-form input[name="url"]');
 
 		this._prepareSlidesAndCursors();
 
@@ -416,7 +375,7 @@ class TourPresenter extends YimelloPresenter {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._swapSlide(1);
+					this._swapSlide(TourPresenterSlides.Guidelines);
 				}
 			);
 
@@ -426,7 +385,7 @@ class TourPresenter extends YimelloPresenter {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._swapSlide(2);
+					this._swapSlide(TourPresenterSlides.URL);
 				}
 			);
 

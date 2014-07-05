@@ -92,7 +92,9 @@ class DataAccessObject extends TSObject {
 			var tagBookmarkRequest : StringBuffer;
 			var config : ActiveRecordConfig =
 			new ActiveRecordConfig(
-				DataAccessObject._dbName
+				DataAccessObject._dbName,
+				'1.0',
+				50 * 1024 * 1024
 			);
 
 			// First init ARO and create an endpoint with DB

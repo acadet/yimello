@@ -297,7 +297,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		}
 
 		if (!TSObject.exists(bookmark.getTitle()) || bookmark.getTitle() === '') {
-			bookmark.setTitle('Default title');
+			bookmark.setTitle(bookmark.getURL());
 		}
 
 		if (!TSObject.exists(bookmark.getDescription())) {

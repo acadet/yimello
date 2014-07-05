@@ -55,7 +55,12 @@ class IntroPresenter extends Presenter {
 		this._hexagon = DOMTree.findSingle('.js-hexagon');
 
 		t = new Timer((o) => {
-			NodeWindow.moveTo('tour.html');
+			if (CacheAPI.get('tour') === 'ok') {
+				NodeWindow.moveTo('main.html');
+			} else {
+				CacheAPI.set('tour', 'ok');
+				NodeWindow.moveTo('tour.html');
+			}
 		}, 3000);
 
 		this._animateHexagon(100);

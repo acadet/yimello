@@ -31,11 +31,12 @@ class TagList {
 		var e : DOMElement;
 
 		s = new StringBuffer('<li>');
-		s.append('<img class="js-tag-delete" src="assets/img/trash-icon.png" />');
-		s.append('<img class="js-tag-edit" src="assets/img/edit-icon.png" />');
 		s.append('<p>');
 		s.append(tag.getLabel());
-		s.append('</p></li>');
+		s.append('</p>');
+		s.append('<img class="js-tag-edit" src="assets/img/edit-icon.png" />');
+		s.append('<img class="js-tag-delete" src="assets/img/trash-icon.png" />');
+		s.append('</li>');
 
 		e = DOMElement.fromString(s.toString());
 		e.setData('id', tag.getId());
@@ -177,6 +178,21 @@ class TagList {
 		this._subscriber.onTagDeletion();
 	}
 
+	private _hide() : void {
+		this._destList.setCss({
+			opacity : 0
+		});
+	}
+
+	private _show() : void {
+		this._destList.animate(
+			{
+				opacity : 1
+			},
+			500
+		);
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -185,6 +201,8 @@ class TagList {
 		var mostPop : boolean = false;
 		var searchTab : boolean = false;
 		var currentId : string;
+
+		this._hide();
 
 		if (TSObject.exists(this._currentSelectedTab)) {
 			if (this.isMostPopularSelected()) {
@@ -232,6 +250,7 @@ class TagList {
 					this._setActive(this._mostPopularTrigger);
 					this._currentSelectedTab = this._mostPopularTrigger;
 				}
+				this._show();
 			}
 		);
 	}

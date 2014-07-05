@@ -103,4 +103,5 @@
 /// <reference path="models/business/utils/BusinessMediator.ts" />
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 /// <reference path="system/Random.ts" />
+/// <reference path="system/storage/CacheAPI.ts" />
 //grunt-end

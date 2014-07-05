@@ -39,8 +39,12 @@ class MenuSubMenu extends SubMenu {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._dragFileArea.show();
-					this.hide();
+					this._dragFileArea.show(
+						() => {
+							this.hide();
+							this.getOwner().hide();
+						}
+					);
 				}
 			);
 	}

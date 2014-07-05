@@ -6,6 +6,7 @@
 .recognizer
 node_modules/
 tscommand*.txt
+release/
 
 # Transpiled files
 app/ui/js/output.js

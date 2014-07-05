@@ -35,9 +35,16 @@ class DragFileArea {
 					.importFromBrowser(
 						e.getOriginalEvent().dataTransfer,
 						(success) => {
-							this.hide();
+							NodeWindow.reload();
 						}
 					);
+			}
+		);
+
+		this._area.on(
+			DOMElementEvents.Click,
+			(e) => {
+				this.hide();
 			}
 		);
 	}
@@ -52,7 +59,7 @@ class DragFileArea {
 	
 	//region Public Methods
 	
-	show() : void {
+	show(callback : Action0 = null) : void {
 		this._area.setCss({
 			display : 'block',
 			zIndex : 999
@@ -62,7 +69,12 @@ class DragFileArea {
 			{
 				top : 0
 			},
-			500
+			800,
+			(e) => {
+				if (callback !== null) {
+					callback();
+				}
+			}
 		);
 	}
 
@@ -71,7 +83,7 @@ class DragFileArea {
 			{
 				top : '-100%'
 			},
-			500,
+			800,
 			(e) => {
 				this._area.setCss({
 					display : 'none',

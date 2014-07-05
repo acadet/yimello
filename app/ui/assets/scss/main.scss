@@ -74,6 +74,8 @@ $green : #7EB530;
 	margin: 0;
 	padding: 0 0 15px 0;
 
+	opacity : 0;
+
 	li {
 		margin: 0;
 		padding : 5px 15px;
@@ -96,11 +98,13 @@ $green : #7EB530;
 
 		p, img {
 			cursor : pointer;
+			display : inline-block;
+			vertical-align : middle;
 		}
 
 		p {
 			margin : 0;
-			width : 100px;
+			width : 95px;
 
 			font: {
 				family: $ptSans;
@@ -112,7 +116,6 @@ $green : #7EB530;
 		}
 
 		img {
-			float : right;
 			margin : 0 5px;
 
 			opacity : 0;
@@ -592,6 +595,7 @@ form .delete-button, form .cancel-button {
 	display : none;
 	z-index : 0;
 	background-color : $blue;
+	cursor : pointer;
 
 	h1, h2 {
 		text-align : center;

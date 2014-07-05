@@ -86,11 +86,15 @@ class NodeWindow {
 	}
 
 	static close() : void {
-		gui.Window.get().close();
+		gui.Window.get().close(true);
 	}
 
 	static openExternal(url : string) : void {
 		gui.Shell.openExternal(url);
+	}
+
+	static reload() : void {
+		NodeWindow.getInstance().window.location.reload();
 	}
 
 	//endregion Public Methods

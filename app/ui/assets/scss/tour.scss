@@ -121,7 +121,7 @@ $red : #DD381D;
 		
 		outline: none;
 		color: $black;
-		border: 1px solid #eee;
+		border: 2px solid #eee;
 
 		&:focus {
 			border-color: $blue;
@@ -222,13 +222,4 @@ $red : #DD381D;
 		background-color: $green;
 		cursor: default;
 	}
-}
-
-.error-bubble {
-	@include bubbleTop($red, 5px);
-
-	width: 150px;
-	height: 30px;
-
-	color: white;
 }

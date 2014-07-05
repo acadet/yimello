@@ -121,6 +121,10 @@ class MenuControl implements ISubMenuOwner {
 		this._tagForm.showToUpdate(tag);
 	}
 
+	hide() : void {
+		this._hideOverlay();
+	}
+
 	//endregion Public Methods
 	
 	//endregion Methods
