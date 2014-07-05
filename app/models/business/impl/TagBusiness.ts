@@ -175,26 +175,6 @@ class TagBusiness implements ITagBusiness {
 		);
 	}
 
-	sortByLabelAscForBookmark(bookmark : BookmarkDAO, callback : Action<IList<TagDAO>>) : void {
-		var request : StringBuffer;
-
-		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' WHERE id IN (');
-		request.append('SELECT tag_id FROM ' + DAOTables.TagBookmark + ' WHERE ');
-		request.append('bookmark_id = "' + bookmark.getId() + '") ');
-		request.append('ORDER BY label ASC');
-
-		DataAccessObject.initialize(
-			(success) => {
-				ActiveRecordObject.executeSQL(
-					request.toString(),
-					(outcome) => {
-						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, TagDAO.fromObject));
-					}
-				);
-			}
-		);
-	}
-
 	//endregion Public Methods
 	
 	//endregion Methods

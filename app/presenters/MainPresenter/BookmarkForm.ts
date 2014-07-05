@@ -171,7 +171,7 @@ class BookmarkForm extends TSObject {
 							this._currentTags,
 							(outcome) => {
 								PresenterMediator
-									.getBookmarkBusiness()
+									.getTagBookmarkBusiness()
 									.bindTags(
 										b,
 										outcome,
@@ -228,7 +228,7 @@ class BookmarkForm extends TSObject {
 							this._currentTags,
 							(outcome) => {
 								PresenterMediator
-									.getBookmarkBusiness()
+									.getTagBookmarkBusiness()
 									.updateTagBinding(
 										this._currentUpdatedBookmark,
 										outcome,
@@ -447,8 +447,8 @@ class BookmarkForm extends TSObject {
 		this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(bookmark.getURL()));
 
 		PresenterMediator
-			.getTagBusiness()
-			.sortByLabelAscForBookmark(
+			.getTagBookmarkBusiness()
+			.sortTagsByLabelAscForBookmark(
 				bookmark,
 				(outcome) => {
 					outcome.forEach(e => this._addTag(e.getLabel()));

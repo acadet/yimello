@@ -7,6 +7,7 @@ class PresenterMediator extends TSObject {
 	private static _hasResumed : boolean;
 	private static _tagBusiness : ITagBusiness;
 	private static _bookmarkBusiness : IBookmarkBusiness;
+	private static _tagBookmarkBusiness : ITagBookmarkBusiness;
 
 	//endregion Fields
 	
@@ -53,6 +54,14 @@ class PresenterMediator extends TSObject {
 		}
 
 		return PresenterMediator._tagBusiness;
+	}
+
+	static getTagBookmarkBusiness() : ITagBookmarkBusiness {
+		if (!TSObject.exists(PresenterMediator._tagBookmarkBusiness)) {
+			PresenterMediator._tagBookmarkBusiness = new TagBookmarkBusiness();
+		}
+
+		return PresenterMediator._tagBookmarkBusiness;
 	}
 	
 	//endregion Public Methods

@@ -310,7 +310,7 @@ class TourPresenter extends YimelloPresenter {
 									if (TSObject.exists(outcome)) {
 										this._currentTags = outcome;
 										PresenterMediator
-											.getBookmarkBusiness()
+											.getTagBookmarkBusiness()
 											.bindTags(
 												this._currentBookmark,
 												this._currentTags,

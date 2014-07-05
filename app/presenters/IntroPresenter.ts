@@ -1,14 +1,21 @@
 /// <reference path="../dependencies.ts" />
 
-class IntroPresenter extends Presenter {
+class IntroPresenter extends YimelloPresenter {
 	//region Fields
 	
 	private _hexagon : DOMElement;
+	private _mustExit : boolean;
 
 	//endregion Fields
 	
 	//region Constructors
 	
+	constructor() {
+	    super();
+	
+	    this._mustExit = false;
+	}
+
 	//endregion Constructors
 	
 	//region Methods
@@ -44,6 +51,15 @@ class IntroPresenter extends Presenter {
 		);
 	}
 
+	private _exit() : void {
+		if (CacheAPI.get('tour') === 'ok') {
+			NodeWindow.moveTo('main.html');
+		} else {
+			CacheAPI.set('tour', 'ok');
+			NodeWindow.moveTo('tour.html');
+		}
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -54,12 +70,23 @@ class IntroPresenter extends Presenter {
 		DOMTree.findSingle('.js-intro-strap').centerize();
 		this._hexagon = DOMTree.findSingle('.js-hexagon');
 
+		BusinessMediator
+			.getTagBookmarkBusiness()
+			.backup(
+				(success) => {
+					if (this._mustExit) {
+						this._exit();
+					} else {
+						this._mustExit = true;
+					}
+				}
+			);
+
 		t = new Timer((o) => {
-			if (CacheAPI.get('tour') === 'ok') {
-				NodeWindow.moveTo('main.html');
+			if (this._mustExit) {
+				this._exit();
 			} else {
-				CacheAPI.set('tour', 'ok');
-				NodeWindow.moveTo('tour.html');
+				this._mustExit = true;
 			}
 		}, 3000);
 

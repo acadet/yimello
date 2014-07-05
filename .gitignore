@@ -1,3 +1,4 @@
+# Tmp files
 .DS_Store
 *~
 .tscache/
@@ -6,7 +7,10 @@
 .recognizer
 node_modules/
 tscommand*.txt
+
+# Special files & folders
 release/
+backup.json
 
 # Transpiled files
 app/ui/js/output.js

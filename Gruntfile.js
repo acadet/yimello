@@ -5,6 +5,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-remove");
     grunt.loadNpmTasks("grunt-mkdir");
+    grunt.loadNpmTasks("grunt-zip");
     grunt.loadNpmTasks("grunt-node-webkit-builder");
 
     // Configure grunt here
@@ -120,7 +121,39 @@ module.exports = function (grunt) {
 	    		trace : true
 	    	},
 	    	release : {
+	    		fileList : [
+	    			'release/releases/yimello-win.zip', 
+	    			'release/releases/yimello-mac.zip',
+	    			'release/releases/yimello-linux-32.zip',
+	    			'release/releases/yimello-linux-64.zip'
+	    		],
 	    		dirList : ['release/src/app', 'release/releases']
+	    	}
+	    },
+	    zip : {
+	    	releaseWin : {
+	    		cwd : 'release/releases/Yimello/win/',
+	    		src : ['release/releases/Yimello/win/**/*'],
+	    		dest : 'release/releases/yimello-win.zip',
+	    		compression : 'DEFLATE'
+	    	},
+	    	releaseMac : {
+	    		cwd : 'release/releases/Yimello/mac/',
+	    		src : ['release/releases/Yimello/mac/**/*'],
+	    		dest : 'release/releases/yimello-mac.zip',
+	    		compression : 'DEFLATE'
+	    	},
+	    	releaseLinux32 : {
+	    		cwd : 'release/releases/Yimello/linux32/',
+	    		src : ['release/releases/Yimello/linux32/**/*'],
+	    		dest : 'release/releases/yimello-linux-32.zip',
+	    		compression : 'DEFLATE'
+	    	},
+	    	releaseLinux64 : {
+	    		cwd : 'release/releases/Yimello/linux64/',
+	    		src : ['release/releases/Yimello/linux64/**/*'],
+	    		dest : 'release/releases/yimello-linux-64.zip',
+	    		compression : 'DEFLATE'
 	    	}
 	    },
 	    nodewebkit : {
@@ -128,8 +161,8 @@ module.exports = function (grunt) {
 	    		build_dir : 'release',
 	    		mac : true,
 	    		win : true,
-	    		linux32 : false,
-	    		linux64 : false,
+	    		linux32 : true,
+	    		linux64 : true,
 	    		mac_icns : 'release/src/logo.icns'
 	    	},
 	    	src : ['release/src/**/*']
@@ -138,5 +171,18 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('build', ['ts:build']);
 	grunt.registerTask('testing', ['copy:appDependencies', 'ts:testing']);
-	grunt.registerTask('release', ['remove:release', 'ts:release', 'mkdir:release', 'copy:release', 'nodewebkit']);
+	grunt.registerTask(
+		'release',
+		[
+			'remove:release', 
+			'ts:release',
+			'mkdir:release',
+			'copy:release',
+			'nodewebkit',
+			'zip:releaseWin',
+			'zip:releaseMac',
+			'zip:releaseLinux32',
+			'zip:releaseLinux64'
+		]
+	);
 };

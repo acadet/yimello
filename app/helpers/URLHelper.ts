@@ -28,7 +28,7 @@ class URLHelper extends TSObject {
 	static isValid(url : string) : boolean {
 		var e : Regex;
 
-		e = new Regex('http(s?)\:\/\/.*\..*', [RegexFlags.Insensitive]);
+		e = new Regex('http(s?)\:\/\/.*', [RegexFlags.Insensitive]);
 
 		return e.test(url);
 	}

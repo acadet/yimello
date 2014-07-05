@@ -25,6 +25,4 @@ interface ITagBusiness {
 	 * @param {Action<IList<TagDAO>>} callback Callback with new tags updated. All tags are into DB
 	 */
 	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>>) : void;
-
-	sortByLabelAscForBookmark(bookmark : BookmarkDAO, callback : Action<IList<TagDAO>>) : void;
 }

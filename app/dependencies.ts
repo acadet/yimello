@@ -23,6 +23,9 @@
 /// <reference path="system/StringHelper.ts" />
 /// <reference path="helpers/FormHelper.ts" />
 /// <reference path="system/Environment.ts" />
+/// <reference path="system/storage/CacheAPI.ts" />
+/// <reference path="system/storage/FileAPI.ts" />
+/// <reference path="system/Random.ts" />
 
 // Collections parts
 
@@ -73,6 +76,9 @@
 /// <reference path="models/business/ITagBusiness.ts" />
 /// <reference path="models/business/impl/TagBusiness.ts" />
 /// <reference path="models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="models/business/ITagBookmarkBusiness.ts" />
+/// <reference path="models/business/impl/TagBookmarkBusiness.ts" />
+/// <reference path="models/business/utils/BusinessMediator.ts" />
 
 // Presenters part
 
@@ -98,10 +104,7 @@
 /// <reference path="presenters/MainPresenter/Menu/TagFormSubMenu.ts" />
 /// <reference path="presenters/MainPresenter/Menu/MenuSubMenu.ts" />
 /// <reference path="presenters/MainPresenter/Menu/MenuControl.ts" />
+/// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
-/// <reference path="models/business/utils/BusinessMediator.ts" />
-/// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
-/// <reference path="system/Random.ts" />
-/// <reference path="system/storage/CacheAPI.ts" />
 //grunt-end

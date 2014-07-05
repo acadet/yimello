@@ -145,6 +145,18 @@ class BookmarkDAO extends DataAccessObject {
 		return b;
 	}
 
+	toJSON() : any {
+		var o : any = {};
+
+		o.id = this.getId();
+		o.url = this.getURL();
+		o.title = this.getTitle();
+		o.description = this.getDescription();
+		o.views = this.getViews();
+
+		return o;
+	}
+
 	hydrateBookmark(out : BookmarkDAO) : void {
 		out.setId(this.getId());
 		out.setURL(this.getURL());

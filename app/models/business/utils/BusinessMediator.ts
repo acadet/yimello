@@ -4,8 +4,8 @@ class BusinessMediator {
 	//region Fields
 	
 	private static _bookmarkBusiness : IBookmarkBusiness;
-
 	private static _tagBusiness : ITagBusiness;
+	private static _tagBookmarkBusiness : ITagBookmarkBusiness;
 
 	//endregion Fields
 	
@@ -34,6 +34,14 @@ class BusinessMediator {
 		}
 
 		return BusinessMediator._tagBusiness;
+	}
+
+	static getTagBookmarkBusiness() : ITagBookmarkBusiness {
+		if (!TSObject.exists(BusinessMediator._tagBookmarkBusiness)) {
+			this._tagBookmarkBusiness = new TagBookmarkBusiness();
+		}
+
+		return BusinessMediator._tagBookmarkBusiness;
 	}
 
 	//endregion Public Methods

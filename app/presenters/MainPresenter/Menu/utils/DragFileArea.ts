@@ -1,9 +1,15 @@
 /// <reference path="../../../../dependencies.ts" />
 
+enum DragFileAreaOperations {
+	BrowserImport,
+	BackupImport
+}
+
 class DragFileArea {
 	//region Fields
 	
 	private _area : DOMElement;
+	private _currentOperation : DragFileAreaOperations;
 
 	//endregion Fields
 	
@@ -30,14 +36,26 @@ class DragFileArea {
 			DOMElementEvents.Drop,
 			(e) => {
 				e.preventDefault();
-				PresenterMediator
-					.getBookmarkBusiness()
-					.importFromBrowser(
-						e.getOriginalEvent().dataTransfer,
-						(success) => {
-							NodeWindow.reload();
-						}
-					);
+
+				if (this._currentOperation === DragFileAreaOperations.BrowserImport) {
+					PresenterMediator
+						.getTagBookmarkBusiness()
+						.importFromBrowser(
+							e.getOriginalEvent().dataTransfer,
+							(success) => {
+								NodeWindow.reload();
+							}
+						);
+				} else {
+					PresenterMediator
+						.getTagBookmarkBusiness()
+						.importBackup(
+							e.getOriginalEvent().dataTransfer,
+							(success) => {
+								NodeWindow.reload();
+							}
+						);
+				}
 			}
 		);
 
@@ -55,11 +73,7 @@ class DragFileArea {
 	
 	//region Private Methods
 
-	//endregion Private Methods
-	
-	//region Public Methods
-	
-	show(callback : Action0 = null) : void {
+	private _show(callback : Action0 = null) : void {
 		this._area.setCss({
 			display : 'block',
 			zIndex : 999
@@ -76,6 +90,21 @@ class DragFileArea {
 				}
 			}
 		);
+	}
+
+	//endregion Private Methods
+	
+	//region Public Methods
+
+
+	showForBrowserImport(callback : Action0 = null) : void {
+		this._currentOperation = DragFileAreaOperations.BrowserImport;
+		this._show();
+	}
+
+	showForBackupImport(callback : Action0 = null) : void {
+		this._currentOperation = DragFileAreaOperations.BackupImport;
+		this._show();
 	}
 
 	hide() : void {

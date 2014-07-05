@@ -192,8 +192,8 @@ class BookmarkList {
 		this._reset();
 
 		PresenterMediator
-			.getBookmarkBusiness()
-			.sortByTitleAscForTag(
+			.getTagBookmarkBusiness()
+			.sortBookmarksByTitleAscForTag(
 				tag,
 				(outcome) => {
 					if (outcome.getLength() < 1) {
@@ -216,7 +216,7 @@ class BookmarkList {
 		this._reset();
 
 		PresenterMediator
-			.getBookmarkBusiness()
+			.getTagBookmarkBusiness()
 			.search(
 				value,
 				(outcome) => {

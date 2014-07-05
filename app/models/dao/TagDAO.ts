@@ -70,6 +70,15 @@ class TagDAO extends DataAccessObject {
 		return t;
 	}
 
+	toJSON() : any {
+		var o : any = {};
+
+		o.id = this.getId();
+		o.label = this.getLabel();
+
+		return o;
+	}
+
 	/**
 	 * Adds a new tag into DB
 	 * @param {Action<TagDAO> = null} callback Callback with new built tag. Id is filled

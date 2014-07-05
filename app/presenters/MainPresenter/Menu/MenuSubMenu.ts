@@ -39,7 +39,22 @@ class MenuSubMenu extends SubMenu {
 			.on(
 				DOMElementEvents.Click,
 				(e) => {
-					this._dragFileArea.show(
+					this._dragFileArea.showForBrowserImport(
+						() => {
+							this.hide();
+							this.getOwner().hide();
+						}
+					);
+				}
+			);
+
+		this
+			.getTarget()
+			.findSingle('.js-import-backup')
+			.on(
+				DOMElementEvents.Click,
+				(e) => {
+					this._dragFileArea.showForBackupImport(
 						() => {
 							this.hide();
 							this.getOwner().hide();

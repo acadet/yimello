@@ -1,7 +1,7 @@
 /// <reference path="../../dependencies.ts" />
 
 class MainPresenter
-	extends Presenter
+	extends YimelloPresenter
 	implements
 		IBookmarkFormSubscriber,
 		ITagListSubscriber,
