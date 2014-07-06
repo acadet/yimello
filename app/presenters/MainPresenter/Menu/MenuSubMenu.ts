@@ -23,15 +23,6 @@ class MenuSubMenu extends SubMenu {
 					NodeWindow.moveTo('tour.html');
 				}
 			);
-		this
-			.getTarget()
-			.findSingle('.js-close-trigger')
-			.on(
-				DOMElementEvents.Click,
-				(e) => {
-					NodeWindow.close();
-				}
-			);
 
 		this
 			.getTarget()

@@ -89,6 +89,10 @@ class NodeWindow {
 		gui.Window.get().close(true);
 	}
 
+	static minimize() : void {
+		NodeWindow.getInstance().minimize();
+	}
+
 	static openExternal(url : string) : void {
 		gui.Shell.openExternal(url);
 	}

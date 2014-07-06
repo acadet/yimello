@@ -107,4 +107,5 @@
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
+/// <reference path="presenters/utils/ErrorMessage.ts" />
 //grunt-end

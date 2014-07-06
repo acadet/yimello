@@ -63,16 +63,21 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			);
 	}
 
-	private _addRecursiveBookmark(coll : IList<Pair<BookmarkDAO, IList<TagDAO>>>, callback : Action<boolean>) : void {
+	private _addRecursiveBookmark(
+		index : number,
+		coll : IList<Pair<BookmarkDAO, IList<TagDAO>>>,
+		callback : Action0 = null,
+		errorHandler : Action<string> = null) : void {
 		var p : Pair<BookmarkDAO, IList<TagDAO>>;
 
-		if (coll.getLength() === 0) {
-			callback(true);
+		if (index === coll.getLength()) {
+			if (callback !== null) {
+				callback();
+			}
 			return;
 		}
 
-		p = coll.getAt(0);
-		coll.remove(p);
+		p = coll.getAt(index);
 		BusinessMediator
 			.getTagBusiness()
 			.merge(
@@ -80,19 +85,24 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 				(outcome) => {
 					var tags : IList<TagDAO> = outcome;
 
-					BusinessMediator.getBookmarkBusiness().add(
-						p.getFirst(),
-						(outcome) => {
-							this.bindTags(
-								outcome,
-								tags,
-								(success) => {
-									this._addRecursiveBookmark(coll, callback);
-								}
-							);
-						}
-					);
-				}
+					BusinessMediator
+						.getBookmarkBusiness()
+						.add(
+							p.getFirst(),
+							(outcome) => {
+								this.bindTags(
+									outcome,
+									tags,
+									() => {
+										this._addRecursiveBookmark(index + 1, coll, callback, errorHandler);
+									},
+									errorHandler
+								);
+							},
+							errorHandler
+						);
+				},
+				errorHandler
 			);
 	}
 
@@ -103,9 +113,22 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	 * @param {number}             index    Current index in tag list
 	 * @param {Action<boolean> =        null}        callback [description]
 	 */
-	private _bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, index : number, callback : Action<boolean> = null) : void {
+	private _bindTags(
+		bookmark : BookmarkDAO,
+		tags : IList<TagDAO>,
+		index : number,
+		callback : Action0 = null,
+		errorHandler : Action<string> = null) : void {
 		var t : TagDAO;
 		var data : IList<any>;
+
+		if (index === tags.getLength()) {
+			// Browsing has ended, trigger the callback
+			if (callback !== null) {
+				callback();
+			}
+			return;
+		}
 
 		t = tags.getAt(index);
 		data = new ArrayList<any>();
@@ -118,21 +141,11 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			data,
 			(success) => {
 				if (!success) {
-					Log.error(new BusinessException('Failed to insert values'));
-					if (callback !== null) {
-						callback(false);
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
 					}
 				} else {
-					index++;
-
-					if (index < tags.getLength()) {
-						this._bindTags(bookmark, tags, index, callback);
-					} else {
-						// Browsing has ended, trigger the callback
-						if (callback !== null) {
-							callback(true);
-						}
-					}
+					this._bindTags(bookmark, tags, index + 1, callback);
 				}
 			}
 		);
@@ -165,11 +178,15 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		data = new ArrayList<any>();
 		data.add(e['tag_id']);
 		data.add(e['bookmark_id']);
-		ActiveRecordObject.insert(
-			DAOTables.TagBookmark,
-			data,
+		DataAccessObject.initialize(
 			(success) => {
-				this._addCouple(currentIndex + 1, list, callback);
+				ActiveRecordObject.insert(
+					DAOTables.TagBookmark,
+					data,
+					(success) => {
+						this._addCouple(currentIndex + 1, list, callback);
+					}
+				);
 			}
 		);
 	}
@@ -186,13 +203,18 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		e = list[currentIndex];
 		data = BookmarkDAO.fromObject(e).toList();
-		ActiveRecordObject.insert(
-			DAOTables.Bookmarks,
-			data,
+		DataAccessObject.initialize(
 			(success) => {
-				this._addBKList(currentIndex + 1, list, callback);
+				ActiveRecordObject.insert(
+					DAOTables.Bookmarks,
+					data,
+					(success) => {
+						this._addBKList(currentIndex + 1, list, callback);
+					}
+				);
 			}
 		);
+		
 	}
 
 	private _addTagList(currentIndex : number, list : Array<any>, callback : Action0 = null) : void {
@@ -207,21 +229,36 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		e = list[currentIndex];
 		data = TagDAO.fromObject(e).toList();
-		ActiveRecordObject.insert(
-			DAOTables.Tags,
-			data,
+		DataAccessObject.initialize(
 			(success) => {
-				this._addTagList(currentIndex + 1, list, callback);
+				ActiveRecordObject.insert(
+					DAOTables.Tags,
+					data,
+					(success) => {
+						this._addTagList(currentIndex + 1, list, callback);
+					}
+				);		
 			}
-		);
+		);		
 	}
 
 	//endregion Private Methods
 	
 	//region Public Methods
 	
-	sortTagsByLabelAscForBookmark(bookmark : BookmarkDAO, callback : Action<IList<TagDAO>>) : void {
+	sortTagsByLabelAscForBookmark(
+		bookmark : BookmarkDAO,
+		callback : Action<IList<TagDAO>>,
+		errorHandler : Action<string> = null) : void {
 		var request : StringBuffer;
+
+		if (!TSObject.exists(bookmark)) {
+			Log.error(new BusinessException('Unable to sort tags: provided bookmark is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
+			}
+			return;
+		}
 
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' WHERE id IN (');
 		request.append('SELECT tag_id FROM ' + DAOTables.TagBookmark + ' WHERE ');
@@ -240,19 +277,24 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		);
 	}
 
-	bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, callback : Action<boolean> = null) : void {
+	bindTags(
+		bookmark : BookmarkDAO,
+		tags : IList<TagDAO>,
+		callback : Action0 = null,
+		errorHandler : Action<string> = null) : void {
+
 		if (!TSObject.exists(bookmark)) {
-			Log.error(new BusinessException('Provided bookmark cannot be null'));
-			if (callback !== null) {
-				callback(false);
+			Log.error(new BusinessException('Unable to bind: provided bookmark is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
 
 		if (!TSObject.exists(tags)) {
-			Log.error(new BusinessException('Provided tags cannot be null'));
-			if (callback != null) {
-				callback(false);
+			Log.error(new BusinessException('Unable to bind: provided tag list is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -260,41 +302,45 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (tags.getLength() < 1) {
 			Log.warn('No tags bound: provided list is empty');
 			if (callback !== null) {
-				callback(true);
+				callback();
 			}
 			return;
 		}
 
 		DataAccessObject.initialize(
 			(success) => {
-				this._bindTags(bookmark, tags, 0, callback);
+				this._bindTags(bookmark, tags, 0, callback, errorHandler);
 			}
 		);
 	}
 
-	updateTagBinding(bookmark : BookmarkDAO, tags : IList<TagDAO>, callback : Action<boolean> = null) {
+	updateTagBinding(
+		bookmark : BookmarkDAO,
+		tags : IList<TagDAO>,
+		callback : Action0 = null,
+		errorHandler : Action<string> = null) : void {
 		var request : StringBuffer;
 
 		if (!TSObject.exists(bookmark)) {
-			Log.error(new BusinessException('Unable to update tag binding: bookmark is null'));
-			if (callback !== null) {
-				callback(false);
+			Log.error(new BusinessException('Unable to bind: provided bookmark is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
 
 		if (!TSObject.exists(tags)) {
-			Log.error(new BusinessException('Unable to update tag binding: tag list is null'));
-			if (callback !== null) {
-				callback(false);
+			Log.error(new BusinessException('Unable to bind: provided tag list is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
 
 		if (tags.getLength() < 1) {
-			Log.warn('No update was done: list is empty');
+			Log.warn('No tags bound: provided list is empty');
 			if (callback !== null) {
-				callback(true);
+				callback();
 			}
 			return;
 		}
@@ -308,26 +354,30 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					request.toString(),
 					(success) => {
 						if (!success) {
-							Log.error(new BusinessException('Failed to remove entries from DB'));
-							if (callback !== null) {
-								callback(false);
+							if (errorHandler !== null) {
+								errorHandler('An internal error has occured. Please try again');
 							}
 							return;
 						}
 
-						this.bindTags(bookmark, tags, callback);
+						this.bindTags(bookmark, tags, callback, errorHandler);
 					}
 				);
 			}
 		);
 	}
 
-	sortBookmarksByTitleAscForTag(tag : TagDAO, callback : Action<IList<BookmarkDAO>>) : void {
+	sortBookmarksByTitleAscForTag(
+		tag : TagDAO,
+		callback : Action<IList<BookmarkDAO>>,
+		errorHandler : Action<string> = null) : void {
 		var request : StringBuffer;
 
 		if (!TSObject.exists(tag)) {
-			Log.error(new BusinessException('Unable to sort: provided tag is null'));
-			callback(null);
+			Log.error(new BusinessException('Unable to sort bookmarks: provided tag is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
+			}
 			return;
 		}
 
@@ -349,6 +399,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		);
 	}
 
+	// TODO : test
 	sortBookmarksByTitleWithBoundTags(callback : Action<IList<Pair<BookmarkDAO, IList<TagDAO>>>>) : void {
 		var request : StringBuffer;
 
@@ -425,17 +476,18 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	// TODO : test
-	importFromBrowser(dataTransfer : any, callback : Action<boolean> = null) : void {
+	importFromBrowser(dataTransfer : any, callback : Action0 = null, errorHandler : Action<string> = null) : void {
 		var reader : FileReader;
 
 		if (dataTransfer.files.length < 1) {
 			Log.error(new BusinessException('No import: there is no file'));
-			if (callback !== null) {
-				callback(false);
+			if (errorHandler !== null) {
+				errorHandler('An error has occured while importing your file.');
 			}
 			return;
 		}
 
+		// TODO : add more tests to file reading
 		reader = new FileReader();
 		reader.onload =
 			(e) => {
@@ -456,12 +508,10 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 				coll = new ArrayList<Pair<BookmarkDAO, IList<TagDAO>>>();
 				this._browseDLNode(dlRoot, tags, coll);
 				this._addRecursiveBookmark(
+					0,
 					coll,
-					(success) => {
-						if (callback !== null) {
-							callback(success);
-						}
-					}
+					callback,
+					errorHandler
 				);
 			};
 		reader.readAsText(dataTransfer.files[0]);
@@ -475,7 +525,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 				var list : IList<ScoredBookmarkDAO>;
 				var keywords : IList<string>;
 
-				max = 0;
+				max = 0.0;
 				list = new ArrayList<ScoredBookmarkDAO>();
 				keywords = StringHelper.extractWords(input);
 
@@ -488,23 +538,23 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 						sbk = new ScoredBookmarkDAO();
 						bk.hydrateBookmark(sbk);
-						currentScore = 0;
+						currentScore = 0.0;
 
 						keywords.forEach(
 							(key) => {
 								var r : Regex = new Regex(key, [RegexFlags.Insensitive]);
 
 								if (r.test(sbk.getTitle())) {
-									currentScore += 20;
+									currentScore += 20.0;
 								}
 								if (r.test(sbk.getDescription())) {
-									currentScore += 2;
+									currentScore += 2.0;
 								}
 
 								tagList.forEach(
 									(tag) => {
 										if (r.test(tag.getLabel())) {
-											currentScore += 10;
+											currentScore += 10.0;
 										}
 									}
 								);
@@ -530,24 +580,40 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	// TODO : test
-	backup(callback : Action<boolean> = null) : void {
+	backup(callback : Action0 = null, errorHandler : Action<string> = null) : void {
 		var bks : IList<BookmarkDAO>;
 		var tags : IList<TagDAO>;
 		var tgBk : IList<any>;
 
 		BookmarkDAO.get(
 			(outcome) => {
-				bks = outcome;
+				if (outcome === null) {
+					Log.warn('No bookmarks to backup');
+					bks = new ArrayList<BookmarkDAO>();
+				} else {
+					bks = outcome;
+				}
 
 				TagDAO.get(
 					(outcome) => {
-						tags = outcome;
+						if (outcome === null) {
+							Log.warn('No tags to backup');
+							tags = new ArrayList<TagDAO>();
+						} else {
+							tags = outcome;
+						}
 
 						ActiveRecordObject.get(
 							DAOTables.TagBookmark,
 							(outcome) => {
 								var result : any = {};
-								tgBk = outcome;
+
+								if (outcome === null) {
+									Log.warn('No relations to backup');
+									tgBk = new ArrayList<any>();
+								} else {
+									tgBk = outcome;
+								}
 
 								result[DAOTables.Tags] = new Array<any>();
 								tags.forEach(e => result[DAOTables.Tags].push(e.toJSON()));
@@ -560,15 +626,15 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 									"backup.json",
 									JSON.stringify(result),
 									(error) => {
-										var isOK : boolean = true;
-
 										if (error) {
 											Log.error(new BusinessException(error));
-											isOK = false;
-										}
-
-										if (callback !== null) {
-											callback(isOK);
+											if (errorHandler !== null) {
+												errorHandler('An internal error has occured. Please try again');
+											}
+										} else {
+											if (callback !== null) {
+												callback();
+											}
 										}
 									}
 								);
@@ -581,17 +647,18 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	// TODO : test
-	importBackup(dataTransfer : any, callback : Action<boolean> = null) : void {
+	importBackup(dataTransfer : any, callback : Action0 = null, errorHandler : Action<string> = null) : void {
 		var reader : FileReader;
 
 		if (dataTransfer.files.length < 1) {
 			Log.error(new BusinessException('Unable to import: no file provided'));
-			if (callback !== null) {
-				callback(false);
+			if (errorHandler !== null) {
+				errorHandler('An error has occured while importing your file.');
 			}
 			return;
 		}
 
+		// TODO : add more tests on reader
 		reader = new FileReader();
 		reader.onload =
 			(e) => {
@@ -616,7 +683,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 									tgBks,
 									() => {
 										if (callback !== null) {
-											callback(true);
+											callback();
 										}
 									}
 								);

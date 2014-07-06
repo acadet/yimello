@@ -27,46 +27,109 @@ class TagBusiness implements ITagBusiness {
 		tags : IList<TagDAO>,
 		index : number,
 		outcome : IList<TagDAO>,
-		callback : Action<IList<TagDAO>> = null) : void {
+		callback : Action<IList<TagDAO>> = null,
+		errorHandler : Action<string> = null) : void {
 
-		tags
-			.getAt(index)
-			.add((result) => {
-					if (!TSObject.exists(result)) {
-						Log.error(new BusinessException('Failed to add tag #' + index));
+		if (index === tags.getLength()) {
+			// Browsing has ended, trigger callback
+			if (callback !== null) {
+				callback(outcome);
+			}
+			return;
+		}
 
-						if (callback !== null) {
-							callback(null);
-						}
-						return;
+		this.add(
+			tags.getAt(index),
+			(result) => {
+				if (!TSObject.exists(result)) {
+					Log.error(new BusinessException('Failed to add tag #' + index));
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
 					}
-
-					index++;
-					outcome.add(result);
-
-					if (index < tags.getLength()) {
-						this._addList(tags, index, outcome, callback);
-					} else {
-						// Browsing has ended, trigger callback
-						if (callback !== null) {
-							callback(outcome);
-						}
-					}
+					return;
 				}
-			);
+
+				outcome.add(result);
+				this._addList(tags, index + 1, outcome, callback, errorHandler);
+			}
+		);
+	}
+
+	private _disarmTag(tag : TagDAO) : void {
+		tag.setLabel(SecurityHelper.disarm(StringHelper.trim(tag.getLabel())));
+	}
+
+	private _checkTag(tag : TagDAO, errorHandler : Action<string> = null) : boolean {
+		var label : string;
+
+		if (!TSObject.exists(tag)) {
+			Log.error(new BusinessException('Provided tag is null'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
+			}
+			return false;
+		}
+
+		label = StringHelper.trim(tag.getLabel());
+
+		if (!TSObject.exists(tag.getLabel()) || tag.getLabel() === '') {
+			Log.error(new BusinessException('Unable to add a tag: tag must have a label'));
+			if (errorHandler !== null) {
+				errorHandler('A tag must have a label');
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	//endregion Private Methods
 	
 	//region Public Methods
+
+	isValueValid(value : string) : boolean {
+		var s : string;
+
+		if (!TSObject.exists(value)) {
+			return false;
+		}
+
+		s = StringHelper.trim(value);
+		if (s === '') {
+			return false;
+		}
+
+		return true;
+	}
+
+	add(tag : TagDAO, callback : Action<TagDAO> = null, errorHandler : Action<string> = null) : void {
+		if (this._checkTag(tag, errorHandler)) {
+			return;
+		}
+
+		this._disarmTag(tag);
+
+		tag.add(
+			(outcome) => {
+				if (!TSObject.exists(outcome)) {
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
+					}
+				}
+				if (callback !== null) {
+					callback(outcome);
+				}
+			}
+		);
+	}
 	
-	addList(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null) : void {
+	addList(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null, errorHandler : Action<string> = null) : void {
 		var outcome : IList<TagDAO>;
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Provided tag list is null'));
-			if (callback !== null) {
-				callback(null);
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -81,28 +144,49 @@ class TagBusiness implements ITagBusiness {
 			return;
 		}
 
-		this._addList(tags, 0, outcome, callback);
+		this._addList(tags, 0, outcome, callback, errorHandler);
 	}
 
-	delete(tag : TagDAO, callback : Action<boolean> = null) : void {
+	update(tag : TagDAO, callback : Action<TagDAO>, errorHandler : Action<string> = null) : void {
+		if (this._checkTag(tag, errorHandler)) {
+			return;
+		}
+
+		this._disarmTag(tag);
+
+		tag.update(
+			(outcome) => {
+				if (!TSObject.exists(outcome)) {
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
+					}
+					return;
+				}
+
+				if (callback !== null) {
+					callback(outcome);
+				}
+			}
+		);
+	}
+
+	delete(tag : TagDAO, callback : Action0 = null, errorHandler : Action<string> = null) : void {
 		var id : string;
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Unable to delete: provided tag is null'));
-			if (callback !== null) {
-				callback(false);
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
 
 		id = tag.getId();
-
 		tag.delete(
 			(success) => {
 				if (!success) {
-					Log.error(new BusinessException('Failed to delete: failed to remove tag'));
-					if (callback !== null) {
-						callback(false);
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
 					}
 					return;
 				}
@@ -113,7 +197,7 @@ class TagBusiness implements ITagBusiness {
 					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = "' + id + '"',
 					(outcome) => {
 						if (callback !== null) {
-							callback(true);
+							callback();
 						}
 					}
 				);
@@ -121,15 +205,16 @@ class TagBusiness implements ITagBusiness {
 		);
 	}
 
-	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null) : void {
+	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null, errorHandler : Action<string> = null) : void {
 		var newOnes : IList<any>; // tags which are not in DB
 		var mergedList : IList<any>; // outcome to use for callback, will contains only tags into DB
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to merge: provided list is null'));
-			if (callback !== null) {
-				callback(null);
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
+			return;
 		}
 
 		newOnes = new ArrayList<TagDAO>();
@@ -164,7 +249,8 @@ class TagBusiness implements ITagBusiness {
 							if (callback !== null) {
 								callback(mergedList);
 							}
-						}
+						},
+						errorHandler
 					);
 				} else {
 					if (callback !== null) {

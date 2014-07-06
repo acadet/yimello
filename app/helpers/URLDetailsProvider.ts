@@ -56,8 +56,7 @@ class URLDetailsProvider extends TSObject {
 			request.execute((data, status, xhr) => {
 				var title : string;
 				var description : string;
-				var favicon : string;
-				var r1 : Regex, r2 : Regex, r3 : Regex;
+				var r1 : Regex, r2 : Regex;
 
 				// Grab title from title tags
 				r1 = new Regex('\<title\>(.*)\<\/title\>', [RegexFlags.Insensitive]);

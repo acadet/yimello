@@ -22,11 +22,40 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));
 	}
 
+	private _checkBookmark(bookmark : BookmarkDAO, errorHandler : Action<string> = null) : boolean {
+		if (!TSObject.exists(bookmark)) {
+			Log.error(new BusinessException('Unable to add: no bookmark provided'));
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
+			}
+			return false;
+		}
+
+		if (!URLHelper.isValid(bookmark.getURL())) {
+			Log.error(new BusinessException('Failed to save: url is not valid'));
+			if (errorHandler !== null) {
+				errorHandler('URL is invalid');
+			}
+			return false;
+		}
+
+		if (!TSObject.exists(bookmark.getTitle()) || bookmark.getTitle() === '') {
+			bookmark.setTitle(bookmark.getURL());
+		}
+
+		if (!TSObject.exists(bookmark.getDescription())) {
+			bookmark.setDescription('');
+		}
+
+		return true;
+	}
+
 	private _addList(
 		current : number,
 		bookmarks : IList<BookmarkDAO>,
 		outcome : IList<BookmarkDAO>,
-		callback : Action<IList<BookmarkDAO>> = null) {
+		callback : Action<IList<BookmarkDAO>> = null,
+		errorHandler : Action<string> = null) {
 		var b : BookmarkDAO;
 
 		if (current === bookmarks.getLength()) {
@@ -41,8 +70,9 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			b,
 			(bk) => {
 				outcome.add(bk);
-				this._addList(current + 1, bookmarks, outcome, callback);
-			}
+				this._addList(current + 1, bookmarks, outcome, callback, errorHandler);
+			},
+			errorHandler
 		);
 	}
 
@@ -50,7 +80,11 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	
 	//region Public Methods
 	
-	createFromURL(url : string, callback : Action<BookmarkDAO> = null) : void {
+	createFromURL(
+		url : string,
+		callback : Action<BookmarkDAO> = null,
+		errorHandler : Action<string> = null,
+		warningHandler : Action<string> = null) : void {
 		var disarmedURL : string;
 
 		disarmedURL = SecurityHelper.disarm(url);
@@ -63,11 +97,12 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 				bookmark = new BookmarkDAO();
 				bookmark.setURL(disarmedURL);
-				bookmark.setTitle(SecurityHelper.disarm(title));
-				bookmark.setDescription(SecurityHelper.disarm(description));
+				bookmark.setTitle(title);
+				bookmark.setDescription(description);
 
 				// Add finally new bookmark
-				bookmark.add(
+				this.add(
+					bookmark,
 					(outcome) => {
 						if (callback !== null) {
 							callback(outcome);
@@ -76,42 +111,50 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				);
 			},
 			(type, error) => {
-				var msg : StringBuffer;
+				if (type === URLDetailsProviderError.BadURL) {
+					Log.error(new BusinessException('Unable to create bookmark: provided URL is invalid'));
+					if (errorHandler !== null) {
+						errorHandler('URL is invalid');
+					}
+				} else if (type === URLDetailsProviderError.Ajax) {
+					var bookmark : BookmarkDAO;
 
-				msg = new StringBuffer('An error occured when getting url details ');
-				msg.append('with type ' + type);
-				msg.append(' and following message: ' + error);
+					bookmark = new BookmarkDAO();
+					bookmark.setURL(disarmedURL);
 
-				Log.error(new BusinessException(msg.toString()));
-
-				if (callback !== null) {
-					callback(null);
+					Log.warn('No data has been pulled: failed to reach target');
+					if (warningHandler !== null) {
+						warningHandler('Unable to connect website. You should check your Internet connection.');
+					}
+					this.add(
+						bookmark,
+						(outcome) => {
+							if (callback !== null) {
+								callback(outcome);
+							}
+						},
+						errorHandler
+					);
 				}
 			}
 		);
 	}
 
-	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
-		if (!URLHelper.isValid(bookmark.getURL())) {
-			Log.error(new BusinessException('Failed to save: url is not valid - ' + bookmark.getURL()));
-			if (callback !== null) {
-				callback(null);
-			}
+	add(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null, errorHandler : Action<string> = null) : void {
+		if (!this._checkBookmark(bookmark, errorHandler)) {
 			return;
-		}
-
-		if (!TSObject.exists(bookmark.getTitle()) || bookmark.getTitle() === '') {
-			bookmark.setTitle(bookmark.getURL());
-		}
-
-		if (!TSObject.exists(bookmark.getDescription())) {
-			bookmark.setDescription('');
 		}
 
 		this._disarmBookmark(bookmark);
 
 		bookmark.add(
 			(outcome) => {
+				if (!TSObject.exists(outcome)) {
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
+					}
+					return;
+				}
 				if (callback !== null) {
 					callback(outcome);
 				}
@@ -120,11 +163,15 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	}
 
 	// TODO : test
-	addList(bookmarks : IList<BookmarkDAO>, callback : Action<IList<BookmarkDAO>> = null) : void {
+	addList(
+		bookmarks : IList<BookmarkDAO>,
+		callback : Action<IList<BookmarkDAO>> = null,
+		errorHandler : Action<string> = null) : void {
+
 		if (!TSObject.exists(bookmarks)) {
 			Log.error(new BusinessException('Unable to add list: provided list is null'));
-			if (callback !== null) {
-				callback(null);
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -137,15 +184,11 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		this._addList(0, bookmarks, new ArrayList<BookmarkDAO>(), callback);
+		this._addList(0, bookmarks, new ArrayList<BookmarkDAO>(), callback, errorHandler);
 	}
 
-	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null) : void {
-		if (!URLHelper.isValid(bookmark.getURL())) {
-			Log.error(new BusinessException('Failed to save: url is not valid'));
-			if (callback !== null) {
-				callback(null);
-			}
+	update(bookmark : BookmarkDAO, callback : Action<BookmarkDAO> = null, errorHandler : Action<string> = null) : void {
+		if (!this._checkBookmark(bookmark, errorHandler)) {
 			return;
 		}
 
@@ -153,6 +196,11 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 		bookmark.update(
 			(outcome) => {
+				if (!TSObject.exists(outcome)) {
+					if (errorHandler !== null) {
+						errorHandler('An internal error has occured. Please try again');
+					}
+				}
 				if (callback !== null) {
 					callback(outcome);
 				}
@@ -160,13 +208,13 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		);
 	}
 
-	delete(bookmark : BookmarkDAO, callback : Action<boolean> = null) : void {
+	delete(bookmark : BookmarkDAO, callback : Action0 = null, errorHandler : Action<string> = null) : void {
 		var id : string;
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to delete: provided bookmark is null'));
-			if (callback !== null) {
-				callback(false);
+			if (errorHandler !== null) {
+				errorHandler('An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -175,9 +223,8 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		bookmark.delete(
 			(success) => {
 				if (!success) {
-					Log.error(new BusinessException('Failed to delete: failed to remove bookmark'));
-					if (callback !== null) {
-						callback(false);
+					if (errorHandler !== null) {
+						errorHandler('An internal has occured. Please try again');
 					}
 					return;
 				}
@@ -188,7 +235,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE bookmark_id = "' + id + '"',
 					(outcome) => {
 						if (callback !== null) {
-							callback(true);
+							callback();
 						}
 					}
 				);

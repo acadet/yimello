@@ -67,7 +67,7 @@ class IntroPresenter extends YimelloPresenter {
 	onStart() : void {
 		var t : Timer;
 
-		DOMTree.findSingle('.js-intro-strap').centerize();
+		DOMTree.findSingle('.js-intro-strap').centerize(DOMTree.findSingle('.body'));
 		this._hexagon = DOMTree.findSingle('.js-hexagon');
 
 		BusinessMediator

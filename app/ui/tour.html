@@ -14,65 +14,78 @@
         </script>
         <script type="text/javascript">
             var _mainClass = 'TourPresenter';
-            var _libs = ['jquery'];
+            var _libs = ['jquery', 'jqueryUI'];
         </script>
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
     <body>
-        <div class="slide-wrapper">
-            <ul class="slides js-slide-list">
-                <li class="slide js-slide">
-                    <h1>Hello!</h1>
-                    <h2>
-                        It is the first time you are using Yimello.<br />
-                        <a href="#" class="js-hello-trigger">Ready for a tour?</a>
-                    </h2>
-                </li>
-                <li class="slide js-slide">
-                    <h1>How does it work?</h1>
-                    <h2>
-                        Yimello is a tiny tool to save your bookmarks and browse them easily.
-                        For that, each one is bound to some tags you define.
-                    </h2>
-                    <h2>In the loop? <a href="#" class="js-guidelines-trigger">Here we go</a></h2>
-                </li>
-                <li class="slide js-slide">
-                    <h1>Insert your URL:</h1>
-                    <form action="#" method="post" class="js-url-form">
-                        <p>
-                            <input name="url" placeholder="http://" type="text" />
-                        </p>
-                        <p>
-                            <button type="button" class="js-save-url-trigger">Save it</button>
-                        </p>                        
-                    </form>
-                </li>
-                <li class="slide js-slide">
-                    <h1>Wonderful!</h1>
-                    <h2>Now bind some tags to it:</h2>
-                    <ul class="tags js-tag-list">
-                    </ul>
-                    <form action="#" method="post" class="js-tag-form">
-                        <p>
-                            <input name="tags" type="text" placeholder="Press Enter to end a tag" />
-                        </p>
-                        <p>
-                            <button type="button" class="js-save-tags-trigger">I am done</button>
-                        </p>
-                    </form>
-                </li>
-                <li class="slide js-slide">
-                    <h1>Congratulations!</h1>
-                    <h2>From now on, you are ready to use Yimello :)</h2>
-                    <h2>Hope you will have fun!</h2>
-                    <p>
-                        <button type="button" class="red-flat-button js-go-button">Go</button>
-                    </p>
-                </li>
-        </div>
-        <div class="slide-cursor-wrapper">
-            <ul class="slide-cursors js-slide-cursor-list">
+        <header class="header">
+            <ul>
+                <li><img src="assets/img/exit.png" class="js-exit-trigger" /></li>
+                <li><img src="assets/img/minus.png" class="js-minimize-trigger" /></li>
             </ul>
+        </header>
+
+        <div class="body">
+            <div class="slide-wrapper">
+                <ul class="slides js-slide-list">
+                    <li class="slide js-slide">
+                        <h1>Hello!</h1>
+                        <h2>
+                            It is the first time you are using Yimello.<br />
+                            <a href="#" class="js-hello-trigger">Ready for a tour?</a>
+                        </h2>
+                    </li>
+                    <li class="slide js-slide">
+                        <h1>How does it work?</h1>
+                        <h2>
+                            Yimello is a tiny tool to save your bookmarks and browse them easily.
+                            For that, each one is bound to some tags you define.
+                        </h2>
+                        <h2>In the loop? <a href="#" class="js-guidelines-trigger">Here we go</a></h2>
+                    </li>
+                    <li class="slide js-slide">
+                        <h1>Insert your URL:</h1>
+                        <form action="#" method="post" class="js-url-form">
+                            <p>
+                                <input name="url" placeholder="http://" type="text" />
+                            </p>
+                            <p>
+                                <button type="button" class="js-save-url-trigger">Save it</button>
+                            </p>                        
+                        </form>
+                    </li>
+                    <li class="slide js-slide">
+                        <h1>Wonderful!</h1>
+                        <h2>Now bind some tags to it:</h2>
+                        <ul class="tags js-tag-list">
+                        </ul>
+                        <form action="#" method="post" class="js-tag-form">
+                            <p>
+                                <input name="tags" type="text" placeholder="Press Enter to end a tag" />
+                            </p>
+                            <p>
+                                <button type="button" class="js-save-tags-trigger">I am done</button>
+                            </p>
+                        </form>
+                    </li>
+                    <li class="slide js-slide">
+                        <h1>Congratulations!</h1>
+                        <h2>From now on, you are ready to use Yimello :)</h2>
+                        <h2>Hope you will have fun!</h2>
+                        <p>
+                            <button type="button" class="red-flat-button js-go-button">Go</button>
+                        </p>
+                    </li>
+            </div>
+            <div class="slide-cursor-wrapper">
+                <ul class="slide-cursors js-slide-cursor-list">
+                </ul>
+            </div>
+
+            <div class="error-message js-error-message">
+                <p></p>
+            </div>
         </div>
     </body>
 </html>

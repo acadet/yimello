@@ -119,16 +119,12 @@ class TourPresenter extends YimelloPresenter {
 		var img : DOMElement;
 		var tagObj : TagDAO;
 
-		value = StringHelper.trim(value);
-		if (!TSObject.exists(value) || value === '') {
-			// No value provided
+		if (!PresenterMediator.getTagBusiness().isValueValid(value)) {
 			return;
 		}
 
-		value = SecurityHelper.disarm(value);
-
 		if (!TSObject.exists(this._tags)) {
-			// Save pointer to tag list if not already done
+			// First call, gather data
 			this._tags = DOMTree.findSingle('.js-slide .js-tag-list');
 			TourPresenter._tagID = 0;
 			this._currentTags = new ArrayList<TagDAO>();
@@ -155,7 +151,6 @@ class TourPresenter extends YimelloPresenter {
 		// On click on delete icon, remove bound tag
 		img.on(DOMElementEvents.Click, (e) => {
 			img.off(DOMElementEvents.Click);
-			tag.remove();
 			this._currentTags.remove(tagObj);
 		});
 	}
@@ -245,25 +240,23 @@ class TourPresenter extends YimelloPresenter {
 				.createFromURL(
 					url,
 					(bookmark) => {
-						if (bookmark === null) {
-							var e : DOMElement;
-							var timer : Timer;
+						var t : Timer;
 
-							alert('Provided error is wrong');
-							this._urlInput.addClass('error');
-						} else {
-							var timer : Timer;
+						this._currentBookmark = bookmark;
+						this._urlInput.addClass('success');
 
-							this._currentBookmark = bookmark;
-							this._urlInput.addClass('success');
-
-							timer = new Timer(
-								(o) => {
-									this._swapSlide(TourPresenterSlides.Tags);
-								},
-								2000
-							);
-						}
+						t = new Timer(
+							(o) => {
+								this._swapSlide(TourPresenterSlides.Tags);
+							},
+							2000
+						);
+					},
+					(errorMsg) => {
+						this.showError(errorMsg);
+					},
+					(warningMsg) => {
+						this.showWarning(warningMsg);
 					}
 				);
 		} else {
@@ -340,11 +333,11 @@ class TourPresenter extends YimelloPresenter {
 								}
 							);
 					} else {
-						alert('You must add some tags before saving');
+						this.showError('You must add some tags before saving');
 						this._tagInput.addClass('error');
 					}
 				} else {
-					alert('You must specify a boomark before saving');
+					this.showError('You must specify a boomark before saving');
 					this._urlInput.addClass('error');
 					this._swapSlide(TourPresenterSlides.URL);
 				}
