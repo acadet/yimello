@@ -237,9 +237,9 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					(success) => {
 						this._addTagList(currentIndex + 1, list, callback);
 					}
-				);		
+				);
 			}
-		);		
+		);
 	}
 
 	//endregion Private Methods

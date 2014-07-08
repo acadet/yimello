@@ -1,6 +1,6 @@
 /// <reference path="../../dependencies.ts" />
 
-class BookmarkForm extends TSObject {
+class BookmarkForm {
 	//region Fields
 	
 	/**
@@ -56,7 +56,6 @@ class BookmarkForm extends TSObject {
 	//region Constructors
 	
 	constructor(subscriber : IBookmarkFormSubscriber) {
-		super();
 		var wrapper : DOMElement = DOMTree.findSingle('.js-bookmark-form-wrapper');
 
 		this._subscriber = subscriber;
@@ -124,6 +123,36 @@ class BookmarkForm extends TSObject {
 	
 	//region Private Methods
 	
+	private _engineFormInputs() : boolean {
+		var url : string = this._urlInput.getValue();
+		var title : string = this._titleInput.getValue();
+
+		this._urlInput.removeClass('error');
+		this._titleInput.removeClass('error');
+		this._tagsInput.removeClass('error');
+
+		// Test if all values have been provided
+		if (!FormHelper.isFilled(url)) {
+			this.showError('Your bookmark will be nicer with an address');
+			this._urlInput.addClass('error');
+			return false;
+		}
+
+		if (!FormHelper.isFilled(title)) {
+			this.showError('Sorry, but a title is needed too!');
+			this._titleInput.addClass('error');
+			return false;
+		}
+
+		if (this._currentTags.getLength() < 1) {
+			this.showError('Oh no! Don\'t let your bookmark alone! Introduce him some tags');
+			this._tagsInput.addClass('error');
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Called when user asks for saving
 	 */
@@ -133,19 +162,7 @@ class BookmarkForm extends TSObject {
 		var title : string = this._titleInput.getValue();
 		var description : string = this._descriptionInput.getValue();
 
-		// Test if all values have been provided
-		if (!FormHelper.isFilled(url)) {
-			alert('URL field must be filled');
-			return;
-		}
-
-		if (!FormHelper.isFilled(title)) {
-			alert('title field must be filled');
-			return;
-		}
-
-		if (this._currentTags.getLength() < 1) {
-			alert('Tags must be specified');
+		if (!this._engineFormInputs()) {
 			return;
 		}
 
@@ -175,17 +192,16 @@ class BookmarkForm extends TSObject {
 									.bindTags(
 										b,
 										outcome,
-										(success) => {
-											if (success) {
-												this._subscriber.onBookmarkAddition();
-											} else {
-												alert('An error has occured while saving bookmark');
-											}
-										}
+										() => {
+											this._subscriber.onBookmarkAddition();
+										},
+										MainPresenterMediator.showError
 									);
-							}
+							},
+							MainPresenterMediator.showError
 						);
-				}
+				},
+				MainPresenterMediator.showError
 			);
 	}
 
@@ -194,19 +210,7 @@ class BookmarkForm extends TSObject {
 		var title : string = this._titleInput.getValue();
 		var description : string = this._descriptionInput.getValue();
 
-		// Test if all values have been provided
-		if (!FormHelper.isFilled(url)) {
-			alert('URL field must be filled');
-			return;
-		}
-
-		if (!FormHelper.isFilled(title)) {
-			alert('title field must be filled');
-			return;
-		}
-
-		if (this._currentTags.getLength() < 1) {
-			alert('Tags must be specified');
+		if (!this._engineFormInputs()) {
 			return;
 		}
 
@@ -232,17 +236,16 @@ class BookmarkForm extends TSObject {
 									.updateTagBinding(
 										this._currentUpdatedBookmark,
 										outcome,
-										(success) => {
-											if (success) {
-												this._subscriber.onBookmarkUpdate();
-											} else {
-												alert('An error occurend while updating bookmark');
-											}
-										}
+										() => {
+											this._subscriber.onBookmarkUpdate();
+										},
+										MainPresenterMediator.showError
 									);
-							}
+							},
+							MainPresenterMediator.showError
 						);
-				}
+				},
+				MainPresenterMediator.showError
 			);
 	}
 
@@ -263,12 +266,9 @@ class BookmarkForm extends TSObject {
 			.delete(
 				this._currentUpdatedBookmark,
 				(success) => {
-					if (success) {
-						this._subscriber.onBookmarkDeletion();
-					} else {
-						alert('An error occured while removing bookmark');
-					}
-				}
+					this._subscriber.onBookmarkDeletion();
+				},
+				MainPresenterMediator.showError
 			);
 	}
 

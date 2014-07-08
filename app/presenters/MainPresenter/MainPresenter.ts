@@ -192,14 +192,17 @@ class MainPresenter
 	}
 
 	onBookmarkAddition() : void {
+		this.showNotification('Yes! A new tag is joining us :)');
 		this._afterBookmarkEdition();
 	}
 
 	onBookmarkUpdate() : void {
+		this.showNotification('All your changes have been saved');
 		this._afterBookmarkEdition();
 	}
 
 	onBookmarkDeletion() : void {
+		this.showNotification('Bye bye old chap...');
 		this._afterBookmarkEdition();
 	}
 

@@ -3,7 +3,7 @@
 class YimelloPresenter extends Presenter {
 	//region Fields
 	
-	private _errorMessage : ErrorMessage;
+	private _notificationItem : NotificationMessage;
 
 	//endregion Fields
 	
@@ -12,7 +12,7 @@ class YimelloPresenter extends Presenter {
 	constructor() {
 		super();
 
-		this._errorMessage = new ErrorMessage();
+		this._notificationItem = new NotificationMessage();
 
 		DOMTree
 			.findSingle('.js-exit-trigger')
@@ -42,17 +42,17 @@ class YimelloPresenter extends Presenter {
 	//endregion Private Methods
 	
 	//region Public Methods
-	
-	getErrorMessage() : ErrorMessage {
-		return this._errorMessage;
-	}
 
 	showError(msg : string) : void {
-		this.getErrorMessage().showForError(msg);
+		this._notificationItem.alert(msg);
 	}
 
 	showWarning(msg : string) : void {
-		this.getErrorMessage().showForWarning(msg);
+		this._notificationItem.warn(msg);
+	}
+
+	showNotification(msg : string) : void {
+		this._notificationItem.inform(msg);
 	}
 
 	//endregion Public Methods

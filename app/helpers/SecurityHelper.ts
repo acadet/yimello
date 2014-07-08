@@ -49,9 +49,6 @@ class SecurityHelper {
 			}
 		}
 
-		// Apply a final trim
-		outcome = outcome.trim();
-
 		return outcome;
 	}
 

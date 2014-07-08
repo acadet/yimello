@@ -7,6 +7,7 @@ class DOMTreeException extends Exception {
 class DOMTree extends TSObject {
 
 	private static _document : DOMElement;
+	private static _root : DOMElement;
 
 	static append(e : DOMElement) : void {
 		DOMTree.findSingle('body').append(e);
@@ -52,5 +53,12 @@ class DOMTree extends TSObject {
 			DOMTree._document = new DOMElement(jQuery(document));
 		}
 		return DOMTree._document;
+	}
+
+	static getRoot() : DOMElement {
+		if (!TSObject.exists(DOMTree._root)) {
+			DOMTree._root = new DOMElement(jQuery('body'));
+		}
+		return DOMTree._root;
 	}
 }

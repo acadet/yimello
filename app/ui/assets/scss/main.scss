@@ -438,6 +438,10 @@ form .delete-button, form .cancel-button {
 	&:focus {
 		border-color : $lightBlue;
 	}
+
+	&.error {
+		border-color : $red;
+	}
 }
 
 .bookmark-form-wrapper form input {

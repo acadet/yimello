@@ -82,6 +82,7 @@
 
 // Presenters part
 
+/// <reference path="presenters/utils/NotificationMessage.ts" />
 /// <reference path="presenters/utils/PresenterException.ts" />
 /// <reference path="presenters/Presenter.ts" />
 /// <reference path="presenters/YimelloPresenter.ts" />
@@ -91,6 +92,7 @@
 
 // Main presenter
 
+/// <reference path="presenters/MainPresenter/utils/MainPresenterMediator.ts" />
 /// <reference path="presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
 /// <reference path="presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
 /// <reference path="presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
@@ -107,5 +109,4 @@
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
-/// <reference path="presenters/utils/ErrorMessage.ts" />
 //grunt-end

@@ -16,17 +16,38 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	
 	//region Private Methods
 
-	private _disarmBookmark(bookmark : BookmarkDAO) : void {
-		bookmark.setURL(SecurityHelper.disarm(bookmark.getURL()));
-		bookmark.setTitle(SecurityHelper.disarm(bookmark.getTitle()));
-		bookmark.setDescription(SecurityHelper.disarm(bookmark.getDescription()));
+	private _engineBookmark(bookmark : BookmarkDAO) : void {
+		var url : string, title : string, description : string;
+
+		url = bookmark.getURL();
+		url = StringHelper.trim(url);
+		url = SecurityHelper.disarm(url);
+		bookmark.setURL(url);
+
+		title = bookmark.getTitle();
+		title = StringHelper.trim(title);
+		title = SecurityHelper.disarm(title);
+		if (title === '') {
+			bookmark.setTitle(bookmark.getURL());
+		} else {
+			bookmark.setTitle(title);
+		}
+		
+		if (!TSObject.exists(description)) {
+			description = '';
+		} else {
+				description = bookmark.getDescription();
+			description = StringHelper.trim(description);
+			description = SecurityHelper.disarm(description);
+		}
+		bookmark.setDescription(description);
 	}
 
 	private _checkBookmark(bookmark : BookmarkDAO, errorHandler : Action<string> = null) : boolean {
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to add: no bookmark provided'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return false;
 		}
@@ -34,17 +55,9 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		if (!URLHelper.isValid(bookmark.getURL())) {
 			Log.error(new BusinessException('Failed to save: url is not valid'));
 			if (errorHandler !== null) {
-				errorHandler('URL is invalid');
+				errorHandler('Ow! Your URL is invalid. Please check it again');
 			}
 			return false;
-		}
-
-		if (!TSObject.exists(bookmark.getTitle()) || bookmark.getTitle() === '') {
-			bookmark.setTitle(bookmark.getURL());
-		}
-
-		if (!TSObject.exists(bookmark.getDescription())) {
-			bookmark.setDescription('');
 		}
 
 		return true;
@@ -114,7 +127,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 				if (type === URLDetailsProviderError.BadURL) {
 					Log.error(new BusinessException('Unable to create bookmark: provided URL is invalid'));
 					if (errorHandler !== null) {
-						errorHandler('URL is invalid');
+						errorHandler('Ouch! Your URL is invalid. Please check it again');
 					}
 				} else if (type === URLDetailsProviderError.Ajax) {
 					var bookmark : BookmarkDAO;
@@ -124,7 +137,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 
 					Log.warn('No data has been pulled: failed to reach target');
 					if (warningHandler !== null) {
-						warningHandler('Unable to connect website. You should check your Internet connection.');
+						warningHandler('Hem... I was not able to connect website. You should check your Internet connection.');
 					}
 					this.add(
 						bookmark,
@@ -145,13 +158,13 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		this._disarmBookmark(bookmark);
+		this._engineBookmark(bookmark);
 
 		bookmark.add(
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 					return;
 				}
@@ -171,7 +184,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		if (!TSObject.exists(bookmarks)) {
 			Log.error(new BusinessException('Unable to add list: provided list is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -192,13 +205,13 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		this._disarmBookmark(bookmark);
+		this._engineBookmark(bookmark);
 
 		bookmark.update(
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 				}
 				if (callback !== null) {
@@ -214,7 +227,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to delete: provided bookmark is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -224,7 +237,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			(success) => {
 				if (!success) {
 					if (errorHandler !== null) {
-						errorHandler('An internal has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 					return;
 				}

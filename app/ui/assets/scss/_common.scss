@@ -101,6 +101,7 @@ a {
 
 	display : none;
 	z-index : 0;
+	background-color : #7EB530;
 	@include border-radius(10px);
 
 	p {
@@ -112,7 +113,6 @@ a {
 		}
 
 		color : white;
-		opacity : 0;
 	}
 
 	&.error {

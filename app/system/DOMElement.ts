@@ -189,6 +189,10 @@ class DOMElement extends TSObject {
 		return list;
 	}
 
+	getCss(key : string) : any {
+		return this._element.css(key);
+	}
+
 	getData(key : string) : string {
 		return this._element.attr('data-' + key);
 	}

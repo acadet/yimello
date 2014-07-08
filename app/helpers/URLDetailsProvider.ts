@@ -62,12 +62,20 @@ class URLDetailsProvider extends TSObject {
 				r1 = new Regex('\<title\>(.*)\<\/title\>', [RegexFlags.Insensitive]);
 				title = r1.execute(data);
 
+				if (TSObject.exists(title) && title !== '') {
+					title = SecurityHelper.disarm(title);
+				}
+
 				// Grab description from meta data
 				r2 = new Regex(
 					'\<meta name\=\"description\" content\=\"(.*)\"',
 					[RegexFlags.Insensitive]
 				);
 				description = r2.execute(data);
+
+				if (TSObject.exists(description) && description !== '') {
+					description = SecurityHelper.disarm(description);
+				}
 
 				success(title, description);
 			});

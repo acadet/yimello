@@ -254,6 +254,7 @@ class TourPresenter extends YimelloPresenter {
 					},
 					(errorMsg) => {
 						this.showError(errorMsg);
+						this._urlInput.addClass('error');
 					},
 					(warningMsg) => {
 						this.showWarning(warningMsg);
@@ -300,44 +301,40 @@ class TourPresenter extends YimelloPresenter {
 							.addList(
 								this._currentTags,
 								(outcome) => {
-									if (TSObject.exists(outcome)) {
-										this._currentTags = outcome;
-										PresenterMediator
-											.getTagBookmarkBusiness()
-											.bindTags(
-												this._currentBookmark,
-												this._currentTags,
-												(success) => {
-													if (success) {
-														var timer : Timer;
-														this._tagInput.addClass('success');
+									this._currentTags = outcome;
+									PresenterMediator
+										.getTagBookmarkBusiness()
+										.bindTags(
+											this._currentBookmark,
+											this._currentTags,
+											() => {
+												var timer : Timer;
 
-														timer = new Timer(
-															(o) => {
-																this._swapSlide(TourPresenterSlides.End);
-															},
-															2000
-														);
-													} else {
-														alert('An intern error has occured. Please try again');
-														this._tagInput.addClass('error');
-														Log.error(new PresenterException('Failed to bind tags to bookmark'));
-													}
-												}
-											);
-									} else {
-										alert('An intern error has occured. Please try again');
-										this._tagInput.addClass('error');
-										Log.error(new PresenterException('Failed to add tags'));
-									}
+												this._tagInput.addClass('success');
+												timer = new Timer(
+													(o) => {
+														this._swapSlide(TourPresenterSlides.End);
+													},
+													2000
+												);
+											},
+											(errorMsg) => {
+												this.showError(errorMsg);
+												this._tagInput.addClass('error');
+											}
+										);
+								},
+								(errorMsg) => {
+									this.showError(errorMsg);
+									this._tagInput.addClass('error');
 								}
 							);
 					} else {
-						this.showError('You must add some tags before saving');
+						this.showError('Damn! You were too fast. Please add some tags before saving');
 						this._tagInput.addClass('error');
 					}
 				} else {
-					this.showError('You must specify a boomark before saving');
+					this.showError('Whoops, you forgot a step! Define a bookmark before dealing with tags');
 					this._urlInput.addClass('error');
 					this._swapSlide(TourPresenterSlides.URL);
 				}
