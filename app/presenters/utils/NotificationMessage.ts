@@ -13,6 +13,7 @@ class NotificationMessage {
 	private _messageItem : DOMElement;
 	private _topPosition : number;
 	private _rightPosition : number;
+	private _timer : Timer;
 
 	//endregion Fields
 	
@@ -42,7 +43,7 @@ class NotificationMessage {
 			this._wrapper.addClass('warning');
 		}
 
-		rightPosition = this._wrapper.getCss('right');
+		this._rightPosition = this._wrapper.getCss('right');
 
 		this._wrapper.setCss({
 			right : -this._wrapper.getWidth(),
@@ -51,6 +52,10 @@ class NotificationMessage {
 			zIndex : 999
 		});
 
+		if (TSObject.exists(this._timer)) {
+			this._timer.stop();
+		}
+
 		this._wrapper.animate(
 			{
 				right : this._rightPosition,
@@ -58,9 +63,10 @@ class NotificationMessage {
 			},
 			750,
 			(e) => {
-				var t : Timer;
-				t = new Timer(
+
+				this._timer = new Timer(
 					(o) => {
+						this._timer = null;
 						this._hide();
 					},
 					5000

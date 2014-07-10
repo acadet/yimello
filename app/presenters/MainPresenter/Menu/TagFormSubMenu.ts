@@ -63,66 +63,88 @@ class TagFormSubMenu extends SubMenu {
 	private _add() : void {
 		var label : string;
 
-		label = StringHelper.trim(this._input.getValue());
-		if (label === '') {
-			alert('A tag must have a label');
+		label = this._input.getValue();
+
+		if (!FormHelper.isFilled(label)) {
+			MainPresenterMediator.showError('Um. I guess your forgot something, don\'t you?');
 			return;
 		}
 
-		label = SecurityHelper.disarm(label);
+		PresenterMediator
+			.getTagBusiness()
+			.isAlreadyExisting(
+				label,
+				(success) => {
+					if (success) {
+						var tag : TagDAO;
 
-		// TODO : create business method
-		TagDAO.findByLabel(
-			label,
-			(outcome) => {
-				if (TSObject.exists(outcome)) {
-					alert('A tag with same label is already existing');
-				} else {
-					var tag : TagDAO = new TagDAO();
-					tag.setLabel(label);
-
-					// TODO : handle errors when adding
-					tag.add();
-					this.hide();
-					this.getOwner().onTagAddition();
+						tag = new TagDAO();
+						tag.setLabel(label);
+						PresenterMediator
+							.getTagBusiness()
+							.add(
+								tag,
+								(outcome) => {
+									this.hide();
+									this.getOwner().onTagAddition();
+								},
+								MainPresenterMediator.showError
+							);
+					} else {
+						MainPresenterMediator.showError('Unfortunately a tag with same label is already existing. Please use another one');
+					}
 				}
-			}
-		);
+			);
 	}
 
 	private _update() : void {
 		var label : string;
+		var areEqual : boolean;
 
-		label = StringHelper.trim(this._input.getValue());
-		if (label === '') {
-			alert('A tag must have a label');
+		label = this._input.getValue();
+
+		if (!FormHelper.isFilled(label)) {
+			MainPresenterMediator.showError('Um. I guess your forgot something, don\'t you?');
 			return;
 		}
 		
-		label = SecurityHelper.disarm(label);
-		
-		if (StringHelper.compare(label, this._currentUpdatedTag.getLabel())) {
+		areEqual =
+			PresenterMediator
+				.getTagBusiness()
+				.compare(
+					label,
+					this._currentUpdatedTag.getLabel()
+				);
+
+		if (areEqual) {
 			// Tag has not been edited, do nothing
 			this.hide();
 			this.getOwner().onTagUpdate();
 			return;
 		}
 
-		// TODO : create business method
-		TagDAO.findByLabel(
-			label,
-			(outcome) => {
-				if (TSObject.exists(outcome)) {
-					alert('A tag with same label is already existing');
-				} else {
-					this._currentUpdatedTag.setLabel(label);
-					// TODO : handle errors when updating
-					this._currentUpdatedTag.update();
-					this.hide();
-					this.getOwner().onTagUpdate();
+		PresenterMediator
+			.getTagBusiness()
+			.isAlreadyExisting(
+				label,
+				(success) => {
+					if (success) {
+						this._currentUpdatedTag.setLabel(label);
+						PresenterMediator
+							.getTagBusiness()
+							.update(
+								this._currentUpdatedTag,
+								(outcome) => {
+									this.hide();
+									this.getOwner().onTagUpdate();
+								},
+								MainPresenterMediator.showError
+							);
+					} else {
+						MainPresenterMediator.showError('Unfortunately a tag with same label is already existing. Please use another one');
+					}
 				}
-			}
-		);
+			);
 	}
 
 	//endregion Private Methods

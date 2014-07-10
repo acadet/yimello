@@ -73,7 +73,7 @@ class IntroPresenter extends YimelloPresenter {
 		BusinessMediator
 			.getTagBookmarkBusiness()
 			.backup(
-				(success) => {
+				() => {
 					if (this._mustExit) {
 						this._exit();
 					} else {

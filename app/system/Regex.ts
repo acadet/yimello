@@ -32,7 +32,7 @@ class Regex extends TSObject {
 
 		if (flags !== null) {
 			for (var i = 0; i < flags.length; i++) {
-				s += flags[0];
+				s += flags[i];
 			}
 		}
 

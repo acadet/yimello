@@ -4,8 +4,15 @@
  * Business layer for tags
  */
 interface ITagBusiness {
+	engineTag(tag : TagDAO) : void;
 
 	isValueValid(value : string) : boolean;
+
+	// TODO : test
+	isAlreadyExisting(label : string, callback : Action<boolean>) : void;
+
+	// TODO : test
+	compare(newLabel : string, exisitingLabel : string) : boolean;
 
 	add(tag : TagDAO, callback? : Action<TagDAO>, errorHandler? : Action<string>) : void;
 

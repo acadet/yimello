@@ -44,7 +44,7 @@ class TagBusiness implements ITagBusiness {
 				if (!TSObject.exists(result)) {
 					Log.error(new BusinessException('Failed to add tag #' + index));
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 					return;
 				}
@@ -55,17 +55,13 @@ class TagBusiness implements ITagBusiness {
 		);
 	}
 
-	private _disarmTag(tag : TagDAO) : void {
-		tag.setLabel(SecurityHelper.disarm(StringHelper.trim(tag.getLabel())));
-	}
-
 	private _checkTag(tag : TagDAO, errorHandler : Action<string> = null) : boolean {
 		var label : string;
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Provided tag is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return false;
 		}
@@ -75,7 +71,7 @@ class TagBusiness implements ITagBusiness {
 		if (!TSObject.exists(tag.getLabel()) || tag.getLabel() === '') {
 			Log.error(new BusinessException('Unable to add a tag: tag must have a label'));
 			if (errorHandler !== null) {
-				errorHandler('A tag must have a label');
+				errorHandler('What about adding a label?');
 			}
 			return false;
 		}
@@ -86,6 +82,10 @@ class TagBusiness implements ITagBusiness {
 	//endregion Private Methods
 	
 	//region Public Methods
+
+	engineTag(tag : TagDAO) : void {
+		tag.setLabel(SecurityHelper.disarm(StringHelper.trim(tag.getLabel())));
+	}
 
 	isValueValid(value : string) : boolean {
 		var s : string;
@@ -102,18 +102,41 @@ class TagBusiness implements ITagBusiness {
 		return true;
 	}
 
+	isAlreadyExisting(label : string, callback : Action<boolean>) : void {
+		var s : string;
+
+		s = SecurityHelper.disarm(StringHelper.trim(label));
+
+		TagDAO.findByLabel(
+			s,
+			(outcome) => {
+				callback(!TSObject.exists(outcome));
+			}
+		);
+	}
+
+	compare(newLabel : string, existingLabel : string) : boolean {
+		var tag : TagDAO;
+
+		tag = new TagDAO();
+		tag.setLabel(existingLabel);
+		this.engineTag(tag);
+
+		return StringHelper.compare(newLabel, tag.getLabel());
+	}
+
 	add(tag : TagDAO, callback : Action<TagDAO> = null, errorHandler : Action<string> = null) : void {
-		if (this._checkTag(tag, errorHandler)) {
+		if (!this._checkTag(tag, errorHandler)) {
 			return;
 		}
 
-		this._disarmTag(tag);
+		this.engineTag(tag);
 
 		tag.add(
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 				}
 				if (callback !== null) {
@@ -129,7 +152,7 @@ class TagBusiness implements ITagBusiness {
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Provided tag list is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -148,17 +171,17 @@ class TagBusiness implements ITagBusiness {
 	}
 
 	update(tag : TagDAO, callback : Action<TagDAO>, errorHandler : Action<string> = null) : void {
-		if (this._checkTag(tag, errorHandler)) {
+		if (!this._checkTag(tag, errorHandler)) {
 			return;
 		}
 
-		this._disarmTag(tag);
+		this.engineTag(tag);
 
 		tag.update(
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 					return;
 				}
@@ -176,7 +199,7 @@ class TagBusiness implements ITagBusiness {
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Unable to delete: provided tag is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -186,7 +209,7 @@ class TagBusiness implements ITagBusiness {
 			(success) => {
 				if (!success) {
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 					return;
 				}
@@ -212,7 +235,7 @@ class TagBusiness implements ITagBusiness {
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to merge: provided list is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -225,6 +248,8 @@ class TagBusiness implements ITagBusiness {
 				tags.forEach(
 					(tag) => {
 						var o : TagDAO;
+
+						tag.setLabel(StringHelper.trim(tag.getLabel()));
 
 						// Find a tag with same name
 						o = outcome.findFirst(e => StringHelper.compare(e.getLabel(), tag.getLabel()));

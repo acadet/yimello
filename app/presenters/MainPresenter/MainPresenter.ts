@@ -99,14 +99,18 @@ class MainPresenter
 	}
 
 	private _afterBookmarkEdition() : void {
-		this._tagList.resetList();
-		if (this._tagList.isMostPopularSelected()) {
-			this._bookmarkList.displayMostPopular();
-		} else if (this._tagList.isSearchTabSelected()) {
-			this._bookmarkList.displayForSeachInput(this._searchField.getValue());
-		} else {
-			this.onTagSelection(this._tagList.getCurrentTagId());
-		}
+		this._tagList.resetList(
+			() => {
+				if (this._tagList.isMostPopularSelected()) {
+					this._bookmarkList.displayMostPopular();
+				} else if (this._tagList.isSearchTabSelected()) {
+					this._bookmarkList.displayForSeachInput(this._searchField.getValue());
+				} else {
+					this.onTagSelection(this._tagList.getCurrentTagId());
+				}
+			}
+		);
+		
 
 		this._switchFromBookmarkForm();
 		this._searchField.setValue('');
@@ -176,8 +180,7 @@ class MainPresenter
 			}
 		);
 
-		this._tagList.resetList();
-		this._tagList.selectMostPopular();
+		this._tagList.resetList(() => this._tagList.selectMostPopular());
 		this._bookmarkList.displayMostPopular();
 	}
 
@@ -192,7 +195,7 @@ class MainPresenter
 	}
 
 	onBookmarkAddition() : void {
-		this.showNotification('Yes! A new tag is joining us :)');
+		this.showNotification('Yes! A new buddy is joining us :)');
 		this._afterBookmarkEdition();
 	}
 
@@ -202,7 +205,7 @@ class MainPresenter
 	}
 
 	onBookmarkDeletion() : void {
-		this.showNotification('Bye bye old chap...');
+		this.showNotification('Bye bye old chap :(');
 		this._afterBookmarkEdition();
 	}
 
@@ -229,9 +232,9 @@ class MainPresenter
 
 	onTagDeletion() : void {
 		this._bookmarkList.displayMostPopular();
-		this._tagList.resetList();
-		this._tagList.selectMostPopular();
+		this._tagList.resetList(() => this._tagList.selectMostPopular());
 		this._searchField.setValue('');
+		this.showNotification('See you mate :(');
 	}
 
 	askingForTagUpdate(tagId : string) : void {
@@ -263,10 +266,12 @@ class MainPresenter
 
 	onTagAddition() : void {
 		this._afterTagEdition();
+		this.showNotification('Hello my friend!');
 	}
 
 	onTagUpdate() : void {
 		this._afterTagEdition();
+		this.showNotification('Allright, everthing was stored');
 	}
 
 	onTagCancellation() : void {

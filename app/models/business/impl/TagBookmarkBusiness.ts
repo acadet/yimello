@@ -142,7 +142,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			(success) => {
 				if (!success) {
 					if (errorHandler !== null) {
-						errorHandler('An internal error has occured. Please try again');
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
 				} else {
 					this._bindTags(bookmark, tags, index + 1, callback);
@@ -176,8 +176,8 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		e = list[currentIndex];
 		data = new ArrayList<any>();
-		data.add(e['tag_id']);
-		data.add(e['bookmark_id']);
+		data.add(SecurityHelper.disarm(StringHelper.trim(e['tag_id'])));
+		data.add(SecurityHelper.disarm(StringHelper.trim(e['bookmark_id'])));
 		DataAccessObject.initialize(
 			(success) => {
 				ActiveRecordObject.insert(
@@ -193,7 +193,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 	private _addBKList(currentIndex : number, list : Array<any>, callback : Action0 = null) : void {
 		var e : any;
-		var data : IList<any>;
+		var bookmark : BookmarkDAO;
 
 		if (currentIndex === list.length) {
 			if (callback !== null) {
@@ -202,12 +202,13 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		}
 
 		e = list[currentIndex];
-		data = BookmarkDAO.fromObject(e).toList();
+		bookmark = BookmarkDAO.fromObject(e);
+		BusinessMediator.getBookmarkBusiness().engineBookmark(bookmark);
 		DataAccessObject.initialize(
 			(success) => {
 				ActiveRecordObject.insert(
 					DAOTables.Bookmarks,
-					data,
+					bookmark.toList(),
 					(success) => {
 						this._addBKList(currentIndex + 1, list, callback);
 					}
@@ -219,7 +220,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 	private _addTagList(currentIndex : number, list : Array<any>, callback : Action0 = null) : void {
 		var e : any;
-		var data : IList<any>;
+		var tag : TagDAO;
 
 		if (currentIndex === list.length) {
 			if (callback !== null) {
@@ -228,12 +229,13 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		}
 
 		e = list[currentIndex];
-		data = TagDAO.fromObject(e).toList();
+		tag = TagDAO.fromObject(e);
+		BusinessMediator.getTagBusiness().engineTag(tag);
 		DataAccessObject.initialize(
 			(success) => {
 				ActiveRecordObject.insert(
 					DAOTables.Tags,
-					data,
+					tag.toList(),
 					(success) => {
 						this._addTagList(currentIndex + 1, list, callback);
 					}
@@ -255,7 +257,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to sort tags: provided bookmark is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -263,7 +265,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' WHERE id IN (');
 		request.append('SELECT tag_id FROM ' + DAOTables.TagBookmark + ' WHERE ');
 		request.append('bookmark_id = "' + bookmark.getId() + '") ');
-		request.append('ORDER BY label ASC');
+		request.append('ORDER BY LOWER(label) ASC');
 
 		DataAccessObject.initialize(
 			(success) => {
@@ -286,7 +288,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to bind: provided bookmark is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -294,7 +296,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to bind: provided tag list is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -324,7 +326,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to bind: provided bookmark is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -332,7 +334,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to bind: provided tag list is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -355,7 +357,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					(success) => {
 						if (!success) {
 							if (errorHandler !== null) {
-								errorHandler('An internal error has occured. Please try again');
+								errorHandler('Ouch! An internal error has occured. Please try again');
 							}
 							return;
 						}
@@ -376,7 +378,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Unable to sort bookmarks: provided tag is null'));
 			if (errorHandler !== null) {
-				errorHandler('An internal error has occured. Please try again');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -385,7 +387,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' WHERE id IN ');
 		request.append('(SELECT bookmark_id FROM ' + DAOTables.TagBookmark + ' ');
 		request.append('WHERE tag_id = "' + tag.getId() + '") ');
-		request.append('ORDER BY title ASC');
+		request.append('ORDER BY LOWER(title) ASC');
 
 		DataAccessObject.initialize(
 			(success) => {
@@ -412,7 +414,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		request.append(DAOTables.TagBookmark + ' AS tbk ON ');
 		request.append('t.id = tbk.tag_id) AS outcome ');
 		request.append('ON bk.id = outcome.bkId ');
-		request.append('ORDER BY bk.title ASC, outcome.tagLabel ASC');
+		request.append('ORDER BY LOWER(bk.title) ASC, LOWER(outcome.tagLabel) ASC');
 
 		DataAccessObject.initialize(
 			(success) => {
@@ -482,7 +484,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (dataTransfer.files.length < 1) {
 			Log.error(new BusinessException('No import: there is no file'));
 			if (errorHandler !== null) {
-				errorHandler('An error has occured while importing your file.');
+				errorHandler('Ouch! An internal error has occured. Please try again');
 			}
 			return;
 		}
@@ -629,7 +631,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 										if (error) {
 											Log.error(new BusinessException(error));
 											if (errorHandler !== null) {
-												errorHandler('An internal error has occured. Please try again');
+												errorHandler('Ouch! An internal error has occured. Please try again');
 											}
 										} else {
 											if (callback !== null) {
@@ -653,7 +655,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		if (dataTransfer.files.length < 1) {
 			Log.error(new BusinessException('Unable to import: no file provided'));
 			if (errorHandler !== null) {
-				errorHandler('An error has occured while importing your file.');
+				errorHandler('Whoops! An error has occured while importing your file. Please try again');
 			}
 			return;
 		}

@@ -197,7 +197,7 @@ class TagList {
 	
 	//region Public Methods
 
-	resetList() : void {
+	resetList(callback : Action0 = null) : void {
 		var mostPop : boolean = false;
 		var searchTab : boolean = false;
 		var currentId : string;
@@ -249,6 +249,9 @@ class TagList {
 				} else {
 					this._setActive(this._mostPopularTrigger);
 					this._currentSelectedTab = this._mostPopularTrigger;
+				}
+				if (callback !== null) {
+					callback();
 				}
 				this._show();
 			}

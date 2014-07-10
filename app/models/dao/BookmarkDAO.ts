@@ -307,7 +307,7 @@ class BookmarkDAO extends DataAccessObject {
 		var request : StringBuffer;
 
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' ');
-		request.append('ORDER BY views DESC, title ASC');
+		request.append('ORDER BY views DESC, LOWER(title) ASC');
 
 		DataAccessObject.initialize(
 			(success) => {
@@ -326,7 +326,7 @@ class BookmarkDAO extends DataAccessObject {
 		var request : StringBuffer;
 
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Bookmarks + ' ');
-		request.append('ORDER BY title ASC');
+		request.append('ORDER BY LOWER(title) ASC');
 
 		DataAccessObject.initialize(
 			(success) => {

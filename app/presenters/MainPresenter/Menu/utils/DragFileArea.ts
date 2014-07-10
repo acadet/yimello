@@ -42,7 +42,8 @@ class DragFileArea {
 						.getTagBookmarkBusiness()
 						.importFromBrowser(
 							e.getOriginalEvent().dataTransfer,
-							(success) => {
+							() => {
+								// TODO : error handling
 								NodeWindow.reload();
 							}
 						);
@@ -51,7 +52,8 @@ class DragFileArea {
 						.getTagBookmarkBusiness()
 						.importBackup(
 							e.getOriginalEvent().dataTransfer,
-							(success) => {
+							() => {
+								// TODO : error handling
 								NodeWindow.reload();
 							}
 						);

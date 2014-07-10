@@ -133,19 +133,19 @@ class BookmarkForm {
 
 		// Test if all values have been provided
 		if (!FormHelper.isFilled(url)) {
-			this.showError('Your bookmark will be nicer with an address');
+			MainPresenterMediator.showError('Your bookmark will be nicer with an address');
 			this._urlInput.addClass('error');
 			return false;
 		}
 
 		if (!FormHelper.isFilled(title)) {
-			this.showError('Sorry, but a title is needed too!');
+			MainPresenterMediator.showError('Sorry, but a title is needed too!');
 			this._titleInput.addClass('error');
 			return false;
 		}
 
 		if (this._currentTags.getLength() < 1) {
-			this.showError('Oh no! Don\'t let your bookmark alone! Introduce him some tags');
+			MainPresenterMediator.showError('Oh no! Don\'t let your bookmark alone! Introduce him some tags');
 			this._tagsInput.addClass('error');
 			return false;
 		}
@@ -265,7 +265,7 @@ class BookmarkForm {
 			.getBookmarkBusiness()
 			.delete(
 				this._currentUpdatedBookmark,
-				(success) => {
+				() => {
 					this._subscriber.onBookmarkDeletion();
 				},
 				MainPresenterMediator.showError

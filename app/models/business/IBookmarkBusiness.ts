@@ -4,6 +4,8 @@
  * Business layer for bookmarks
  */
 interface IBookmarkBusiness {
+	engineBookmark(bookmark : BookmarkDAO) : void;
+
 	/**
 	 * Creates a bookmark from an URL
 	 */

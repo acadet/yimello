@@ -225,7 +225,7 @@ class TagDAO extends DataAccessObject {
 		var request : StringBuffer;
 
 		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' ');
-		request.append('ORDER BY label ASC');
+		request.append('ORDER BY LOWER(label) ASC');
 
 		DataAccessObject.initialize(
 			(success) => {

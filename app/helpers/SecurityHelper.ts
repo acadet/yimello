@@ -43,6 +43,9 @@ class SecurityHelper {
 				case '>':
 					outcome += '&gt;';
 					break;
+				case '"':
+					outcome += '&quot;';
+					break;
 				default:
 					outcome += c;
 					break;

@@ -16,33 +16,6 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	
 	//region Private Methods
 
-	private _engineBookmark(bookmark : BookmarkDAO) : void {
-		var url : string, title : string, description : string;
-
-		url = bookmark.getURL();
-		url = StringHelper.trim(url);
-		url = SecurityHelper.disarm(url);
-		bookmark.setURL(url);
-
-		title = bookmark.getTitle();
-		title = StringHelper.trim(title);
-		title = SecurityHelper.disarm(title);
-		if (title === '') {
-			bookmark.setTitle(bookmark.getURL());
-		} else {
-			bookmark.setTitle(title);
-		}
-		
-		if (!TSObject.exists(description)) {
-			description = '';
-		} else {
-				description = bookmark.getDescription();
-			description = StringHelper.trim(description);
-			description = SecurityHelper.disarm(description);
-		}
-		bookmark.setDescription(description);
-	}
-
 	private _checkBookmark(bookmark : BookmarkDAO, errorHandler : Action<string> = null) : boolean {
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to add: no bookmark provided'));
@@ -92,6 +65,33 @@ class BookmarkBusiness implements IBookmarkBusiness {
 	//endregion Private Methods
 	
 	//region Public Methods
+
+	engineBookmark(bookmark : BookmarkDAO) : void {
+		var url : string, title : string, description : string;
+
+		url = bookmark.getURL();
+		url = StringHelper.trim(url);
+		url = SecurityHelper.disarm(url);
+		bookmark.setURL(url);
+
+		title = bookmark.getTitle();
+		title = StringHelper.trim(title);
+		title = SecurityHelper.disarm(title);
+		if (title === '') {
+			bookmark.setTitle(bookmark.getURL());
+		} else {
+			bookmark.setTitle(title);
+		}
+		
+		description = bookmark.getDescription();
+		if (!TSObject.exists(description)) {
+			description = '';
+		} else {
+			description = StringHelper.trim(description);
+			description = SecurityHelper.disarm(description);
+		}
+		bookmark.setDescription(description);
+	}
 	
 	createFromURL(
 		url : string,
@@ -158,7 +158,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		this._engineBookmark(bookmark);
+		this.engineBookmark(bookmark);
 
 		bookmark.add(
 			(outcome) => {
@@ -205,7 +205,7 @@ class BookmarkBusiness implements IBookmarkBusiness {
 			return;
 		}
 
-		this._engineBookmark(bookmark);
+		this.engineBookmark(bookmark);
 
 		bookmark.update(
 			(outcome) => {
