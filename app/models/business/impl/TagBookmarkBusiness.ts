@@ -204,6 +204,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		e = list[currentIndex];
 		bookmark = BookmarkDAO.fromObject(e);
 		BusinessMediator.getBookmarkBusiness().engineBookmark(bookmark);
+		bookmark.setId(SecurityHelper.disarm(StringHelper.trim(bookmark.getId())));
 		DataAccessObject.initialize(
 			(success) => {
 				ActiveRecordObject.insert(
@@ -231,6 +232,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		e = list[currentIndex];
 		tag = TagDAO.fromObject(e);
 		BusinessMediator.getTagBusiness().engineTag(tag);
+		tag.setId(SecurityHelper.disarm(StringHelper.trim(tag.getId())));
 		DataAccessObject.initialize(
 			(success) => {
 				ActiveRecordObject.insert(

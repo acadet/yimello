@@ -123,13 +123,6 @@ class TourPresenter extends YimelloPresenter {
 			return;
 		}
 
-		if (!TSObject.exists(this._tags)) {
-			// First call, gather data
-			this._tags = DOMTree.findSingle('.js-slide .js-tag-list');
-			TourPresenter._tagID = 0;
-			this._currentTags = new ArrayList<TagDAO>();
-		}
-
 		// Start to build a new tag
 		tag =
 			DOMElement.fromString('<li><p>' + value + '</p></li>');
@@ -212,9 +205,11 @@ class TourPresenter extends YimelloPresenter {
 	 * Prepares tag generator
 	 */
 	private _prepareTagGenerator() : void {
-		if (!TSObject.exists(this._tagInput)) {
-			this._tagInput = this._slides.findSingle('.js-slide .js-tag-form input[name="tags"]');
-		}
+		this._tagInput = this._slides.findSingle('.js-slide .js-tag-form input[name="tags"]');
+		this._tags = DOMTree.findSingle('.js-slide .js-tag-list');
+		TourPresenter._tagID = 0;
+		this._currentTags = new ArrayList<TagDAO>();
+
 		this._tagInput.on(
 			DOMElementEvents.KeyDown, 
 			(e) => {
