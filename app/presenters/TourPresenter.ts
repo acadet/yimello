@@ -144,6 +144,7 @@ class TourPresenter extends YimelloPresenter {
 		// On click on delete icon, remove bound tag
 		img.on(DOMElementEvents.Click, (e) => {
 			img.off(DOMElementEvents.Click);
+			tag.remove();
 			this._currentTags.remove(tagObj);
 		});
 	}
@@ -293,7 +294,7 @@ class TourPresenter extends YimelloPresenter {
 					if (this._currentTags.getLength() > 0) {
 						PresenterMediator
 							.getTagBusiness()
-							.addList(
+							.merge(
 								this._currentTags,
 								(outcome) => {
 									this._currentTags = outcome;

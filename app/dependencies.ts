@@ -109,4 +109,5 @@
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
+/// <reference path="helpers/VersionHelper.ts" />
 //grunt-end

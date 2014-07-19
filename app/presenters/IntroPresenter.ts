@@ -4,6 +4,7 @@ class IntroPresenter extends YimelloPresenter {
 	//region Fields
 	
 	private _hexagon : DOMElement;
+
 	private _mustExit : boolean;
 
 	//endregion Fields
@@ -60,6 +61,24 @@ class IntroPresenter extends YimelloPresenter {
 		}
 	}
 
+	private _testVersion() : void {
+		var notification : DOMElement;
+
+		notification = DOMTree.findSingle('.js-update-notification');
+
+		VersionHelper.isUpToDate(
+			(success) => {
+				if (!success) {
+					notification.setCss(
+						{
+							opacity : 1
+						}
+					);
+				}
+			}
+		);
+	}
+
 	//endregion Private Methods
 	
 	//region Public Methods
@@ -67,8 +86,9 @@ class IntroPresenter extends YimelloPresenter {
 	onStart() : void {
 		var t : Timer;
 
-		DOMTree.findSingle('.js-intro-strap').centerize(DOMTree.findSingle('.body'));
+		DOMTree.findSingle('.js-strap-wrapper').centerize(DOMTree.findSingle('.body'));
 		this._hexagon = DOMTree.findSingle('.js-hexagon');
+		this._testVersion();
 
 		BusinessMediator
 			.getTagBookmarkBusiness()
