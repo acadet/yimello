@@ -123,6 +123,9 @@ class TourPresenter extends YimelloPresenter {
 			return;
 		}
 
+		// Avoid harmful values
+		value = SecurityHelper.disarm(value);
+
 		// Start to build a new tag
 		tag =
 			DOMElement.fromString('<li><p>' + value + '</p></li>');
