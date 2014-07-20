@@ -183,11 +183,7 @@ class MainPresenter
 		this._tagList.resetList(() => this._tagList.selectMostPopular());
 		this._bookmarkList.displayMostPopular();
 	}
-
-	onPause() : void {
-		this._bookmarkList.unfocus();
-	}
-
+	
 	//region IBookmarkFormSubscriber
 
 	onBookmarkCancellation() : void {

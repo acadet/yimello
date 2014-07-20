@@ -71,6 +71,8 @@ a {
 			img {
 				opacity : 1;
 
+				-webkit-app-region: no-drag;
+
 				@include transition(opacity, 0.5s, ease);
 
 				&:hover {

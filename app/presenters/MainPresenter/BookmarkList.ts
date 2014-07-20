@@ -10,7 +10,7 @@ class BookmarkList {
 
 	private _defaultContent : DOMElement;
 	private _isDefaultContentCurrent : boolean;
-	private _isPressingMetaKey : boolean;
+	private _keyboardEventObj : DOMElementEventObject;
 
 	//endregion Fields
 	
@@ -22,21 +22,24 @@ class BookmarkList {
 		this._destList = this._wrapper.findSingle('.js-bookmark-list');
 		this._defaultContent = this._wrapper.findSingle('.js-default-content');
 		this._isDefaultContentCurrent = false;
-		this._isPressingMetaKey = false;
 
-		DOMTree.getDocument().on(
-			DOMElementEvents.KeyDown,
-			(e) => {
-				this._isPressingMetaKey = e.isMetaKey();
-			}
-		);
+		DOMTree
+			.getDocument()
+			.on(
+				DOMElementEvents.KeyDown,
+				(e) => {
+					this._keyboardEventObj = e;
+				}
+			);
 
-		DOMTree.getDocument().on(
-			DOMElementEvents.KeyUp,
-			(e) => {
-				this._isPressingMetaKey = false;
-			}
-		);
+		DOMTree
+			.getDocument()
+			.on(
+				DOMElementEvents.KeyUp,
+				(e) => {
+					this._keyboardEventObj = null;
+				}
+			);
 	}
 
 	//endregion Constructors
@@ -105,16 +108,18 @@ class BookmarkList {
 					e.on(
 						DOMElementEvents.Click,
 						(arg) => {
-							if (this._isPressingMetaKey) {
-								BookmarkDAO.find(
-									e.getData('id'),
-									(outcome) => {
-										outcome.setViews(outcome.getViews() + 1);
-										outcome.update();
-										NodeWindow.openExternal(outcome.getURL());
-									}
-								);
-								this._isPressingMetaKey = false;
+							if (TSObject.exists(this._keyboardEventObj)) {
+								if (this._keyboardEventObj.getWhich() === 17
+									|| this._keyboardEventObj.isMetaKey()) {
+									BookmarkDAO.find(
+										e.getData('id'),
+										(outcome) => {
+											outcome.setViews(outcome.getViews() + 1);
+											outcome.update();
+											NodeWindow.openExternal(outcome.getURL());
+										}
+									);
+								}
 							} else {
 								this._subscriber.onBookmarkSelection(e.getData('id'));
 							}
@@ -234,10 +239,6 @@ class BookmarkList {
 					this._show();
 				}
 			);
-	}
-
-	unfocus() : void {
-		this._isPressingMetaKey = false;
 	}
 
 	//endregion Public Methods

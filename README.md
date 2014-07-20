@@ -6,8 +6,8 @@ using it. Please open a ticket in tracker to notify me :) I'll appreciate.
 
 ## Knowns issues
 
-* Closing and minimizing window are not working on Windows
 * Troubles with menu animations
+* Import/export functions are experimental
 
 ## Future improvements 
 
@@ -15,3 +15,4 @@ using it. Please open a ticket in tracker to notify me :) I'll appreciate.
 * Creating a backup from app
 * A reset feature
 * Improving design
+* Social network sharing
