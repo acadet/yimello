@@ -1,4 +1,4 @@
-# Yimello
+# Yimello - http://yimello.adriencadet.com/
 
 Yimello is a tiny tool to save your bookmarks and browse them easily.
 Current version is a beta one. Then, you can encounter some issues when
