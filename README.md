@@ -1,4 +1,4 @@
-![Logo](http://yimello.adriencadet.com/assets/img/logo-reduced.png)
+![Logo](http://yimello.adriencadet.com/assets/img/logo-reduced.png =250x)
 
 # Yimello
 
