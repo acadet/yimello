@@ -20,3 +20,9 @@ using it. Please open a ticket in tracker to notify me :) I'll appreciate.
 * A reset feature
 * Improve design
 * Social network sharing
+
+## Baked with love <3
+
+* Based on Node-Webkit framework
+* Uses TypeScript to produce JS code
+* HTML5/CSS3/SASS for front-end 
