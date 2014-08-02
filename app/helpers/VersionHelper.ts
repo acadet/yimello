@@ -5,7 +5,7 @@ class VersionHelper {
 	//region Fields
 	
 	private static _target : string = 'http://yimello.adriencadet.com/version';
-	private static _version : string = '0.1.2';
+	private static _version : string = '0.2.0';
 
 	//endregion Fields
 	
@@ -21,16 +21,29 @@ class VersionHelper {
 	
 	//region Public Methods
 	
-	static isUpToDate(callback : Action<boolean>) : void {
+	static isUpToDate(callback : Action<boolean>, errorHandler : Action<string> = null) : void {
 		var get : GetRequest;
 
-		get = new GetRequest(VersionHelper._target);
-		get.setDataType(AjaxRequestDataType.Text);
-		get.execute(
-			(data, status, xhr) => {
-				callback(data === VersionHelper._version);
+		if (Environment.isOnline()) {
+			get = new GetRequest(VersionHelper._target);
+			get.setDataType(AjaxRequestDataType.Text);
+			get.setErrorHandler(
+				(xhr, status, error) => {
+					if (TSObject.exists(errorHandler)) {
+						errorHandler(error);
+					}
+				}
+			);
+			get.execute(
+				(data, status, xhr) => {
+					callback(data === VersionHelper._version);
+				}
+			);
+		} else {
+			if (TSObject.exists(errorHandler)) {
+				errorHandler('Unable to check version: no connection was spotted');
 			}
-		);
+		}
 	}
 
 	//endregion Public Methods

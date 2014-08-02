@@ -7,6 +7,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-mkdir");
     grunt.loadNpmTasks("grunt-zip");
     grunt.loadNpmTasks("grunt-node-webkit-builder");
+    grunt.loadNpmTasks("grunt-contrib-uglify");
 
     // Configure grunt here
     grunt.initConfig({
@@ -166,7 +167,19 @@ module.exports = function (grunt) {
 	    		mac_icns : 'release/src/logo.icns'
 	    	},
 	    	src : ['release/src/**/*']
-	    }
+	    },
+		uglify: {
+			release: {
+				options : {
+					compress : true,
+					mangle : false,
+					preserveComments : false
+				},
+				files: {
+					'release/src/app/ui/js/output.js' : ['release/src/app/ui/js/output.js']
+				}
+			}
+		}
 	});
 
 	grunt.registerTask('build', ['ts:build']);
@@ -178,6 +191,7 @@ module.exports = function (grunt) {
 			'ts:release',
 			'mkdir:release',
 			'copy:release',
+			'uglify:release',
 			'nodewebkit',
 			'zip:releaseWin',
 			'zip:releaseMac',

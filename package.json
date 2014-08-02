@@ -8,16 +8,17 @@
     "height": 527,
     "resizable": false,
     "position": "center",
-    "icon" : "app/ui/assets/img/logo.png"
+    "icon": "app/ui/assets/img/logo.png"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-ts": "~1.9.2",
     "typescript": "0.9.7",
     "grunt-contrib-copy": "~0.5.0",
-    "grunt-remove" : "0.1.0",
-    "grunt-mkdir" : "0.1.1",
-    "grunt-node-webkit-builder" : "0.1.21",
-    "grunt-zip" : "0.15.0"
+    "grunt-remove": "0.1.0",
+    "grunt-mkdir": "0.1.1",
+    "grunt-node-webkit-builder": "0.1.21",
+    "grunt-zip": "0.15.0",
+    "grunt-contrib-uglify": "~0.5.1"
   }
 }

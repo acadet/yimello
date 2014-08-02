@@ -75,12 +75,16 @@ class BookmarkBusiness implements IBookmarkBusiness {
 		bookmark.setURL(url);
 
 		title = bookmark.getTitle();
-		title = StringHelper.trim(title);
-		title = SecurityHelper.disarm(title);
-		if (title === '') {
+		if (!TSObject.exists(title) || title === '') {
 			bookmark.setTitle(bookmark.getURL());
 		} else {
-			bookmark.setTitle(title);
+			title = StringHelper.trim(title);
+			title = SecurityHelper.disarm(title);
+			if (title === '') {
+				bookmark.setTitle(bookmark.getURL());
+			} else {
+				bookmark.setTitle(title);
+			}
 		}
 		
 		description = bookmark.getDescription();
