@@ -267,7 +267,7 @@ class MainPresenter
 
 	onTagUpdate() : void {
 		this._afterTagEdition();
-		this.showNotification('Allright, everthing was stored');
+		this.showNotification('Alright, everything was stored');
 	}
 
 	onTagCancellation() : void {
