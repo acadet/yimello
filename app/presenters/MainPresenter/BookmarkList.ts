@@ -111,6 +111,7 @@ class BookmarkList {
 							if (TSObject.exists(this._keyboardEventObj)) {
 								if (this._keyboardEventObj.getWhich() === 17
 									|| this._keyboardEventObj.isMetaKey()) {
+									this._keyboardEventObj = null;
 									BookmarkDAO.find(
 										e.getData('id'),
 										(outcome) => {
@@ -239,6 +240,10 @@ class BookmarkList {
 					this._show();
 				}
 			);
+	}
+
+	unfocus() : void {
+		this._keyboardEventObj = null;
 	}
 
 	//endregion Public Methods
