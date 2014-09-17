@@ -1,7 +1,7 @@
 /// <reference path="../dependencies.ts" />
 
 /**
- * Provides methods for form
+ * Provides methods for form handling
  */
 class FormHelper {
 	

@@ -382,6 +382,65 @@ class BookmarkDAOTest extends UnitTestClass {
 			}
 		);
 	}
+
+	BookmarkDAOSortByTileAscTest() : void {
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var b1 : BookmarkDAO, b2 : BookmarkDAO, b3 : BookmarkDAO;
+
+				b1 = new BookmarkDAO();
+				b1
+					.setTitle('Joe Pesci')
+					.setId('1');
+				b2 = new BookmarkDAO();
+				b2
+					.setTitle('Robert de Niro')
+					.setId('2');
+				b3 = new BookmarkDAO();
+				b3
+					.setTitle('Al Pacino')
+					.setId('3');
+
+				DataAccessObject.initialize(
+					(success) => {
+						ActiveRecordObject.insert(
+							DAOTables.Bookmarks,
+							b1.toList(),
+							(success) => {
+								ActiveRecordObject.insert(
+									DAOTables.Bookmarks,
+									b2.toList(),
+									(success) => {
+										ActiveRecordObject.insert(
+											DAOTables.Bookmarks,
+											b3.toList(),
+											(success) => {
+												// Act
+												BookmarkDAO.sortByViewsDescThenByTitleAsc(
+													(outcome) => {
+														// Assert
+														this.isTrue(TSObject.exists(outcome));
+
+														this.areIdentical(3, outcome.getLength());
+														this.areIdentical(b3.getTitle(), outcome.getAt(0).getTitle());
+														this.areIdentical(b1.getTitle(), outcome.getAt(1).getTitle());
+														this.areIdentical(b2.getTitle(), outcome.getAt(2).getTitle());
+
+														DataAccessObject.clean((success) => UnitTestClass.done());
+													}
+												);
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
+	}
 }
 
 UnitTestClass.handle(new BookmarkDAOTest());

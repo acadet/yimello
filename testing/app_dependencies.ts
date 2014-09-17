@@ -23,6 +23,9 @@
 /// <reference path="../app/system/StringHelper.ts" />
 /// <reference path="../app/helpers/FormHelper.ts" />
 /// <reference path="../app/system/Environment.ts" />
+/// <reference path="../app/system/storage/CacheAPI.ts" />
+/// <reference path="../app/system/storage/FileAPI.ts" />
+/// <reference path="../app/system/Random.ts" />
 
 // Collections parts
 
@@ -72,9 +75,14 @@
 /// <reference path="../app/models/business/impl/BookmarkBusiness.ts" />
 /// <reference path="../app/models/business/ITagBusiness.ts" />
 /// <reference path="../app/models/business/impl/TagBusiness.ts" />
+/// <reference path="../app/models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="../app/models/business/ITagBookmarkBusiness.ts" />
+/// <reference path="../app/models/business/impl/TagBookmarkBusiness.ts" />
+/// <reference path="../app/models/business/utils/BusinessMediator.ts" />
 
 // Presenters part
 
+/// <reference path="../app/presenters/utils/NotificationMessage.ts" />
 /// <reference path="../app/presenters/utils/PresenterException.ts" />
 /// <reference path="../app/presenters/Presenter.ts" />
 /// <reference path="../app/presenters/YimelloPresenter.ts" />
@@ -84,11 +92,12 @@
 
 // Main presenter
 
-/// <reference path="../app/presenters/MainPresenter/IBookmarkFormSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/IBookmarkListSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/ITagListSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/Menu/IMenuControlSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/Menu/ISubMenuOwner.ts" />
+/// <reference path="../app/presenters/MainPresenter/utils/MainPresenterMediator.ts" />
+/// <reference path="../app/presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/interfaces/IMenuControlSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/interfaces/ISubMenuOwner.ts" />
 /// <reference path="../app/presenters/MainPresenter/TagList.ts" />
 /// <reference path="../app/presenters/MainPresenter/BookmarkForm.ts" />
 /// <reference path="../app/presenters/MainPresenter/BookmarkList.ts" />
@@ -97,7 +106,8 @@
 /// <reference path="../app/presenters/MainPresenter/Menu/TagFormSubMenu.ts" />
 /// <reference path="../app/presenters/MainPresenter/Menu/MenuSubMenu.ts" />
 /// <reference path="../app/presenters/MainPresenter/Menu/MenuControl.ts" />
+/// <reference path="../app/presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
-/// <reference path="../app/models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="../app/helpers/VersionHelper.ts" />
 //grunt-end

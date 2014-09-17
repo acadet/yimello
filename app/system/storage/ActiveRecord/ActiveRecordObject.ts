@@ -4,22 +4,18 @@
  * Matches ARO pattern. Provides shortcut for
  * SQL requests
  */
-class ActiveRecordObject extends TSObject {
+class ActiveRecordObject implements IActiveRecordObject {
 	//region Fields
+
+	private _database : ISQLDatabase;
 	
-	/**
-	 * Current DB
-	 */
-	private static _currentDB : SQLDatabase;
-
-	/**
-	 * Current configuration
-	 */
-	private static _currentConfig : ActiveRecordConfig;
-
 	//endregion Fields
 	
 	//region Constructors
+
+	constructor(database : ISQLDatabase) {
+		this._database = database;
+	}
 	
 	//endregion Constructors
 	
@@ -27,51 +23,24 @@ class ActiveRecordObject extends TSObject {
 	
 	//region Private Methods
 	
-	/**
-	 * Called by intern methods to enable an endpoint with DB
-	 */
-	private static _init() : void {
-		if (!TSObject.exists(ActiveRecordObject._currentDB)) {
-			ActiveRecordObject._currentDB =
-			SQLDatabase.open(
-				ActiveRecordObject._currentConfig.getDatabaseName(),
-				ActiveRecordObject._currentConfig.getDatabaseVersion(),
-				ActiveRecordObject._currentConfig.getDatabaseName(),
-				ActiveRecordObject._currentConfig.getDatabaseSize()
-			);
-		}
-	}
-
 	//endregion Private Methods
 	
 	//region Public Methods
-	
-	/**
-	 * Initializes ARO with provided configuration
-	 * @param {ActiveRecordConfig} config [description]
-	 */
-	static init(config : ActiveRecordConfig) : void {
-		ActiveRecordObject._currentConfig = config;
-	}
 
-	/**
-	 * Execute a raw sql request
-	 */
-	static executeSQL(request : string, callback : Action<any> = null) : void {
-		ActiveRecordObject._init();
-		ActiveRecordObject._currentDB.transaction(
+	executeSQL(request : string, callback? : Action<any>) : void {
+		this._database.transaction(
 			(tx) => {
 				tx.execute(
 					request,
 					[],
 					(tx, outcome) => {
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(outcome);
 						}
 					},
 					(tx, e) => {
 						ActiveRecordHelper.executeErrorHandler(tx, e);
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(null);
 						}
 						return false;
@@ -81,14 +50,8 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
-	/**
-	 * Gets all entries from specified tables.
-	 * Returns a list of items built with given 
-	 * converter
-	 */
-	static get<T>(table : string, callback : Action<IList<T>>, converter : Func<any, T> = null) : void {
-		ActiveRecordObject._init();
-		ActiveRecordObject._currentDB.transaction(
+	get<T>(table : string, callback : Action<IList<T>>, converter? : Func<any, T>) : void {
+		this._database.transaction(
 			(tx) => {
 				tx.execute(
 					'SELECT * FROM ' + table,
@@ -108,14 +71,13 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
-	static find<T>(
+	find<T>(
 		table : string,
 		selector : Pair<string, any>,
 		callback : Action<T>,
-		converter : Func<any, T> = null) : void {
-		
-		ActiveRecordObject._init();
-		ActiveRecordObject._currentDB.transaction(
+		converter? : Func<any, T>) : void {
+	
+		this._database.transaction(
 			(tx) => {
 				var request : StringBuffer;
 
@@ -138,11 +100,12 @@ class ActiveRecordObject extends TSObject {
 						s = outcome.getRows();
 
 						if (s.getLength() < 1) {
+							// No entry
 							callback(null);
 							return;
 						}
 
-						if (converter !== null) {
+						if (TSObject.exists(converter)) {
 							callback(converter(s.item(0)));
 						} else {
 							callback(s.item(0));
@@ -160,21 +123,17 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
-	/**
-	 * Execute an insert request with a single object
-	 */
-	static insert(table : string, data : IList<any>, callback : Action<boolean> = null) : void {
+	insert(table : string, data : IList<any>, callback? : Action<boolean>) : void {
 
 		if (!TSObject.exists(data)) {
 			Log.error(new ActiveRecordException('insert(): Provided data are undefined'));
-			if (callback !== null) {
+			if (TSObject.exists(callback)) {
 				callback(false);
 			}
 			return;
 		}
 
-		ActiveRecordObject._init();
-		ActiveRecordObject._currentDB.transaction(
+		this._database.transaction(
 			(tx) => {
 				var s : StringBuffer = new StringBuffer();
 				s.append('(');
@@ -193,13 +152,13 @@ class ActiveRecordObject extends TSObject {
 					'INSERT INTO ' + table + ' VALUES ' + s.toString(),
 					data.toArray(),
 					(tx, outcome) => {
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(true);
 						}
 					},
 					(tx, error) => {
 						ActiveRecordHelper.executeErrorHandler(tx, error);
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(false);
 						}
 						return false;
@@ -209,26 +168,22 @@ class ActiveRecordObject extends TSObject {
 			ActiveRecordHelper.transactionErrorHandler
 		);
 	}
-
-	/**
-	 * Updates entry from DB using provided selector
-	 */
-	static update(
+	
+	update(
 		table : string,
 		selector : Pair<string, any>,
 		data : IDictionary<string, any>,
-		callback : Action<boolean> = null) : void {
+		callback? : Action<boolean>) : void {
 
 		if (!TSObject.exists(data)) {
 			Log.error(new ActiveRecordException('update(): Provided data are undefined'));
-			if (callback !== null) {
+			if (TSObject.exists(callback)) {
 				callback(false);
 			}
 			return;
 		}
 
-		ActiveRecordObject._init();
-		ActiveRecordObject._currentDB.transaction(
+		this._database.transaction(
 			(tx) => {
 				var args : IList<any>;
 				var marks : StringBuffer = new StringBuffer();
@@ -254,13 +209,13 @@ class ActiveRecordObject extends TSObject {
 					'UPDATE ' + table + ' SET ' + marks.toString() + ' WHERE ' + selector.getFirst() + ' = ?',
 					args.toArray(),
 					(tx, outcome) => {
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(true);
 						}
 					},
 					(tx, error) => {
 						ActiveRecordHelper.executeErrorHandler(tx, error);
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(false);
 						}
 						return false;
@@ -271,10 +226,7 @@ class ActiveRecordObject extends TSObject {
 		);
 	}
 
-	/**
-	 * Deletes an entry from DB
-	 */
-	static delete(table : string, selector : Pair<string, any>, callback : Action<boolean> = null) : void {
+	delete(table : string, selector : Pair<string, any>, callback? : Action<boolean>) : void {
 		ActiveRecordObject._init();
 
 		ActiveRecordObject._currentDB.transaction(
@@ -296,7 +248,7 @@ class ActiveRecordObject extends TSObject {
 					(tx, error) => {
 						ActiveRecordHelper.executeErrorHandler(tx, error);
 
-						if (callback !== null) {
+						if (TSObject.exists(callback)) {
 							callback(false);
 						}
 
@@ -307,43 +259,7 @@ class ActiveRecordObject extends TSObject {
 			ActiveRecordHelper.transactionErrorHandler
 		);
 	}
-
-	// static couple(table : string, pairs : IList<Pair<any, any>>, callback : Action<boolean> = null) : void {
-	// 	if (!TSObject.exists(pairs)) {
-	// 		Log.error(new ActiveRecordException('Provided pairs are undefined'));
-	// 		if (callback !== null) {
-	// 			callback(false);
-	// 		}
-	// 		return;
-	// 	}
-		
-	// 	ActiveRecordObject._init();
-	// 	ActiveRecordObject._currentDB.transaction(
-	// 		(tx) => {
-	// 			for(var i = 0; i < pairs.getLength(); i++) {
-	// 				var p : Pair<any, any> = pairs.getAt(i);
-	// 				var args : IList<any> = new ArrayList<any>();
-
-	// 				args.add(table);
-	// 				args.add(p.getFirst());
-	// 				args.add(p.getSecond());
-
-	// 				tx.execute(
-	// 					'INSERT INTO ? VALUES (?, ?)',
-	// 					args.toArray(),
-	// 					(tx, outcome) => {
-	// 						if (callback !== null) {
-	// 							callback(true);
-	// 						}
-	// 					},
-	// 					ActiveRecordHelper.executeErrorHandler
-	// 				);
-	// 			}
-	// 		},
-	// 		ActiveRecordHelper.transactionErrorHandler
-	// 	);
-	// }
-
+	
 	//endregion Public Methods
 	
 	//endregion Methods
