@@ -15,6 +15,7 @@
 /// <reference path="system/DOMTree.ts" />
 /// <reference path="system/strings/StringBuffer.ts" />
 /// <reference path="system/node-webkit/NodeWindow.ts" />
+/// <reference path="system/node-webkit/Presenter.ts" />
 /// <reference path="system/Regex.ts" />
 /// <reference path="system/Log.ts" />
 /// <reference path="system/Pair.ts" />
@@ -39,13 +40,13 @@
 // Storage part
 
 /// <reference path="system/storage/SQLAPI.ts" />
+/// <reference path="system/storage/ActiveRecord/IActiveRecordObject.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordConfig.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordException.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordHelper.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordObject.ts" />
 
 // Ajax part
-
 
 /// <reference path="system/ajax/AjaxRequest.ts" />
 /// <reference path="system/ajax/AjaxRequestDataType.ts" />
@@ -60,14 +61,24 @@
 /// <reference path="helpers/URLDetailsProvider.ts" />
 /// <reference path="helpers/SecurityHelper.ts" />
 /// <reference path="helpers/FaviconHelper.ts" />
+/// <reference path="helpers/VersionHelper.ts" />
+
+// Beans part
+
+/// <reference path="models/beans/Bookmark.ts" />
+/// <reference path="models/beans/Tag.ts" />
 
 // DAO part
 
+/// <reference path="models/utils/AROFactory.ts" />
 /// <reference path="models/dao/utils/DAOException.ts" />
-/// <reference path="models/dao/DAOTables.ts" />
-/// <reference path="models/dao/DataAccessObject.ts" />
-/// <reference path="models/dao/BookmarkDAO.ts" />
-/// <reference path="models/dao/TagDAO.ts" />
+/// <reference path="models/dao/IBookmarkDAO.ts" />
+/// <reference path="models/dao/ITagDAO.ts" />
+/// <reference path="models/dao/impl/BookmarkDAO.ts" />
+/// <reference path="models/dao/impl/TagDAO.ts" />
+/// <reference path="models/dao/utils/DAOTables.ts" />
+/// <reference path="models/dao/utils/DataAccessObject.ts" />
+/// <reference path="models/utils/DAOFactory.ts" />
 
 // Business part
 /// <reference path="models/business/utils/BusinessException.ts" />
@@ -75,10 +86,10 @@
 /// <reference path="models/business/impl/BookmarkBusiness.ts" />
 /// <reference path="models/business/ITagBusiness.ts" />
 /// <reference path="models/business/impl/TagBusiness.ts" />
-/// <reference path="models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="models/business/utils/ScoredBookmark.ts" />
 /// <reference path="models/business/ITagBookmarkBusiness.ts" />
 /// <reference path="models/business/impl/TagBookmarkBusiness.ts" />
-/// <reference path="models/business/utils/BusinessMediator.ts" />
+/// <reference path="models/utils/BusinessFactory.ts" />
 
 // Presenters part
 
@@ -86,7 +97,6 @@
 /// <reference path="presenters/utils/PresenterException.ts" />
 /// <reference path="presenters/Presenter.ts" />
 /// <reference path="presenters/YimelloPresenter.ts" />
-/// <reference path="presenters/utils/PresenterMediator.ts" />
 /// <reference path="presenters/IntroPresenter.ts" />
 /// <reference path="presenters/TourPresenter.ts" />
 
@@ -109,5 +119,4 @@
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
-/// <reference path="helpers/VersionHelper.ts" />
 //grunt-end

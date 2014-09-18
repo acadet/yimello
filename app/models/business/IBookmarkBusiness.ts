@@ -4,33 +4,35 @@
  * Business layer for bookmarks
  */
 interface IBookmarkBusiness {
-	engineBookmark(bookmark : BookmarkDAO) : void;
-
 	/**
 	 * Creates a bookmark from an URL
 	 */
 	createFromURL(
 		url : string,
-		callback? : Action<BookmarkDAO>,
+		callback? : Action<Bookmark>,
 		errorHandler? : Action<string>,
 		warningHandler? : Action<string>) : void;
 
 	/**
 	 * Adds a new bookmark into DB. 
 	 * Applies security operation on it
-	 * @param {BookmarkDAO}         bookmark [description]
-	 * @param {Action<BookmarkDAO>} callback Callback with new bookmark as argument
+	 * @param {Bookmark}         bookmark [description]
+	 * @param {Action<Bookmark>} callback Callback with new bookmark as argument
 	 */
-	add(bookmark : BookmarkDAO, callback? : Action<BookmarkDAO>, errorHandler? : Action<string>) : void;
+	add(bookmark : Bookmark, callback? : Action<Bookmark>, errorHandler? : Action<string>) : void;
 
-	addList(bookmarks : IList<BookmarkDAO>, callback? : Action<IList<BookmarkDAO>>, errorHandler? : Action<string>) : void;
+	//addList(bookmarks : IList<Bookmark>, callback? : Action<IList<Bookmark>>, errorHandler? : Action<string>) : void;
 
-	update(bookmark : BookmarkDAO, callback? : Action<BookmarkDAO>, errorHandler? : Action<string>) : void;
+	update(bookmark : Bookmark, callback? : Action<Bookmark>, errorHandler? : Action<string>) : void;
 
 	/**
 	 * Deletes a bookmark from DB
 	 * @param {BookmarkDAO}     bookmark [description]
 	 * @param {Action<boolean>} callback Callback with a success arg
 	 */
-	delete(bookmark : BookmarkDAO, callback? : Action0, errorHandler? : Action<string>) : void;
+	delete(bookmark : Bookmark, callback? : Action0, errorHandler? : Action<string>) : void;
+
+	find(id : string, callback : Action<Bookmark>) : void;
+
+	sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void;
 }

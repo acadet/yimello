@@ -86,21 +86,25 @@ class IntroPresenter extends YimelloPresenter {
 	onStart() : void {
 		var t : Timer;
 
+		super.onStart();
+
 		DOMTree.findSingle('.js-strap-wrapper').centerize(DOMTree.findSingle('.body'));
 		this._hexagon = DOMTree.findSingle('.js-hexagon');
 		this._testVersion();
 
-		BusinessMediator
-			.getTagBookmarkBusiness()
-			.backup(
-				() => {
-					if (this._mustExit) {
-						this._exit();
-					} else {
-						this._mustExit = true;
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.backup(
+					() => {
+						if (this._mustExit) {
+							this._exit();
+						} else {
+							this._mustExit = true;
+						}
 					}
-				}
-			);
+				);
+			}
+		);
 
 		t = new Timer((o) => {
 			if (this._mustExit) {

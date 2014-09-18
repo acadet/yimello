@@ -3,9 +3,6 @@
 $black: #333333;
 $blue: #0c7cbb;
 $lightBlue : #22A8E8;
-$orange : #EB6841;
-$red : #DD381D;
-$green : #7EB530;
 
 .main-view-wrapper {
 	position: absolute;
@@ -303,7 +300,7 @@ $green : #7EB530;
 
 	form {
 		height: 100%;
-		width: $appWidth * 0.75 - 95px;
+		width: $app-width * 0.75 - 95px;
 
 		@include placeholder-color(transparentize(white, 0.5));
 	}
@@ -369,7 +366,7 @@ $green : #7EB530;
 	form {
 		margin: 15px 0;
 		padding: 0 25px;
-		width: $appWidth - 72 * 2;
+		width: $app-width - 72 * 2;
 		
 		text-align: center;
 		@include box-sizing(border-box);

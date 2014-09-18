@@ -116,7 +116,7 @@ class MenuControl implements ISubMenuOwner {
 		this._subscriber.onTagCancellation();
 	}
 
-	prepareForTagUpdate(tag : TagDAO) : void {
+	prepareForTagUpdate(tag : Tag) : void {
 		this._showOverlay();
 		this._tagForm.showToUpdate(tag);
 	}

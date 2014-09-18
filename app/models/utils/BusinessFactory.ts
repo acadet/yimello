@@ -23,9 +23,9 @@ class BusinessFactory {
 	
 	//region Public Methods
 
-	public buildTag(callback : Action<ITagBusiness>) : void {
+	static buildTag(callback : Action<ITagBusiness>) : void {
 		if (!TSObject.exists(BusinessFactory._tag)) {
-			new DAOFactory().buildTag(
+			DAOFactory.buildTag(
 				(outcome) => {
 					BusinessFactory._tag = new TagBusiness(outcome);
 
@@ -37,9 +37,9 @@ class BusinessFactory {
 		}
 	}
 
-	public buildBookmark(callback : Action<IBookmarkBusiness>) : void {
+	static buildBookmark(callback : Action<IBookmarkBusiness>) : void {
 		if (!TSObject.exists(BusinessFactory._bookmark)) {
-			new DAOFactory().buildBookmark(
+			DAOFactory.buildBookmark(
 				(outcome) => {
 					BusinessFactory._bookmark = new BookmarkBusiness(outcome);
 
@@ -51,15 +51,11 @@ class BusinessFactory {
 		}
 	}
 
-	public buildTagBookmark(callback : Action<ITagBookmarkBusiness>) : void {
+	static buildTagBookmark(callback : Action<ITagBookmarkBusiness>) : void {
 		if (!TSObject.exists(BusinessFactory._tagBk)) {
-			var factory : DAOFactory;
-
-			factory = new DAOFactory();
-
-			factory.buildTag(
+			DAOFactory.buildTag(
 				(tagDAO) => {
-					factory.buildBookmark(
+					DAOFactory.buildBookmark(
 						(bookmarkDAO) => {
 							BusinessFactory._tagBk = new TagBookmarkBusiness(tagDAO, bookmarkDAO);
 

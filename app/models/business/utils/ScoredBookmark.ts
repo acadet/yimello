@@ -1,6 +1,6 @@
 /// <reference path="../../../dependencies.ts" />
 
-class ScoredBookmarkDAO extends BookmarkDAO {
+class ScoredBookmark extends Bookmark {
 	//region Fields
 	
 	private _score : number;
@@ -23,7 +23,7 @@ class ScoredBookmarkDAO extends BookmarkDAO {
 		return this._score;
 	}
 
-	setScore(value : number) : ScoredBookmarkDAO {
+	setScore(value : number) : ScoredBookmark {
 		this._score = value;
 		return this;
 	}

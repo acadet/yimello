@@ -125,6 +125,8 @@ class MainPresenter
 	//region Public Methods
 	
 	onStart() : void {
+		super.onStart();
+
 		this._mainViewWrapper = DOMTree.findSingle('.js-main-view-wrapper');
 		this._bookmarkAddTrigger = DOMTree.findSingle('.js-bookmark-add-trigger');
 		this._bookmarkFormWrapper = DOMTree.findSingle('.js-bookmark-form-wrapper');
@@ -185,6 +187,8 @@ class MainPresenter
 	}
 
 	onPause() : void {
+		super.onPause();
+		
 		this._bookmarkList.unfocus();
 	}
 	

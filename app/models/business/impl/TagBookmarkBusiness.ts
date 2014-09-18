@@ -2,10 +2,16 @@
 
 class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	//region Fields
+
+	private _args : TagBookmarkBusinessArgs;
 	
 	//endregion Fields
 	
 	//region Constructors
+
+	constructor(args : TagBookmarkBusinessArgs) {
+		this._args = args;
+	}
 	
 	//endregion Constructors
 	
@@ -15,34 +21,34 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	
 	private _browseDLNode(
 		node : DOMElement,
-		currentTags : IList<TagDAO>,
-		collection : IList<Pair<BookmarkDAO, IList<TagDAO>>>)
+		currentTags : IList<Tag>,
+		collection : IList<Pair<Bookmark, IList<Tag>>>)
 		: void
 	{
 		var i : number;
-		var collectedTags : IList<TagDAO>;
+		var collectedTags : IList<Tag>;
 
 		node
 			.find('> DT > A')
 			.forEach(
 				(a) => {
-					var b : BookmarkDAO;
+					var b : Bookmark;
 
-					b = new BookmarkDAO();
+					b = new Bookmark();
 					b.setURL(a.getAttribute('href'));
 					b.setTitle(a.getText());
 
-					collection.add(new Pair<BookmarkDAO, IList<TagDAO>>(b, currentTags));
+					collection.add(new Pair<Bookmark, IList<Tag>>(b, currentTags));
 				}
 			);
 
-		collectedTags = new ArrayList<TagDAO>();
+		collectedTags = new ArrayList<Tag>();
 		node
 			.find('> DT > H3')
 			.forEach(
 				(e) => {
-					var t : TagDAO;
-					t = new TagDAO();
+					var t : Tag;
+					t = new Tag();
 					t.setLabel(e.getText());
 					collectedTags.add(t);
 				}
@@ -53,7 +59,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			.find('> DT > DL')
 			.forEach(
 				(e) => {
-					var l : IList<TagDAO>;
+					var l : IList<Tag>;
 
 					l = currentTags.clone();
 					l.add(collectedTags.getAt(i));
@@ -65,27 +71,30 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 	private _addRecursiveBookmark(
 		index : number,
-		coll : IList<Pair<BookmarkDAO, IList<TagDAO>>>,
-		callback : Action0 = null,
-		errorHandler : Action<string> = null) : void {
-		var p : Pair<BookmarkDAO, IList<TagDAO>>;
+		coll : IList<Pair<Bookmark, IList<Tag>>>,
+		callback? : Action0,
+		errorHandler? : Action<string>) : void {
+		var p : Pair<Bookmark, IList<Tag>>;
+
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (index === coll.getLength()) {
-			if (callback !== null) {
-				callback();
-			}
+			callback();
 			return;
 		}
 
 		p = coll.getAt(index);
-		BusinessMediator
+		this
+			._args
 			.getTagBusiness()
 			.merge(
 				p.getSecond(),
 				(outcome) => {
-					var tags : IList<TagDAO> = outcome;
+					var tags : IList<Tag> = outcome;
 
-					BusinessMediator
+					this
+						._args
 						.getBookmarkBusiness()
 						.add(
 							p.getFirst(),
@@ -108,52 +117,50 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 	/**
 	 * Recursive function for binding a list of tags to a bookmark
-	 * @param {BookmarkDAO}        bookmark [description]
-	 * @param {IList<TagDAO>}      tags     [description]
+	 * @param {Bookmark}        bookmark [description]
+	 * @param {IList<Tag>}      tags     [description]
 	 * @param {number}             index    Current index in tag list
-	 * @param {Action<boolean> =        null}        callback [description]
+	 * @param {Action<boolean>}        callback [description]
 	 */
 	private _bindTags(
-		bookmark : BookmarkDAO,
-		tags : IList<TagDAO>,
+		bookmark : Bookmark,
+		tags : IList<Tag>,
 		index : number,
-		callback : Action0 = null,
-		errorHandler : Action<string> = null) : void {
-		var t : TagDAO;
-		var data : IList<any>;
+		callback? : Action0,
+		errorHandler? : Action<string>) : void {
+		var t : Tag;
+
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (index === tags.getLength()) {
 			// Browsing has ended, trigger the callback
-			if (callback !== null) {
-				callback();
-			}
+			callback();
 			return;
 		}
 
 		t = tags.getAt(index);
-		data = new ArrayList<any>();
-		data.add(t.getId());
-		data.add(bookmark.getId());
 
-		// Insert new couple into table
-		ActiveRecordObject.insert(
-			DAOTables.TagBookmark,
-			data,
-			(success) => {
-				if (!success) {
-					if (errorHandler !== null) {
+		// Insert new couple into DB
+		this
+			._args
+			.getTagBookmarkDAO()
+			.addRelation(
+				t,
+				bookmark,
+				(success) => {
+					if (!success) {
 						errorHandler('Ouch! An internal error has occured. Please try again');
+					} else {
+						this._bindTags(bookmark, tags, index + 1, callback);
 					}
-				} else {
-					this._bindTags(bookmark, tags, index + 1, callback);
 				}
-			}
-		);
+			);
 	}
 
-	private _addInScoredList(target : ScoredBookmarkDAO, list : IList<ScoredBookmarkDAO>) : void {
+	private _addInScoredList(target : ScoredBookmark, list : IList<ScoredBookmark>) : void {
 		for (var i = 0; i < list.getLength(); i++) {
-			var e : ScoredBookmarkDAO = list.getAt(i);
+			var e : ScoredBookmark = list.getAt(i);
 
 			if (target.getScore() > e.getScore()) {
 				list.insertAt(i, target);
@@ -164,86 +171,82 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		list.add(target);
 	}
 
-	private _addCouple(currentIndex : number, list : Array<any>, callback : Action0 = null) : void {
+	private _addCouple(currentIndex : number, list : Array<any>, callback? : Action0) : void {
 		var e : any;
-		var data : IList<any>;
+		var t : Tag;
+		var bk : Bookmark;
+
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (currentIndex === list.length) {
-			if (callback !== null) {
-				callback();
-			}
+			callback();
+			return;
 		}
 
 		e = list[currentIndex];
-		data = new ArrayList<any>();
-		data.add(SecurityHelper.disarm(StringHelper.trim(e['tag_id'])));
-		data.add(SecurityHelper.disarm(StringHelper.trim(e['bookmark_id'])));
-		DataAccessObject.initialize(
-			(success) => {
-				ActiveRecordObject.insert(
-					DAOTables.TagBookmark,
-					data,
-					(success) => {
-						this._addCouple(currentIndex + 1, list, callback);
-					}
-				);
-			}
-		);
+		t = new Tag();
+		t.setId(e.tag_id);
+		bk = new Bookmark();
+		bk.setId(e.bookmark_id);
+
+		this
+			._args
+			.getTagBookmarkDAO()
+			.addRelation(
+				t,
+				bk,
+				(success) => {
+					this._addCouple(currentIndex + 1, list, callback);
+				}
+			);
 	}
 
-	private _addBKList(currentIndex : number, list : Array<any>, callback : Action0 = null) : void {
-		var e : any;
-		var bookmark : BookmarkDAO;
+	private _addBKList(currentIndex : number, list : Array<any>, callback? : Action0) : void {
+		var bookmark : Bookmark;
+
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (currentIndex === list.length) {
-			if (callback !== null) {
-				callback();
-			}
+			callback();
+			return;
 		}
 
-		e = list[currentIndex];
-		bookmark = BookmarkDAO.fromObject(e);
-		BusinessMediator.getBookmarkBusiness().engineBookmark(bookmark);
-		bookmark.setId(SecurityHelper.disarm(StringHelper.trim(bookmark.getId())));
-		DataAccessObject.initialize(
-			(success) => {
-				ActiveRecordObject.insert(
-					DAOTables.Bookmarks,
-					bookmark.toList(),
-					(success) => {
-						this._addBKList(currentIndex + 1, list, callback);
-					}
-				);
-			}
-		);
-		
+		bookmark = Bookmark.fromObject(list[currentIndex]);
+		this._args.getBookmarkBusiness().engineBookmark(bookmark);
+
+		this
+			._args
+			.getBookmarkDAO()
+			.addRaw(
+				bookmark,
+				(success) => {
+					this._addBKList(currentIndex + 1, list, callback);
+				}
+			);
 	}
 
-	private _addTagList(currentIndex : number, list : Array<any>, callback : Action0 = null) : void {
-		var e : any;
-		var tag : TagDAO;
+	private _addTagList(currentIndex : number, list : Array<any>, callback? : Action0) : void {
+		var tag : Tag;
+
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (currentIndex === list.length) {
-			if (callback !== null) {
-				callback();
-			}
+			callback();
+			return;
 		}
 
-		e = list[currentIndex];
-		tag = TagDAO.fromObject(e);
-		BusinessMediator.getTagBusiness().engineTag(tag);
-		tag.setId(SecurityHelper.disarm(StringHelper.trim(tag.getId())));
-		DataAccessObject.initialize(
-			(success) => {
-				ActiveRecordObject.insert(
-					DAOTables.Tags,
-					tag.toList(),
-					(success) => {
-						this._addTagList(currentIndex + 1, list, callback);
-					}
-				);
-			}
-		);
+		tag = TagDAO.fromObject(list[currentIndex]);
+		this._args.getTagBusiness().engineTag(tag);
+
+		this
+			._args
+			.getTagDAO()
+			.addRaw(
+				tag,
+				(success) => {
+					this._addTagList(currentIndex + 1, list, callback);
+				}
+			);
 	}
 
 	//endregion Private Methods
@@ -251,34 +254,48 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	//region Public Methods
 	
 	sortTagsByLabelAscForBookmark(
-		bookmark : BookmarkDAO,
-		callback : Action<IList<TagDAO>>,
-		errorHandler : Action<string> = null) : void {
-		var request : StringBuffer;
+		bookmark : Bookmark,
+		callback : Action<IList<Tag>>,
+		errorHandler? : Action<string>) : void {
+
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to sort tags: provided bookmark is null'));
-			if (errorHandler !== null) {
-				errorHandler('Ouch! An internal error has occured. Please try again');
-			}
+			errorHandler('Ouch! An internal error has occured. Please try again');
 			return;
 		}
 
-		request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' WHERE id IN (');
-		request.append('SELECT tag_id FROM ' + DAOTables.TagBookmark + ' WHERE ');
-		request.append('bookmark_id = "' + bookmark.getId() + '") ');
-		request.append('ORDER BY LOWER(label) ASC');
-
-		DataAccessObject.initialize(
-			(success) => {
-				ActiveRecordObject.executeSQL(
-					request.toString(),
-					(outcome) => {
-						callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, TagDAO.fromObject));
+		this
+			._args
+			.getTagBookmarkDAO()
+			.sortTagsByLabelAscForBookmark(
+				bookmark,
+				(outcome) => {
+					if (TSObject.exists(outcome)) {
+						callback(outcome);
+					} else {
+						Log.error(new BusinessException('Unable to sort tags: no outcome was returned'));
+						errorHandler('Ouch! An internal error has occured. Please try again');
 					}
-				);
-			}
-		);
+				}
+			);
+
+		// request = new StringBuffer('SELECT * FROM ' + DAOTables.Tags + ' WHERE id IN (');
+		// request.append('SELECT tag_id FROM ' + DAOTables.TagBookmark + ' WHERE ');
+		// request.append('bookmark_id = "' + bookmark.getId() + '") ');
+		// request.append('ORDER BY LOWER(label) ASC');
+
+		// DataAccessObject.initialize(
+		// 	(success) => {
+		// 		ActiveRecordObject.executeSQL(
+		// 			request.toString(),
+		// 			(outcome) => {
+		// 				callback(ActiveRecordHelper.getListFromSQLResultSet(outcome, TagDAO.fromObject));
+		// 			}
+		// 		);
+		// 	}
+		// );
 	}
 
 	bindTags(
@@ -522,25 +539,25 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	// TODO : test
-	search(input : string, callback : Action<IList<ScoredBookmarkDAO>>) : void {
+	search(input : string, callback : Action<IList<Bookmark>>) : void {
 		this.sortBookmarksByTitleWithBoundTags(
 			(outcome) => {
 				var max : number;
-				var list : IList<ScoredBookmarkDAO>;
+				var list : IList<ScoredBookmark>;
 				var keywords : IList<string>;
 
 				max = 0.0;
-				list = new ArrayList<ScoredBookmarkDAO>();
+				list = new ArrayList<ScoredBookmark>();
 				keywords = StringHelper.extractWords(input);
 
 				outcome.forEach(
 					(pair) => {
-						var sbk : ScoredBookmarkDAO;
+						var sbk : ScoredBookmark;
 						var currentScore : number;
-						var bk : BookmarkDAO = pair.getFirst();
-						var tagList : IList<TagDAO> = pair.getSecond();
+						var bk : Bookmark = pair.getFirst();
+						var tagList : IList<Tag> = pair.getSecond();
 
-						sbk = new ScoredBookmarkDAO();
+						sbk = new ScoredBookmark();
 						bk.hydrateBookmark(sbk);
 						currentScore = 0.0;
 

@@ -2,18 +2,18 @@
 
 interface ITagBookmarkBusiness {
 	sortTagsByLabelAscForBookmark(
-		bookmark : BookmarkDAO,
-		callback : Action<IList<TagDAO>>,
+		bookmark : Bookmark,
+		callback : Action<IList<Tag>>,
 		errorHandler? : Action<string>) : void;
 
 	/**
 	 * Binds multiple tags to a bookmark
 	 */
-	bindTags(bookmark : BookmarkDAO, tags : IList<TagDAO>, callback? : Action0, errorHandler? : Action<string>) : void;
+	bindTags(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void;
 
 	updateTagBinding(
-		bookmark : BookmarkDAO,
-		tags : IList<TagDAO>,
+		bookmark : Bookmark,
+		tags : IList<Tag>,
 		callback? : Action0,
 		errorHandler? : Action<string>) : void;
 
@@ -23,15 +23,15 @@ interface ITagBookmarkBusiness {
 	 * @param {Action<IList<BookmarkDAO>>} callback [description]
 	 */
 	sortBookmarksByTitleAscForTag(
-		tag : TagDAO,
-		callback : Action<IList<BookmarkDAO>>,
+		tag : Tag,
+		callback : Action<IList<Bookmark>>,
 		errorHandler? : Action<string>) : void;
 
-	sortBookmarksByTitleWithBoundTags(callback : Action<IList<Pair<BookmarkDAO, IList<TagDAO>>>>) : void;
+	sortBookmarksByTitleWithBoundTags(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void;
 
 	importFromBrowser(dataTransfer : any, callback? : Action0, errorHandler? : Action<string>) : void;
 
-	search(input : string, callback : Action<IList<ScoredBookmarkDAO>>) : void;
+	search(input : string, callback : Action<IList<ScoredBookmark>>) : void;
 
 	backup(callback? : Action0, errorHandler? : Action<string>) : void;
 

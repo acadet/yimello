@@ -48,7 +48,7 @@ class BookmarkList {
 	
 	//region Private Methods
 	
-	private _buildDOMBookmark(bookmark : BookmarkDAO) : DOMElement {
+	private _buildDOMBookmark(bookmark : Bookmark) : DOMElement {
 		var e : DOMElement;
 		var s : StringBuffer;
 		var truncatedDescription : string;
@@ -66,7 +66,7 @@ class BookmarkList {
 		return e;
 	}
 
-	private _buildDOMSearchResult(bookmark : ScoredBookmarkDAO) : DOMElement {
+	private _buildDOMSearchResult(bookmark : ScoredBookmark) : DOMElement {
 		var e : DOMElement;
 		var s : StringBuffer;
 		var score : string;
@@ -112,12 +112,18 @@ class BookmarkList {
 								if (this._keyboardEventObj.getWhich() === 17
 									|| this._keyboardEventObj.isMetaKey()) {
 									this._keyboardEventObj = null;
-									BookmarkDAO.find(
-										e.getData('id'),
-										(outcome) => {
-											outcome.setViews(outcome.getViews() + 1);
-											outcome.update();
-											NodeWindow.openExternal(outcome.getURL());
+
+									BusinessFactory.buildBookmark(
+										(business) => {
+											business.find(
+												e.getData('id'),
+												(outcome) => {
+													outcome.setViews(outcome.getViews() + 1);
+													// TODO: test errors
+													business.update(outcome);
+													NodeWindow.openExternal(outcome.getURL());
+												}
+											);
 										}
 									);
 								}
@@ -176,20 +182,24 @@ class BookmarkList {
 	displayMostPopular() : void {
 		this._reset();
 
-		BookmarkDAO.sortByViewsDescThenByTitleAsc(
-			(outcome) => {
-				if (outcome.getLength() < 1) {
-					this._setDefaultContent();
-				} else {
-					this._removeDefaultContent();
-					outcome.forEach(
-						(e) => {
-							this._destList.append(this._buildDOMBookmark(e));
+		BusinessFactory.buildBookmark(
+			(business) => {
+				business.sortByViewsDescThenByTitleAsc(
+					(outcome) => {
+						if (outcome.getLength() < 1) {
+							this._setDefaultContent();
+						} else {
+							this._removeDefaultContent();
+							outcome.forEach(
+								(e) => {
+									this._destList.append(this._buildDOMBookmark(e));
+								}
+							);
+							this._subscribeTriggers();
 						}
-					);
-					this._subscribeTriggers();
-				}
-				this._show();
+						this._show();
+					}
+				);
 			}
 		);
 	}
@@ -197,49 +207,53 @@ class BookmarkList {
 	displayForTag(tag : TagDAO) : void {
 		this._reset();
 
-		PresenterMediator
-			.getTagBookmarkBusiness()
-			.sortBookmarksByTitleAscForTag(
-				tag,
-				(outcome) => {
-					if (outcome.getLength() < 1) {
-						this._setDefaultContent();
-					} else {
-						this._removeDefaultContent();
-						outcome.forEach(
-							(e) => {
-								this._destList.append(this._buildDOMBookmark(e));
-							}
-						);
-						this._subscribeTriggers();
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.sortBookmarksByTitleAscForTag(
+					tag,
+					(outcome) => {
+						if (outcome.getLength() < 1) {
+							this._setDefaultContent();
+						} else {
+							this._removeDefaultContent();
+							outcome.forEach(
+								(e) => {
+									this._destList.append(this._buildDOMBookmark(e));
+								}
+							);
+							this._subscribeTriggers();
+						}
+						this._show();
 					}
-					this._show();
-				}
-			);
+				);
+			}
+		);
 	}
 
 	displayForSeachInput(value : string) : void {
 		this._reset();
 
-		PresenterMediator
-			.getTagBookmarkBusiness()
-			.search(
-				value,
-				(outcome) => {
-					if (outcome.getLength() < 1) {
-						this._setDefaultContent();
-					} else {
-						this._removeDefaultContent();
-						outcome.forEach(
-							(e) => {
-								this._destList.append(this._buildDOMSearchResult(e));
-							}
-						);
-						this._subscribeTriggers();
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.search(
+					value,
+					(outcome) => {
+						if (outcome.getLength() < 1) {
+							this._setDefaultContent();
+						} else {
+							this._removeDefaultContent();
+							outcome.forEach(
+								(e) => {
+									this._destList.append(this._buildDOMSearchResult(e));
+								}
+							);
+							this._subscribeTriggers();
+						}
+						this._show();
 					}
-					this._show();
-				}
-			);
+				);
+			}
+		);
 	}
 
 	unfocus() : void {

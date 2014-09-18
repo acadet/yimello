@@ -40,7 +40,7 @@ class BookmarkForm {
 	/**
 	 * List of current tags
 	 */
-	private _currentTags : IList<TagDAO>;
+	private _currentTags : IList<Tag>;
 
 	/**
 	 * Subscriber to form event
@@ -49,16 +49,19 @@ class BookmarkForm {
 
 	private _isUpdating : boolean;
 
-	private _currentUpdatedBookmark : BookmarkDAO;
+	private _currentUpdatedBookmark : Bookmark;
+
+	private _notificationObj : NotificationMessage;
 
 	//endregion Fields
 	
 	//region Constructors
 	
-	constructor(subscriber : IBookmarkFormSubscriber) {
+	constructor(subscriber : IBookmarkFormSubscriber, notificationObj : NotificationMessage) {
 		var wrapper : DOMElement = DOMTree.findSingle('.js-bookmark-form-wrapper');
 
 		this._subscriber = subscriber;
+		this._notificationObj = notificationObj;
 
 		// First, grab all dom elements
 		this._urlInput = wrapper.findSingle('input[name="url"]');
@@ -106,9 +109,14 @@ class BookmarkForm {
 			DOMElementEvents.Click,
 			(e) => {
 				if (this._isUpdating) {
-					this._currentUpdatedBookmark.setViews(this._currentUpdatedBookmark.getViews() + 1);
-					this._currentUpdatedBookmark.update();
-					NodeWindow.openExternal(this._currentUpdatedBookmark.getURL());
+					BusinessFactory.buildBookmark(
+						(business) => {
+							this._currentUpdatedBookmark.setViews(this._currentUpdatedBookmark.getViews() + 1);
+							// TODO: test errors
+							business.update(bookmark);
+							NodeWindow.openExternal(this._currentUpdatedBookmark.getURL());
+						}
+					);
 				}
 			}
 		);
@@ -133,19 +141,19 @@ class BookmarkForm {
 
 		// Test if all values have been provided
 		if (!FormHelper.isFilled(url)) {
-			MainPresenterMediator.showError('Your bookmark will be nicer with an address');
+			this._notificationObj.alert('Your bookmark will be nicer with an address');
 			this._urlInput.addClass('error');
 			return false;
 		}
 
 		if (!FormHelper.isFilled(title)) {
-			MainPresenterMediator.showError('Sorry, but a title is needed too!');
+			this._notificationObj.alert('Sorry, but a title is needed too!');
 			this._titleInput.addClass('error');
 			return false;
 		}
 
 		if (this._currentTags.getLength() < 1) {
-			MainPresenterMediator.showError('Oh no! Don\'t let your bookmark alone! Introduce him some tags');
+			this._notificationObj.alert('Oh no! Don\'t let your bookmark alone! Introduce him some tags');
 			this._tagsInput.addClass('error');
 			return false;
 		}
@@ -157,7 +165,7 @@ class BookmarkForm {
 	 * Called when user asks for saving
 	 */
 	private _onAdd() : void {
-		var b : BookmarkDAO;
+		var b : Bookmark;
 		var url : string = this._urlInput.getValue();
 		var title : string = this._titleInput.getValue();
 		var description : string = this._descriptionInput.getValue();
@@ -166,7 +174,7 @@ class BookmarkForm {
 			return;
 		}
 
-		b = new BookmarkDAO();
+		b = new Bookmark();
 		b
 			.setURL(url)
 			.setTitle(title)
@@ -175,34 +183,40 @@ class BookmarkForm {
 		// Process: add new bookmark
 		// Then save new tags
 		// Finally bind tags to bookmark
-		PresenterMediator
-			.getBookmarkBusiness()
-			.add(
-				b,
-				(outcome) => {
-					b = outcome;
+		BusinessFactory.buildBookmark(
+			(bkBusiness) => {
+				bkBusiness.add(
+					b,
+					(outcome) => {
+						b = outcome;
 
-					PresenterMediator
-						.getTagBusiness()
-						.merge(
-							this._currentTags,
-							(outcome) => {
-								PresenterMediator
-									.getTagBookmarkBusiness()
-									.bindTags(
-										b,
-										outcome,
-										() => {
-											this._subscriber.onBookmarkAddition();
-										},
-										MainPresenterMediator.showError
-									);
-							},
-							MainPresenterMediator.showError
+						BusinessFactory.buildTag(
+							(tagBusiness) => {
+								tagBusiness.merge(
+									this._currentTags,
+									(outcome) => {
+										BusinessFactory.buildTagBookmark(
+											(tagBkBusiness) => {
+												tagBkBusiness.bindTags(
+													b,
+													outcome,
+													() => {
+														this._subscriber.onBookmarkAddition();
+													},
+													this._notificationObj.alert
+												);
+											}
+										);
+									},
+									this._notificationObj.alert
+								);
+							}
 						);
-				},
-				MainPresenterMediator.showError
-			);
+					},
+					this._notificationObj.alert
+				);
+			}
+		);
 	}
 
 	private _onUpdate() : void {
@@ -219,34 +233,41 @@ class BookmarkForm {
 			.setTitle(title)
 			.setDescription(description);
 
-		PresenterMediator
-			.getBookmarkBusiness()
-			.update(
-				this._currentUpdatedBookmark,
-				(outcome) => {
-					this._currentUpdatedBookmark = outcome;
+		// TODO: replace by a single function
+		BusinessFactory.buildBookmark(
+			(bkBusiness) => {
+				bkBusiness.update(
+					this._currentUpdatedBookmark,
+					(outcome) => {
+						this._currentUpdatedBookmark = outcome;
 
-					PresenterMediator
-						.getTagBusiness()
-						.merge(
-							this._currentTags,
-							(outcome) => {
-								PresenterMediator
-									.getTagBookmarkBusiness()
-									.updateTagBinding(
-										this._currentUpdatedBookmark,
-										outcome,
-										() => {
-											this._subscriber.onBookmarkUpdate();
-										},
-										MainPresenterMediator.showError
-									);
-							},
-							MainPresenterMediator.showError
+						BusinessFactory.buildTag(
+							(tagBusiness) => {
+								tagBusiness.merge(
+									this._currentTags,
+									(outcome) => {
+										BusinessFactory.buildTagBookmark(
+											(tagBkBusiness) => {
+												tagBkBusiness.updateTagBinding(
+													this._currentUpdatedBookmark,
+													outcome,
+													() => {
+														this._subscriber.onBookmarkUpdate();
+													},
+													this._notificationObj.alert
+												);
+											}
+										);
+									},
+									this._notificationObj.alert
+								);
+							}
 						);
-				},
-				MainPresenterMediator.showError
-			);
+					},
+					this._notificationObj.alert
+				);
+			}
+		);
 	}
 
 	private _onDelete() : void {
@@ -261,15 +282,17 @@ class BookmarkForm {
 			return;
 		}
 
-		PresenterMediator
-			.getBookmarkBusiness()
-			.delete(
-				this._currentUpdatedBookmark,
-				() => {
-					this._subscriber.onBookmarkDeletion();
-				},
-				MainPresenterMediator.showError
-			);
+		BusinessFactory.buildBookmark(
+			(business) => {
+				business.delete(
+					this._currentUpdatedBookmark,
+					() => {
+						this._subscriber.onBookmarkDeletion();
+					},
+					this._notificationObj.alert
+				);
+			}
+		);
 	}
 
 	/**
@@ -277,9 +300,9 @@ class BookmarkForm {
 	 * @param {string} value [description]
 	 */
 	private _addTag(value : string) : void {
-		var tag : TagDAO;
+		var tag : Tag;
 		var e : DOMElement;
-		var test : TagDAO;
+		var test : Tag;
 		var s : StringBuffer;
 
 		// Do nothing with empty strings
@@ -302,7 +325,7 @@ class BookmarkForm {
 			return;
 		}
 
-		tag = new TagDAO();
+		tag = new Tag();
 		tag.setLabel(value);
 		this._currentTags.add(tag);
 
@@ -315,16 +338,14 @@ class BookmarkForm {
 			.on(
 				DOMElementEvents.Click,
 				(arg) => {
-					this._deleteTag(arg.getTarget().getData('label'));
+					this._currentTags.removeIf(
+						e => StringHelper.compare(arg.getTarget().getData('label'), e.getLabel())
+					);
 					e.remove();
 				}
 			);
 
 		this._tagList.append(e);
-	}
-
-	private _deleteTag(tagLabel : string) : void {
-		this._currentTags.removeIf(e => StringHelper.compare(tagLabel, e.getLabel()));
 	}
 
 	/**
@@ -355,8 +376,7 @@ class BookmarkForm {
 			title = this._titleInput.getValue();
 			description = this._descriptionInput.getValue();
 
-			if (!TSObject.exists(title) || title !== ''
-				|| !TSObject.exists(description) || description !== '') {
+			if (FormHelper.isFilled(title) || FormHelper.isFilled(description)) {
 				// Fill title and description only if they are not already
 				// filled
 				return;
@@ -396,14 +416,18 @@ class BookmarkForm {
 
 		// Reset tag suggestions
 		this._tagDataList.getChildren().forEach(e => e.remove());
-		TagDAO.sortByLabelAsc(
-			(outcome) => {
-				outcome.forEach(
-					(tag)  => {
-						var e : DOMElement;
-						e = DOMElement.fromString('<option value="' + tag.getLabel() + '"></option>');
+		BusinessFactory.buildTag(
+			(business) => {
+				business.sortByLabelAsc(
+					(outcome) => {
+						outcome.forEach(
+							(tag)  => {
+								var e : DOMElement;
+								e = DOMElement.fromString('<option value="' + tag.getLabel() + '"></option>');
 
-						this._tagDataList.append(e);
+								this._tagDataList.append(e);
+							}
+						);
 					}
 				);
 			}
@@ -446,14 +470,16 @@ class BookmarkForm {
 		this._deleteButton.setCss({display : 'inline-block'});
 		this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(bookmark.getURL()));
 
-		PresenterMediator
-			.getTagBookmarkBusiness()
-			.sortTagsByLabelAscForBookmark(
-				bookmark,
-				(outcome) => {
-					outcome.forEach(e => this._addTag(e.getLabel()));
-				}
-			);
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.sortTagsByLabelAscForBookmark(
+					bookmark,
+					(outcome) => {
+						outcome.forEach(e => this._addTag(e.getLabel()));
+					}
+				);
+			}
+		);
 	}
 
 	//endregion Public Methods

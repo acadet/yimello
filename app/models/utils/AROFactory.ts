@@ -19,7 +19,7 @@ class AROFactory {
 	
 	//region Public Methods
 
-	public build(config : ActiveRecordConfig) : IActiveRecordObject {
+	static build(config : ActiveRecordConfig) : IActiveRecordObject {
 		if (!TSObject.exists(AROFactory._aro)) {
 			var db : ISQLDatabase;
 

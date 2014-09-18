@@ -43,6 +43,16 @@ class YimelloPresenter extends Presenter {
 	
 	//region Public Methods
 
+	onStart() : void {
+		super.onStart();
+		DOMTree.findSingle('.js-body').animate(
+			{
+				opacity : 1
+			},
+			500
+		);
+	}
+
 	showError(msg : string) : void {
 		this._notificationItem.alert(msg);
 	}

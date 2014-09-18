@@ -5,13 +5,17 @@
  */
 class TagDAO extends DataAccessObject implements ITagDAO {
 	//region Fields
+
+	private _tagBkDAO : ITagBookmarkDAO;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(aro : IActiveRecordObject) {
+	constructor(aro : IActiveRecordObject, tagBookmarkDAO : ITagBookmarkDAO) {
 	    super(aro);
+
+	    this._tagBkDAO = tagBookmarkDAO;
 	}
 	
 	//endregion Constructors
@@ -96,15 +100,40 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 			return;
 		}
 
+		// Foreign key constraints do not work with webSQL
+		// Then, remove deps
 		this
-			.getARO()
-			.delete(
-				DAOTables.Tags,
-				new Pair<string, any>('id', tag.getId()),
-				(success) => {
-					callback(success);
+			._tagBkDAO
+			.removeTagRelations(
+				tag.get,
+				(success1) => {
+					this
+						.getARO()
+						.delete(
+							DAOTables.Tags,
+							new Pair<string, any>('id', tag.getId()),
+							(success2) => {
+								callback(success1 && success2);
+							}
+						);
 				}
 			);
+		// this
+		// 	.getARO()
+		// 	.executeSQL(
+		// 		'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = "' + id + '"',
+		// 		(outcome) => {
+		// 			this
+		// 				.getARO()
+		// 				.delete(
+		// 					DAOTables.Tags,
+		// 					new Pair<string, any>('id', tag.getId()),
+		// 					(success) => {
+		// 						callback(success);
+		// 					}
+		// 				);
+		// 		}
+		// 	);
 	}
 
 	get(callback : Action<IList<Tag>>) : void {

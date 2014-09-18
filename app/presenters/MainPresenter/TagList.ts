@@ -158,7 +158,7 @@ class TagList {
 	}
 
 	private _deleteTag(id : string) : void {
-		var tag : TagDAO;
+		var tag : Tag;
 		var isOk : boolean;
 
 		isOk = confirm('Do you want to remove this tag?');
@@ -166,16 +166,21 @@ class TagList {
 			return;
 		}
 
-		tag = new TagDAO();
+		tag = new Tag();
 		tag.setId(id);
-		// TODO : test success
-		tag.delete();
+		
+		BusinessFactory.buldTag(
+			(business) => {
+				// TODO : test success
+				business.delete(tag);
 
-		if (this.getCurrentTagId() === id) {
-			this._currentSelectedTab = null;
-		}
+				if (this.getCurrentTagId() === id) {
+					this._currentSelectedTab = null;
+				}
 
-		this._subscriber.onTagDeletion();
+				this._subscriber.onTagDeletion();
+			}
+		);
 	}
 
 	private _hide() : void {
@@ -222,38 +227,42 @@ class TagList {
 		this._mostPopularTrigger = this._buildMostPopularTag();
 		this._destList.append(this._mostPopularTrigger);
 
-		TagDAO.sortByLabelAsc(
-			(outcome) => {
-				outcome.forEach(
-					(e) => {
-						this._destList.append(this._buildDOMTag(e));
+		BusinessFactory.buildTag(
+			(business) => {
+				business.sortByLabelAsc(
+					(outcome) => {
+						outcome.forEach(
+							(e) => {
+								this._destList.append(this._buildDOMTag(e));
+							}
+						);
+						this._subscribeTriggers();
+						if (TSObject.exists(this._currentSelectedTab)) {
+							if (mostPop) {
+								this._setActive(this._mostPopularTrigger);
+								this._currentSelectedTab = this._mostPopularTrigger;
+							} else if (searchTab) {
+								this._setActive(this._searchTab);
+								this._currentSelectedTab = this._searchTab;
+							} else {
+								var e : DOMElement;
+
+								e = this._destList
+									.getChildren()
+									.findFirst(e => e.getData('id') === currentId);
+								this._setActive(e);
+								this._currentSelectedTab = e;
+							}
+						} else {
+							this._setActive(this._mostPopularTrigger);
+							this._currentSelectedTab = this._mostPopularTrigger;
+						}
+						if (callback !== null) {
+							callback();
+						}
+						this._show();
 					}
 				);
-				this._subscribeTriggers();
-				if (TSObject.exists(this._currentSelectedTab)) {
-					if (mostPop) {
-						this._setActive(this._mostPopularTrigger);
-						this._currentSelectedTab = this._mostPopularTrigger;
-					} else if (searchTab) {
-						this._setActive(this._searchTab);
-						this._currentSelectedTab = this._searchTab;
-					} else {
-						var e : DOMElement;
-
-						e = this._destList
-							.getChildren()
-							.findFirst(e => e.getData('id') === currentId);
-						this._setActive(e);
-						this._currentSelectedTab = e;
-					}
-				} else {
-					this._setActive(this._mostPopularTrigger);
-					this._currentSelectedTab = this._mostPopularTrigger;
-				}
-				if (callback !== null) {
-					callback();
-				}
-				this._show();
 			}
 		);
 	}

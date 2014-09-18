@@ -3,12 +3,18 @@
 /**
  * Implementation of tag business layer
  */
-class TagBusiness implements ITagBusiness {
+class TagBusiness implements IInternalTagBusiness {
 	//region Fields
+
+	private _dao : ITagDAO;
 	
 	//endregion Fields
 	
 	//region Constructors
+
+	constructor(dao : ITagDAO) {
+		this._dao = dao;
+	}
 	
 	//endregion Constructors
 	
@@ -18,23 +24,24 @@ class TagBusiness implements ITagBusiness {
 	
 	/**
 	 * Recursive function for adding a list of tags
-	 * @param {IList<TagDAO>}            tags    [description]
+	 * @param {IList<Tag>}            tags    [description]
 	 * @param {number}                   index   Current index
-	 * @param {IList<TagDAO>}            outcome List to use for callback
-	 * @param {Action<IList<TagDAO>> =       null}        callback [description]
+	 * @param {IList<Tag>}            outcome List to use for callback
+	 * @param {Action<IList<Tag>>}        callback [description]
 	 */
 	private _addList(
-		tags : IList<TagDAO>,
+		tags : IList<Tag>,
 		index : number,
-		outcome : IList<TagDAO>,
-		callback : Action<IList<TagDAO>> = null,
-		errorHandler : Action<string> = null) : void {
+		outcome : IList<Tag>,
+		callback? : Action<IList<Tag>>,
+		errorHandler? : Action<string>) : void {
+
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (index === tags.getLength()) {
 			// Browsing has ended, trigger callback
-			if (callback !== null) {
-				callback(outcome);
-			}
+			callback(outcome);
 			return;
 		}
 
@@ -43,9 +50,7 @@ class TagBusiness implements ITagBusiness {
 			(result) => {
 				if (!TSObject.exists(result)) {
 					Log.error(new BusinessException('Failed to add tag #' + index));
-					if (errorHandler !== null) {
-						errorHandler('Ouch! An internal error has occured. Please try again');
-					}
+					errorHandler('Ouch! An internal error has occured. Please try again');
 					return;
 				}
 
@@ -55,24 +60,19 @@ class TagBusiness implements ITagBusiness {
 		);
 	}
 
-	private _checkTag(tag : TagDAO, errorHandler : Action<string> = null) : boolean {
-		var label : string;
+	private _checkTag(tag : Tag, errorHandler? : Action<string>) : boolean {
+
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Provided tag is null'));
-			if (errorHandler !== null) {
-				errorHandler('Ouch! An internal error has occured. Please try again');
-			}
+			errorHandler('Ouch! An internal error has occured. Please try again');
 			return false;
 		}
 
-		label = StringHelper.trim(tag.getLabel());
-
-		if (!TSObject.exists(tag.getLabel()) || tag.getLabel() === '') {
+		if (!this.isValueValid(tag.getLabel())) {
 			Log.error(new BusinessException('Unable to add a tag: tag must have a label'));
-			if (errorHandler !== null) {
-				errorHandler('What about adding a label?');
-			}
+			errorHandler('What about adding a label?');
 			return false;
 		}
 
@@ -83,8 +83,20 @@ class TagBusiness implements ITagBusiness {
 	
 	//region Public Methods
 
-	engineTag(tag : TagDAO) : void {
-		tag.setLabel(SecurityHelper.disarm(StringHelper.trim(tag.getLabel())));
+	engineTag(tag : Tag) : void {
+		var id : string, label : string;
+
+		id = tag.getId();
+		if (TSObject.exists(id)) {
+			id = StringHelper.trim(id);
+			id = SecurityHelper.disarm(id);
+			tag.setId(id);
+		}
+
+		label = tag.getLabel();
+		label = StringHelper.trim(label);
+		label = SecurityHelper.disarm(label);
+		tag.setLabel(label);
 	}
 
 	isValueValid(value : string) : boolean {
@@ -107,7 +119,7 @@ class TagBusiness implements ITagBusiness {
 
 		s = SecurityHelper.disarm(StringHelper.trim(label));
 
-		TagDAO.findByLabel(
+		this._dao.findByLabel(
 			s,
 			(outcome) => {
 				callback(!TSObject.exists(outcome));
@@ -116,138 +128,127 @@ class TagBusiness implements ITagBusiness {
 	}
 
 	compare(newLabel : string, existingLabel : string) : boolean {
-		var tag : TagDAO;
+		var tag : Tag;
 
-		tag = new TagDAO();
+		tag = new Tag();
 		tag.setLabel(existingLabel);
 		this.engineTag(tag);
 
 		return StringHelper.compare(newLabel, tag.getLabel());
 	}
 
-	add(tag : TagDAO, callback : Action<TagDAO> = null, errorHandler : Action<string> = null) : void {
+	add(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void {
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
 		if (!this._checkTag(tag, errorHandler)) {
 			return;
 		}
 
 		this.engineTag(tag);
 
-		tag.add(
+		this._dao.add(
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
-					if (errorHandler !== null) {
-						errorHandler('Ouch! An internal error has occured. Please try again');
-					}
+					errorHandler('Ouch! An internal error has occured. Please try again');
+					return;
 				}
-				if (callback !== null) {
-					callback(outcome);
-				}
+				callback(outcome);
 			}
 		);
 	}
 	
-	addList(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null, errorHandler : Action<string> = null) : void {
-		var outcome : IList<TagDAO>;
+	addList(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void {
+		var outcome : IList<Tag>;
+
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Provided tag list is null'));
-			if (errorHandler !== null) {
-				errorHandler('Ouch! An internal error has occured. Please try again');
-			}
+			errorHandler('Ouch! An internal error has occured. Please try again');
 			return;
 		}
 
-		outcome = new ArrayList<TagDAO>();
+		outcome = new ArrayList<Tag>();
 
 		if (tags.getLength() < 1) {
 			Log.warn('No tag added: list is empty');
-			if (callback !== null) {
-				callback(outcome);
-			}
+			callback(outcome);
 			return;
 		}
 
 		this._addList(tags, 0, outcome, callback, errorHandler);
 	}
 
-	update(tag : TagDAO, callback : Action<TagDAO>, errorHandler : Action<string> = null) : void {
+	update(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void {
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
 		if (!this._checkTag(tag, errorHandler)) {
 			return;
 		}
 
 		this.engineTag(tag);
 
-		tag.update(
+		this._dao.update(
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
-					if (errorHandler !== null) {
-						errorHandler('Ouch! An internal error has occured. Please try again');
-					}
+					errorHandler('Ouch! An internal error has occured. Please try again');
 					return;
 				}
 
-				if (callback !== null) {
-					callback(outcome);
-				}
+				callback(outcome);
 			}
 		);
 	}
 
-	delete(tag : TagDAO, callback : Action0 = null, errorHandler : Action<string> = null) : void {
+	delete(tag : Tag, callback? : Action0, errorHandler? : Action<string>) : void {
 		var id : string;
+
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Unable to delete: provided tag is null'));
-			if (errorHandler !== null) {
-				errorHandler('Ouch! An internal error has occured. Please try again');
-			}
+			errorHandler('Ouch! An internal error has occured. Please try again');
 			return;
 		}
 
 		id = tag.getId();
-		tag.delete(
+		this._dao.delete(
 			(success) => {
 				if (!success) {
-					if (errorHandler !== null) {
-						errorHandler('Ouch! An internal error has occured. Please try again');
-					}
+					errorHandler('Ouch! An internal error has occured. Please try again');
 					return;
 				}
 
-				// Foreign key constraints do not work with webSQL
-				// Then, remove deps
-				ActiveRecordObject.executeSQL(
-					'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = "' + id + '"',
-					(outcome) => {
-						if (callback !== null) {
-							callback();
-						}
-					}
-				);
+				callback();
 			}
 		);
 	}
 
-	merge(tags : IList<TagDAO>, callback : Action<IList<TagDAO>> = null, errorHandler : Action<string> = null) : void {
-		var newOnes : IList<any>; // tags which are not in DB
-		var mergedList : IList<any>; // outcome to use for callback, will contains only tags into DB
+	merge(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void {
+		var newOnes : IList<Tag>; // tags which are not in DB
+		var mergedList : IList<Tag>; // outcome to use for callback, will contains only tags into DB
+
+		callback = ActionHelper.getValueOrDefault(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to merge: provided list is null'));
-			if (errorHandler !== null) {
-				errorHandler('Ouch! An internal error has occured. Please try again');
-			}
+			errorHandler('Ouch! An internal error has occured. Please try again');
 			return;
 		}
 
-		newOnes = new ArrayList<TagDAO>();
-		mergedList = new ArrayList<TagDAO>();
+		newOnes = new ArrayList<Tag>();
+		mergedList = new ArrayList<Tag>();
 
-		TagDAO.get(
+		this._dao.get(
 			(outcome) => {
 				tags.forEach(
 					(tag) => {
-						var o : TagDAO;
+						var o : Tag;
 
 						tag.setLabel(StringHelper.trim(tag.getLabel()));
 
@@ -271,16 +272,12 @@ class TagBusiness implements ITagBusiness {
 						(outcome) => {
 							outcome.forEach(e => mergedList.add(e));
 
-							if (callback !== null) {
-								callback(mergedList);
-							}
+							callback(mergedList);
 						},
 						errorHandler
 					);
 				} else {
-					if (callback !== null) {
-						callback(mergedList);
-					}
+					callback(mergedList);
 				}
 			}
 		);

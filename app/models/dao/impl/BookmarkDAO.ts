@@ -5,13 +5,17 @@
  */
 class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 	//region Fields
+
+	private _tagBkDAO : ITagBookmarkDAO;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(aro : IActiveRecordObject) {
+	constructor(aro : IActiveRecordObject, tagBookmarkDAO : ITagBookmarkDAO) {
 		super(aro);
+
+		this._tagBkDAO = tagBookmarkDAO;
 	}
 	
 	//endregion Constructors
@@ -30,7 +34,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 		var l : IList<any>;
 		var id : string;
 
-		callback = (TSObject.exists(callback)) ? callback : ((bk) => {return; });
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		id = Guid.newGuid();
 
@@ -60,7 +64,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 		var dict : IDictionary<string, any>;
 		var selector : Pair<string, any>;
 
-		callback = (TSObject.exists(callback)) ? callback : ((bk) => {return; });
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (!TSObject.exists(bookmark.getId()) || bookmark.getId() === '') {
 			Log.error(new DAOException('Unable to update: no id was specified'));
@@ -92,7 +96,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 	}
 
 	delete(bookmark : Bookmark, callback? : Action<boolean>) : void {
-		callback = (TSObject.exists(callback)) ? callback : ((s) => { return; });
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (!TSObject.exists(bookmark.getId()) || bookmark.getId() === '') {
 			Log.error(new DAOException('Unable to delete: an id must be specify'));
@@ -100,15 +104,40 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 			return;
 		}
 
+		// Foreign keys constraints are not working with webSQL
+		// Then, removing dependencies are needed
 		this
-			.getARO()
-			.delete(
-				DAOTables.Bookmarks,
-				new Pair<string, any>('id', bookmark.getId()),
-				(b) => {
-					callback(b);
+			._tagBkDAO
+			.removeBookmarkRelations(
+				bookmark,
+				(success1) => {
+					this
+						.getARO()
+						.delete(
+							DAOTables.Bookmarks,
+							new Pair<string, any>('id', bookmark.getId()),
+							(success2) => {
+								callback(success1 && success2);
+							}
+						);
 				}
 			);
+		// this
+		// 	.getARO()
+		// 	.executeSQL(
+		// 		'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE bookmark_id = "' + id + '"',
+		// 		(outcome) => {
+		// 			this
+		// 				.getARO()
+		// 				.delete(
+		// 					DAOTables.Bookmarks,
+		// 					new Pair<string, any>('id', bookmark.getId()),
+		// 					(b) => {
+		// 						callback(b);
+		// 					}
+		// 				);
+		// 		}
+		// 	);
 	}
 
 	get(callback : Action<IList<Bookmark>>) : void {

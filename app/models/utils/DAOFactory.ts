@@ -19,7 +19,7 @@ class DAOFactory {
 	
 	//region Private Methods
 
-	private static _init(callback : Action0) : void {
+	static _init(callback : Action0) : void {
 		var tagRequest : StringBuffer;
 		var bookmarkRequest : StringBuffer;
 		var tagBookmarkRequest : StringBuffer;
@@ -58,7 +58,7 @@ class DAOFactory {
 		tagBookmarkRequest.append('bookmark_id VARCHAR(36) NOT NULL, ');
 		tagBookmarkRequest.append('PRIMARY KEY (tag_id, bookmark_id))');
 
-		DataAccessObject._aro = new AROFactory().build(config);
+		DataAccessObject._aro = AROFactory.build(config);
 
 		DataAccessObject._aro.executeSQL(
 			tagRequest.toString(),
@@ -83,23 +83,25 @@ class DAOFactory {
 	
 	//region Public Methods
 
-	public buildBookmark(callback : Action<IBookmarkDAO>) : void {
+	static buildBookmark(callback : Action<IBookmarkDAO>) : void {
 		DAOFactory._init(
-			() =>
+			() => {
 				if (!TSObject.exists(DAOFactory._bookmark)) {
 					DAOFactory._bookmark = new BookmarkDAO(DataAccessObject._aro);
 				}
 				callback(DAOFactory._bookmark);
+			}
 		);
 	}
 
-	public buildTag(callback : Action<ITagDAO>) : void {
+	static buildTag(callback : Action<ITagDAO>) : void {
 		DAOFactory._init(
-			() =>
+			() => {
 				if (!TSObject.exists(DAOFactory._tag)) {
 					DAOFactory._tag = new TagDAO(DataAccessObject._aro);
 				}
 				callback(DAOFactory._tag);
+			}
 		);
 	}
 	

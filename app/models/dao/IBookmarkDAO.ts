@@ -12,6 +12,8 @@ interface IBookmarkDAO {
 	 */
 	add(bookmark : Bookmark, callback? : Action<Bookmark>) : void;
 
+	addRaw(bookmark : Bookmark, callback? : Action<boolean>) : void;
+
 	/**
 	 * Updates existing bookmark in DB
 	 * @param {Bookmark}         bookmark Target

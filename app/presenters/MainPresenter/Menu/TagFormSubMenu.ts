@@ -5,7 +5,7 @@ class TagFormSubMenu extends SubMenu {
 
 	private _input : DOMElement;
 	private _isUpdating : boolean;
-	private _currentUpdatedTag : TagDAO;
+	private _currentUpdatedTag : Tag;
 
 	//endregion Fields
 	
@@ -61,90 +61,90 @@ class TagFormSubMenu extends SubMenu {
 	//region Private Methods
 
 	private _add() : void {
-		var label : string;
+		// var label : string;
 
-		label = this._input.getValue();
+		// label = this._input.getValue();
 
-		if (!FormHelper.isFilled(label)) {
-			MainPresenterMediator.showError('Um. I guess your forgot something, don\'t you?');
-			return;
-		}
+		// if (!FormHelper.isFilled(label)) {
+		// 	MainPresenterMediator.showError('Um. I guess your forgot something, don\'t you?');
+		// 	return;
+		// }
 
-		PresenterMediator
-			.getTagBusiness()
-			.isAlreadyExisting(
-				label,
-				(success) => {
-					if (success) {
-						var tag : TagDAO;
+		// PresenterMediator
+		// 	.getTagBusiness()
+		// 	.isAlreadyExisting(
+		// 		label,
+		// 		(success) => {
+		// 			if (success) {
+		// 				var tag : TagDAO;
 
-						tag = new TagDAO();
-						tag.setLabel(label);
-						PresenterMediator
-							.getTagBusiness()
-							.add(
-								tag,
-								(outcome) => {
-									this.hide();
-									this.getOwner().onTagAddition();
-								},
-								MainPresenterMediator.showError
-							);
-					} else {
-						MainPresenterMediator.showError('Unfortunately a tag with same label is already existing. Please use another one');
-					}
-				}
-			);
+		// 				tag = new TagDAO();
+		// 				tag.setLabel(label);
+		// 				PresenterMediator
+		// 					.getTagBusiness()
+		// 					.add(
+		// 						tag,
+		// 						(outcome) => {
+		// 							this.hide();
+		// 							this.getOwner().onTagAddition();
+		// 						},
+		// 						MainPresenterMediator.showError
+		// 					);
+		// 			} else {
+		// 				MainPresenterMediator.showError('Unfortunately a tag with same label is already existing. Please use another one');
+		// 			}
+		// 		}
+		// 	);
 	}
 
 	private _update() : void {
-		var label : string;
-		var areEqual : boolean;
+		// var label : string;
+		// var areEqual : boolean;
 
-		label = this._input.getValue();
+		// label = this._input.getValue();
 
-		if (!FormHelper.isFilled(label)) {
-			MainPresenterMediator.showError('Um. I guess your forgot something, don\'t you?');
-			return;
-		}
+		// if (!FormHelper.isFilled(label)) {
+		// 	MainPresenterMediator.showError('Um. I guess your forgot something, don\'t you?');
+		// 	return;
+		// }
 		
-		areEqual =
-			PresenterMediator
-				.getTagBusiness()
-				.compare(
-					label,
-					this._currentUpdatedTag.getLabel()
-				);
+		// areEqual =
+		// 	PresenterMediator
+		// 		.getTagBusiness()
+		// 		.compare(
+		// 			label,
+		// 			this._currentUpdatedTag.getLabel()
+		// 		);
 
-		if (areEqual) {
-			// Tag has not been edited, do nothing
-			this.hide();
-			this.getOwner().onTagUpdate();
-			return;
-		}
-
-		PresenterMediator
-			.getTagBusiness()
-			.isAlreadyExisting(
-				label,
-				(success) => {
-					if (success) {
-						this._currentUpdatedTag.setLabel(label);
-						PresenterMediator
-							.getTagBusiness()
-							.update(
-								this._currentUpdatedTag,
-								(outcome) => {
-									this.hide();
-									this.getOwner().onTagUpdate();
-								},
-								MainPresenterMediator.showError
-							);
-					} else {
-						MainPresenterMediator.showError('Unfortunately a tag with same label is already existing. Please use another one');
-					}
-				}
-			);
+		// if (areEqual) {
+		// 	// Tag has not been edited, do nothing
+		// 	this.hide();
+		// 	this.getOwner().onTagUpdate();
+		// 	return;
+		// }
+		
+		// PresenterMediator
+		// 	.getTagBusiness()
+		// 	.isAlreadyExisting(
+		// 		label,
+		// 		(success) => {
+		// 			if (success) {
+		// 				this._currentUpdatedTag.setLabel(label);
+		// 				PresenterMediator
+		// 					.getTagBusiness()
+		// 					.update(
+		// 						this._currentUpdatedTag,
+		// 						(outcome) => {
+		// 							this.hide();
+		// 							this.getOwner().onTagUpdate();
+		// 						},
+		// 						MainPresenterMediator.showError
+		// 					);
+		// 			} else {
+		// 				MainPresenterMediator.showError('Unfortunately a tag with same label is already existing. Please use another one');
+		// 			}
+		// 		}
+		// 	);
 	}
 
 	//endregion Private Methods

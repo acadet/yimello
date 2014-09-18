@@ -34,18 +34,24 @@ class TourPresenter extends YimelloPresenter {
 	/**
 	 * Current available tag id
 	 */
-	private static _tagID : number;
+	private _tagID : number;
 
 	private _tagInput : DOMElement;
 
 	private _urlInput : DOMElement;
 
-	private _currentBookmark : BookmarkDAO;
-	private _currentTags : IList<TagDAO>;
+	private _currentBookmark : Bookmark;
+	private _currentTags : IList<Tag>;
 
 	//endregion Fields
 	
 	//region Constructors
+
+	constructor() {
+		super();
+
+		this._tagID = 0;
+	}
 
 	//endregion Constructors
 	
@@ -115,41 +121,44 @@ class TourPresenter extends YimelloPresenter {
 	 * @param {string} value Used label
 	 */
 	private _createTag(value : string) : void {
-		var tag : DOMElement;
-		var img : DOMElement;
-		var tagObj : TagDAO;
+		BusinessFactory.buildTag(
+			(business) => {
+				var tag : DOMElement;
+				var img : DOMElement;
+				var tagObj : Tag;
 
-		if (!PresenterMediator.getTagBusiness().isValueValid(value)) {
-			return;
-		}
+				if (!business.isValueValid(value)) {
+					return;
+				}
 
-		// Avoid harmful values
-		value = SecurityHelper.disarm(value);
+				// Avoid harmful values
+				value = SecurityHelper.disarm(value);
 
-		// Start to build a new tag
-		tag =
-			DOMElement.fromString('<li><p>' + value + '</p></li>');
-		tag.addClass('tag');
-		img = DOMElement.fromString('<img />');
-		img.setAttribute('src', "assets/img/x-mark-icon.png");
-		img.addClass('delete-tag');
-		img.setData('tag-id', NumberHelper.toString(TourPresenter._tagID));
-		TourPresenter._tagID++;
+				// Start to build a new tag
+				tag =
+					DOMElement.fromString('<li><p>' + value + '</p></li>');
+				tag.addClass('tag');
+				img = DOMElement.fromString('<img />');
+				img.setAttribute('src', "assets/img/x-mark-icon.png");
+				img.addClass('delete-tag');
+				img.setData('tag-id', NumberHelper.toString(this._tagID++));
 
-		tag.append(img);
-		this._tags.append(tag);
+				tag.append(img);
+				this._tags.append(tag);
 
-		tagObj = new TagDAO();
-		tagObj.setLabel(value);
+				tagObj = new Tag();
+				tagObj.setLabel(value);
 
-		this._currentTags.add(tagObj);
+				this._currentTags.add(tagObj);
 
-		// On click on delete icon, remove bound tag
-		img.on(DOMElementEvents.Click, (e) => {
-			img.off(DOMElementEvents.Click);
-			tag.remove();
-			this._currentTags.remove(tagObj);
-		});
+				// On click on delete icon, remove bound tag
+				img.on(DOMElementEvents.Click, (e) => {
+					img.off(DOMElementEvents.Click);
+					tag.remove();
+					this._currentTags.remove(tagObj);
+				});
+			}
+		);
 	}
 
 	/**
@@ -211,8 +220,7 @@ class TourPresenter extends YimelloPresenter {
 	private _prepareTagGenerator() : void {
 		this._tagInput = this._slides.findSingle('.js-slide .js-tag-form input[name="tags"]');
 		this._tags = DOMTree.findSingle('.js-slide .js-tag-list');
-		TourPresenter._tagID = 0;
-		this._currentTags = new ArrayList<TagDAO>();
+		this._currentTags = new ArrayList<Tag>();
 
 		this._tagInput.on(
 			DOMElementEvents.KeyDown, 
@@ -229,36 +237,38 @@ class TourPresenter extends YimelloPresenter {
 	private _saveURLInput() : void {
 		var url : string;
 
-		url = this._urlInput.getValue();
+		url = StringHelper.trim(this._urlInput.getValue());
 		this._urlInput.removeClass('success');
 		this._urlInput.removeClass('error');
 
 		if (url !== '') {
-			PresenterMediator
-				.getBookmarkBusiness()
-				.createFromURL(
-					url,
-					(bookmark) => {
-						var t : Timer;
+			BusinessFactory.buildBookmark(
+				(business) => {
+					business.createFromURL(
+						url,
+						(bookmark) => {
+							var t : Timer;
 
-						this._currentBookmark = bookmark;
-						this._urlInput.addClass('success');
+							this._currentBookmark = bookmark;
+							this._urlInput.addClass('success');
 
-						t = new Timer(
-							(o) => {
-								this._swapSlide(TourPresenterSlides.Tags);
-							},
-							2000
-						);
-					},
-					(errorMsg) => {
-						this.showError(errorMsg);
-						this._urlInput.addClass('error');
-					},
-					(warningMsg) => {
-						this.showWarning(warningMsg);
-					}
-				);
+							t = new Timer(
+								(o) => {
+									this._swapSlide(TourPresenterSlides.Tags);
+								},
+								2000
+							);
+						},
+						(errorMsg) => {
+							this.showError(errorMsg);
+							this._urlInput.addClass('error');
+						},
+						(warningMsg) => {
+							this.showWarning(warningMsg);
+						}
+					);
+				}
+			);
 		} else {
 			this._urlInput.addClass('error');
 		}
@@ -295,39 +305,44 @@ class TourPresenter extends YimelloPresenter {
 			(e) => {
 				if (TSObject.exists(this._currentBookmark)) {
 					if (this._currentTags.getLength() > 0) {
-						PresenterMediator
-							.getTagBusiness()
-							.merge(
-								this._currentTags,
-								(outcome) => {
-									this._currentTags = outcome;
-									PresenterMediator
-										.getTagBookmarkBusiness()
-										.bindTags(
-											this._currentBookmark,
-											this._currentTags,
-											() => {
-												var timer : Timer;
+						BusinessFactory.buildTag(
+							(tagBusiness) => {
+								tagBusiness.merge(
+									this._currentTags,
+									(outcome) => {
+										this._currentTags = outcome;
 
-												this._tagInput.addClass('success');
-												timer = new Timer(
-													(o) => {
-														this._swapSlide(TourPresenterSlides.End);
+										BusinessFactory.buildTagBookmark(
+											(tgBkBusiness) => {
+												tgBkBusiness.bindTags(
+													this._currentBookmark,
+													this._currentTags,
+													() => {
+														var timer : Timer;
+
+														this._tagInput.addClass('success');
+														timer = new Timer(
+															(o) => {
+																this._swapSlide(TourPresenterSlides.End);
+															},
+															2000
+														);
 													},
-													2000
+													(errorMsg) => {
+														this.showError(errorMsg);
+														this._tagInput.addClass('error');
+													}
 												);
-											},
-											(errorMsg) => {
-												this.showError(errorMsg);
-												this._tagInput.addClass('error');
 											}
 										);
-								},
-								(errorMsg) => {
-									this.showError(errorMsg);
-									this._tagInput.addClass('error');
-								}
-							);
+									},
+									(errorMsg) => {
+										this.showError(errorMsg);
+										this._tagInput.addClass('error');
+									}
+								);
+							}
+						);
 					} else {
 						this.showError('Damn! You were too fast. Please add some tags before saving');
 						this._tagInput.addClass('error');
@@ -346,6 +361,8 @@ class TourPresenter extends YimelloPresenter {
 	//region Public Methods
 	
 	onStart() : void {
+		super.onStart();
+
 		// First, get UI elements
 		this._slides = DOMTree.findSingle('.js-slide-list');
 		this._slideCursors = DOMTree.findSingle('.js-slide-cursor-list');
@@ -386,6 +403,8 @@ class TourPresenter extends YimelloPresenter {
 	}
 
 	onDestroy() : void {
+		super.onDestroy();
+		
 		// TODO : remove event handler bindings
 		this._slideCursors.find('.js-slide-cursor').forEach((e) => {
 			e.off(DOMElementEvents.Click);

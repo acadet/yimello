@@ -11,6 +11,8 @@ interface ITagDAO {
 	 */
 	add(tag : Tag, callback? : Action<Tag>) : void;
 
+	addRaw(tag : Tag, callback? : Action<boolean>) : void;
+
 	/**
 	 * Updates existing bookmark
 	 * @param {Tag}         tag      Target
