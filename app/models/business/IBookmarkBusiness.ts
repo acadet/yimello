@@ -32,7 +32,7 @@ interface IBookmarkBusiness {
 	 */
 	delete(bookmark : Bookmark, callback? : Action0, errorHandler? : Action<string>) : void;
 
-	find(id : string, callback : Action<Bookmark>) : void;
+	find(id : string, callback : Action<Bookmark>, errorHandler? : Action<string>) : void;
 
-	sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void;
+	sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>, errorHandler? : Action<string>) : void;
 }

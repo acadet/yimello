@@ -27,11 +27,9 @@ interface ITagBookmarkBusiness {
 		callback : Action<IList<Bookmark>>,
 		errorHandler? : Action<string>) : void;
 
-	sortBookmarksByTitleWithBoundTags(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void;
-
 	importFromBrowser(dataTransfer : any, callback? : Action0, errorHandler? : Action<string>) : void;
 
-	search(input : string, callback : Action<IList<ScoredBookmark>>) : void;
+	search(input : string, callback : Action<IList<ScoredBookmark>>, errorHandler? : Action<string>) : void;
 
 	backup(callback? : Action0, errorHandler? : Action<string>) : void;
 

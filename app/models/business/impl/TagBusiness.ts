@@ -148,6 +148,7 @@ class TagBusiness implements IInternalTagBusiness {
 		this.engineTag(tag);
 
 		this._dao.add(
+			tag,
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					errorHandler('Ouch! An internal error has occured. Please try again');
@@ -192,6 +193,7 @@ class TagBusiness implements IInternalTagBusiness {
 		this.engineTag(tag);
 
 		this._dao.update(
+			tag,
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					errorHandler('Ouch! An internal error has occured. Please try again');
@@ -206,7 +208,7 @@ class TagBusiness implements IInternalTagBusiness {
 	delete(tag : Tag, callback? : Action0, errorHandler? : Action<string>) : void {
 		var id : string;
 
-		callback = ActionHelper.getValueOrDefault(callback);
+		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(tag)) {
@@ -217,6 +219,7 @@ class TagBusiness implements IInternalTagBusiness {
 
 		id = tag.getId();
 		this._dao.delete(
+			tag,
 			(success) => {
 				if (!success) {
 					errorHandler('Ouch! An internal error has occured. Please try again');
@@ -281,6 +284,23 @@ class TagBusiness implements IInternalTagBusiness {
 				}
 			}
 		);
+	}
+
+	sortByLabelAsc(callback : Action<IList<Tag>>, errorHandler? : Action<string>) : void {
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		this
+			._dao
+			.sortByLabelAsc(
+				(outcome) => {
+					if (TSObject.exists(outcome)) {
+						callback(outcome);
+					} else {
+						Log.error(new BusinessException('Unable to sort: an error has occured when pulling'));
+						errorHandler('Ouch! An internal error has occured. Please try again');
+					}
+				}
+			);
 	}
 
 	//endregion Public Methods

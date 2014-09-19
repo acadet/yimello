@@ -40,32 +40,32 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		return true;
 	}
 
-	private _addList(
-		current : number,
-		bookmarks : IList<Bookmark>,
-		outcome : IList<Bookmark>,
-		callback? : Action<IList<Bookmark>>,
-		errorHandler? : Action<string>) : void {
-		var b : BookmarkDAO;
+	// private _addList(
+	// 	current : number,
+	// 	bookmarks : IList<Bookmark>,
+	// 	outcome : IList<Bookmark>,
+	// 	callback? : Action<IList<Bookmark>>,
+	// 	errorHandler? : Action<string>) : void {
+	// 	var b : BookmarkDAO;
 
-		callback = ActionHelper.getValueOrDefault(callback);
-		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+	// 	callback = ActionHelper.getValueOrDefault(callback);
+	// 	errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
-		if (current === bookmarks.getLength()) {
-			callback(outcome);
-			return;
-		}
+	// 	if (current === bookmarks.getLength()) {
+	// 		callback(outcome);
+	// 		return;
+	// 	}
 
-		b = bookmarks.getAt(current);
-		this.add(
-			b,
-			(bk) => {
-				outcome.add(bk);
-				this._addList(current + 1, bookmarks, outcome, callback, errorHandler);
-			},
-			errorHandler
-		);
-	}
+	// 	b = bookmarks.getAt(current);
+	// 	this.add(
+	// 		b,
+	// 		(bk) => {
+	// 			outcome.add(bk);
+	// 			this._addList(current + 1, bookmarks, outcome, callback, errorHandler);
+	// 		},
+	// 		errorHandler
+	// 	);
+	// }
 
 	//endregion Private Methods
 	
@@ -126,9 +126,9 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		URLDetailsProvider.getDetails(
 			disarmedURL,
 			(title, description) => {
-				var bookmark : BookmarkDAO;
+				var bookmark : Bookmark;
 
-				bookmark = new BookmarkDAO();
+				bookmark = new Bookmark();
 				bookmark.setURL(disarmedURL);
 				bookmark.setTitle(title);
 				bookmark.setDescription(description);
@@ -146,9 +146,9 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 					Log.error(new BusinessException('Unable to create bookmark: provided URL is invalid'));
 					errorHandler('Ouch! Your URL is invalid. Please check it again');
 				} else if (type === URLDetailsProviderError.Ajax) {
-					var bookmark : BookmarkDAO;
+					var bookmark : Bookmark;
 
-					bookmark = new BookmarkDAO();
+					bookmark = new Bookmark();
 					bookmark.setURL(disarmedURL);
 
 					Log.warn('No data has been pulled: failed to reach target');
@@ -179,6 +179,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		this.engineBookmark(bookmark);
 
 		this._dao.add(
+			bookmark,
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					errorHandler('Ouch! An internal error has occured. Please try again');
@@ -190,30 +191,30 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 	}
 
 	// TODO : test
-	addList(
-		bookmarks : IList<Bookmark>,
-		callback? : Action<IList<Bookmark>>,
-		errorHandler? : Action<string>) : void {
+	// addList(
+	// 	bookmarks : IList<Bookmark>,
+	// 	callback? : Action<IList<Bookmark>>,
+	// 	errorHandler? : Action<string>) : void {
 
-		callback = ActionHelper.getValueOrDefault(callback);
-		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+	// 	callback = ActionHelper.getValueOrDefault(callback);
+	// 	errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
-		if (!TSObject.exists(bookmarks)) {
-			Log.error(new BusinessException('Unable to add list: provided list is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
-			return;
-		}
+	// 	if (!TSObject.exists(bookmarks)) {
+	// 		Log.error(new BusinessException('Unable to add list: provided list is null'));
+	// 		errorHandler('Ouch! An internal error has occured. Please try again');
+	// 		return;
+	// 	}
 
-		if (bookmarks.getLength() === 0) {
-			Log.warn('Provided list is empty, nothing was added');
-			callback(new ArrayList<Bookmark>());
-			return;
-		}
+	// 	if (bookmarks.getLength() === 0) {
+	// 		Log.warn('Provided list is empty, nothing was added');
+	// 		callback(new ArrayList<Bookmark>());
+	// 		return;
+	// 	}
 
-		this._addList(0, bookmarks, new ArrayList<Bookmark>(), callback, errorHandler);
-	}
+	// 	this._addList(0, bookmarks, new ArrayList<Bookmark>(), callback, errorHandler);
+	// }
 
-	update(bookmark : BookmarkDAO, callback? : Action<Bookmark>, errorHandler? : Action<string>) : void {
+	update(bookmark : Bookmark, callback? : Action<Bookmark>, errorHandler? : Action<string>) : void {
 		callback = ActionHelper.getValueOrDefault(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
@@ -224,6 +225,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		this.engineBookmark(bookmark);
 
 		this._dao.update(
+			bookmark,
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
 					errorHandler('Ouch! An internal error has occured. Please try again');
@@ -236,7 +238,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 	delete(bookmark : Bookmark, callback? : Action0, errorHandler? : Action<string>) : void {
 		var id : string;
 
-		callback = ActionHelper.getValueOrDefault(callback);
+		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(bookmark)) {
@@ -247,6 +249,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 
 		id = bookmark.getId();
 		this._dao.delete(
+			bookmark,
 			(success) => {
 				if (!success) {
 					errorHandler('Ouch! An internal error has occured. Please try again');
@@ -256,6 +259,41 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 				callback();
 			}
 		);
+	}
+
+	find(id : string, callback : Action<Bookmark>, errorHandler? : Action<string>) : void {
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		this
+			._dao
+			.find(
+				id,
+				(outcome) => {
+					if (TSObject.exists(outcome)) {
+						callback(outcome);
+					} else {
+						Log.error(new BusinessException('No bookmark found with id: ' + id));
+						errorHandler('Ouch! An internal error has occured. Please try again');
+					}
+				}
+			);
+	}
+
+	sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>, errorHandler? : Action<string>) : void {
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		this
+			._dao
+			.sortByViewsDescThenByTitleAsc(
+				(outcome) => {
+					if (TSObject.exists(outcome)) {
+						callback(outcome);
+					} else {
+						Log.error(new BusinessException('Unable to sort: an error has occured when pulling'));
+						errorHandler('Ouch! An internal error has occured. Please try again');
+					}
+				}
+			);
 	}
 
 	//endregion Public Methods

@@ -1,5 +1,5 @@
 /// <reference path="../../../dependencies.ts" />
 
-interface IInternalBookmarkBusiness implements IBookmarkBusiness {
-	engineBookmark(bookmark : BookmarkDAO) : void;
+interface IInternalBookmarkBusiness extends IBookmarkBusiness {
+	engineBookmark(bookmark : Bookmark) : void;
 }

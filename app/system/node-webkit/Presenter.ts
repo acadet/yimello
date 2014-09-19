@@ -11,8 +11,6 @@ class Presenter {
 	//region Constructors
 	
 	constructor() {
-		super();
-
 		this._isPaused = false;
 
 		NodeWindow.on(NodeWindowEvents.Blur, this._onPause);

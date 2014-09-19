@@ -8,6 +8,8 @@ class DAOFactory {
 	private static _bookmark : IBookmarkDAO;
 
 	private static _tag : ITagDAO;
+
+	private static _tagBk : ITagBookmarkDAO;
 	
 	//endregion Fields
 	
@@ -58,18 +60,17 @@ class DAOFactory {
 		tagBookmarkRequest.append('bookmark_id VARCHAR(36) NOT NULL, ');
 		tagBookmarkRequest.append('PRIMARY KEY (tag_id, bookmark_id))');
 
-		DataAccessObject._aro = AROFactory.build(config);
+		DAOFactory._aro = AROFactory.build(config);
 
-		DataAccessObject._aro.executeSQL(
+		DAOFactory._aro.executeSQL(
 			tagRequest.toString(),
 			(o) => {
-				DataAccessObject._aro.executeSQL(
+				DAOFactory._aro.executeSQL(
 					bookmarkRequest.toString(),
 					(o) => {
-						DataAccessObject._aro.executeSQL(
+						DAOFactory._aro.executeSQL(
 							tagBookmarkRequest.toString(),
 							(o) => {
-								DAOFactory._initialized = true;
 								callback();
 							}
 						);
@@ -86,10 +87,14 @@ class DAOFactory {
 	static buildBookmark(callback : Action<IBookmarkDAO>) : void {
 		DAOFactory._init(
 			() => {
-				if (!TSObject.exists(DAOFactory._bookmark)) {
-					DAOFactory._bookmark = new BookmarkDAO(DataAccessObject._aro);
-				}
-				callback(DAOFactory._bookmark);
+				DAOFactory.buildTagBookmark(
+					(outcome) => {
+						if (!TSObject.exists(DAOFactory._bookmark)) {
+							DAOFactory._bookmark = new BookmarkDAO(DAOFactory._aro, outcome);
+						}
+						callback(DAOFactory._bookmark);
+					}
+				);
 			}
 		);
 	}
@@ -97,10 +102,26 @@ class DAOFactory {
 	static buildTag(callback : Action<ITagDAO>) : void {
 		DAOFactory._init(
 			() => {
-				if (!TSObject.exists(DAOFactory._tag)) {
-					DAOFactory._tag = new TagDAO(DataAccessObject._aro);
+				DAOFactory.buildTagBookmark(
+					(outcome) => {
+						if (!TSObject.exists(DAOFactory._tag)) {
+							DAOFactory._tag = new TagDAO(DAOFactory._aro, outcome);
+						}
+						callback(DAOFactory._tag);
+					}
+				);
+			}
+		);
+	}
+
+	static buildTagBookmark(callback : Action<ITagBookmarkDAO>) : void {
+		DAOFactory._init(
+			() => {
+				if (!TSObject.exists(DAOFactory._tagBk)) {
+					// TODO
+					//DAOFactory._tagBk = new 
 				}
-				callback(DAOFactory._tag);
+				callback(DAOFactory._tagBk);
 			}
 		);
 	}

@@ -37,27 +37,27 @@ class DragFileArea {
 			(e) => {
 				e.preventDefault();
 
-				if (this._currentOperation === DragFileAreaOperations.BrowserImport) {
-					PresenterMediator
-						.getTagBookmarkBusiness()
-						.importFromBrowser(
-							e.getOriginalEvent().dataTransfer,
-							() => {
-								// TODO : error handling
-								NodeWindow.reload();
-							}
-						);
-				} else {
-					PresenterMediator
-						.getTagBookmarkBusiness()
-						.importBackup(
-							e.getOriginalEvent().dataTransfer,
-							() => {
-								// TODO : error handling
-								NodeWindow.reload();
-							}
-						);
-				}
+				// if (this._currentOperation === DragFileAreaOperations.BrowserImport) {
+				// 	PresenterMediator
+				// 		.getTagBookmarkBusiness()
+				// 		.importFromBrowser(
+				// 			e.getOriginalEvent().dataTransfer,
+				// 			() => {
+				// 				// TODO : error handling
+				// 				NodeWindow.reload();
+				// 			}
+				// 		);
+				// } else {
+				// 	PresenterMediator
+				// 		.getTagBookmarkBusiness()
+				// 		.importBackup(
+				// 			e.getOriginalEvent().dataTransfer,
+				// 			() => {
+				// 				// TODO : error handling
+				// 				NodeWindow.reload();
+				// 			}
+				// 		);
+				// }
 			}
 		);
 

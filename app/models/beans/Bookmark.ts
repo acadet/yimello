@@ -73,7 +73,7 @@ class Bookmark {
 	/**
 	 * Sets URL
 	 * @param  {string}      u [description]
-	 * @return {BookmarkDAO}   [description]
+	 * @return {Bookmark}   [description]
 	 */
 	setURL(u : string) : Bookmark {
 		this._url = u;
@@ -157,7 +157,7 @@ class Bookmark {
 	 * @return {Bookmark}     [description]
 	 */
 	static fromObject(obj : any) : Bookmark {
-		var b : BookmarkDAO = new Bookmark();
+		var b : Bookmark = new Bookmark();
 
 		b.setId(obj.id);
 		b.setURL(obj.url);

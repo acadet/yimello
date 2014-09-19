@@ -40,10 +40,10 @@ class MainPresenter
 	constructor() {
 		super();
 
-		this._bookmarkForm = new BookmarkForm(this);
-		this._tagList = new TagList(this);
-		this._bookmarkList = new BookmarkList(this);
-		this._menu = new MenuControl(this);
+		// this._bookmarkForm = new BookmarkForm(this);
+		// this._tagList = new TagList(this);
+		// this._bookmarkList = new BookmarkList(this);
+		// this._menu = new MenuControl(this);
 	}
 
 	//endregion Constructors
@@ -222,12 +222,12 @@ class MainPresenter
 	}
 
 	onTagSelection(tagId : string) : void {
-		TagDAO.find(
-			tagId,
-			(outcome) => {
-				this._bookmarkList.displayForTag(outcome);
-			}
-		);
+		// TagDAO.find(
+		// 	tagId,
+		// 	(outcome) => {
+		// 		this._bookmarkList.displayForTag(outcome);
+		// 	}
+		// );
 	}
 
 	onSearchTabSelection() : void {
@@ -242,12 +242,12 @@ class MainPresenter
 	}
 
 	askingForTagUpdate(tagId : string) : void {
-		TagDAO.find(
-			tagId,
-			(outcome) => {
-				this._menu.prepareForTagUpdate(outcome);
-			}
-		);
+		// TagDAO.find(
+		// 	tagId,
+		// 	(outcome) => {
+		// 		this._menu.prepareForTagUpdate(outcome);
+		// 	}
+		// );
 	}
 
 	//endregion ITagListSubscriber
@@ -255,13 +255,13 @@ class MainPresenter
 	//region IBookmarkListSubscriber
 
 	onBookmarkSelection(bookmarkId : string) : void {
-		BookmarkDAO.find(
-			bookmarkId,
-			(outcome) => {
-				this._bookmarkForm.resetToUpdate(outcome);
-				this._switchToBookmarkForm();
-			}
-		);
+		// BookmarkDAO.find(
+		// 	bookmarkId,
+		// 	(outcome) => {
+		// 		this._bookmarkForm.resetToUpdate(outcome);
+		// 		this._switchToBookmarkForm();
+		// 	}
+		// );
 	}
 
 	//endregion IBookmarkListSubscriber

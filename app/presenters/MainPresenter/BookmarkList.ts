@@ -204,7 +204,7 @@ class BookmarkList {
 		);
 	}
 
-	displayForTag(tag : TagDAO) : void {
+	displayForTag(tag : Tag) : void {
 		this._reset();
 
 		BusinessFactory.buildTagBookmark(

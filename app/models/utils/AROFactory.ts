@@ -33,7 +33,7 @@ class AROFactory {
 			AROFactory._aro = new ActiveRecordObject(db);
 		}
 
-		return ActiveRecordObject._aro;
+		return AROFactory._aro;
 	}
 	
 	//endregion Public Methods

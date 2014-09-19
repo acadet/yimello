@@ -86,9 +86,9 @@ class Tag {
 	 * @return {Tag}     [description]
 	 */
 	static fromObject(obj : any) : Tag {
-		var t : TagDAO;
+		var t : Tag;
 
-		t = new TagDAO();
+		t = new Tag();
 		t.setId(obj.id);
 		t.setLabel(obj.label);
 

@@ -15,6 +15,7 @@
 /// <reference path="../app/system/DOMTree.ts" />
 /// <reference path="../app/system/strings/StringBuffer.ts" />
 /// <reference path="../app/system/node-webkit/NodeWindow.ts" />
+/// <reference path="../app/system/node-webkit/Presenter.ts" />
 /// <reference path="../app/system/Regex.ts" />
 /// <reference path="../app/system/Log.ts" />
 /// <reference path="../app/system/Pair.ts" />
@@ -39,13 +40,13 @@
 // Storage part
 
 /// <reference path="../app/system/storage/SQLAPI.ts" />
+/// <reference path="../app/system/storage/ActiveRecord/IActiveRecordObject.ts" />
 /// <reference path="../app/system/storage/ActiveRecord/ActiveRecordConfig.ts" />
 /// <reference path="../app/system/storage/ActiveRecord/ActiveRecordException.ts" />
 /// <reference path="../app/system/storage/ActiveRecord/ActiveRecordHelper.ts" />
 /// <reference path="../app/system/storage/ActiveRecord/ActiveRecordObject.ts" />
 
 // Ajax part
-
 
 /// <reference path="../app/system/ajax/AjaxRequest.ts" />
 /// <reference path="../app/system/ajax/AjaxRequestDataType.ts" />
@@ -60,33 +61,46 @@
 /// <reference path="../app/helpers/URLDetailsProvider.ts" />
 /// <reference path="../app/helpers/SecurityHelper.ts" />
 /// <reference path="../app/helpers/FaviconHelper.ts" />
+/// <reference path="../app/helpers/VersionHelper.ts" />
+
+// Beans part
+
+/// <reference path="../app/models/beans/Bookmark.ts" />
+/// <reference path="../app/models/beans/Tag.ts" />
 
 // DAO part
 
+/// <reference path="../app/models/utils/AROFactory.ts" />
 /// <reference path="../app/models/dao/utils/DAOException.ts" />
-/// <reference path="../app/models/dao/DAOTables.ts" />
-/// <reference path="../app/models/dao/DataAccessObject.ts" />
-/// <reference path="../app/models/dao/BookmarkDAO.ts" />
-/// <reference path="../app/models/dao/TagDAO.ts" />
+/// <reference path="../app/models/dao/IBookmarkDAO.ts" />
+/// <reference path="../app/models/dao/ITagDAO.ts" />
+/// <reference path="../app/models/dao/ITagBookmarkDAO.ts" />
+/// <reference path="../app/models/dao/utils/DataAccessObject.ts" />
+/// <reference path="../app/models/dao/impl/BookmarkDAO.ts" />
+/// <reference path="../app/models/dao/impl/TagDAO.ts" />
+/// <reference path="../app/models/dao/impl/TagBookmarkDAO.ts" />
+/// <reference path="../app/models/dao/utils/DAOTables.ts" />
+/// <reference path="../app/models/utils/DAOFactory.ts" />
 
 // Business part
+/// <reference path="../app/models/business/utils/IInternalBookmarkBusiness.ts" />
+/// <reference path="../app/models/business/utils/IInternalTagBusiness.ts" />
+/// <reference path="../app/models/business/utils/InternalBusinessFactory.ts" />
+/// <reference path="../app/models/business/utils/TagBookmarkBusinessArgs.ts" />
 /// <reference path="../app/models/business/utils/BusinessException.ts" />
 /// <reference path="../app/models/business/IBookmarkBusiness.ts" />
 /// <reference path="../app/models/business/impl/BookmarkBusiness.ts" />
 /// <reference path="../app/models/business/ITagBusiness.ts" />
 /// <reference path="../app/models/business/impl/TagBusiness.ts" />
-/// <reference path="../app/models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="../app/models/business/utils/ScoredBookmark.ts" />
 /// <reference path="../app/models/business/ITagBookmarkBusiness.ts" />
 /// <reference path="../app/models/business/impl/TagBookmarkBusiness.ts" />
-/// <reference path="../app/models/business/utils/BusinessMediator.ts" />
+/// <reference path="../app/models/utils/BusinessFactory.ts" />
 
 // Presenters part
 
 /// <reference path="../app/presenters/utils/NotificationMessage.ts" />
-/// <reference path="../app/presenters/utils/PresenterException.ts" />
-/// <reference path="../app/presenters/Presenter.ts" />
 /// <reference path="../app/presenters/YimelloPresenter.ts" />
-/// <reference path="../app/presenters/utils/PresenterMediator.ts" />
 /// <reference path="../app/presenters/IntroPresenter.ts" />
 /// <reference path="../app/presenters/TourPresenter.ts" />
 
@@ -109,5 +123,5 @@
 /// <reference path="../app/presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
-/// <reference path="../app/helpers/VersionHelper.ts" />
+
 //grunt-end

@@ -28,21 +28,19 @@ class ActiveRecordObject implements IActiveRecordObject {
 	//region Public Methods
 
 	executeSQL(request : string, callback? : Action<any>) : void {
+		callback = ActionHelper.getValueOrDefault(callback);
+
 		this._database.transaction(
 			(tx) => {
 				tx.execute(
 					request,
 					[],
 					(tx, outcome) => {
-						if (TSObject.exists(callback)) {
-							callback(outcome);
-						}
+						callback(outcome);
 					},
 					(tx, e) => {
 						ActiveRecordHelper.executeErrorHandler(tx, e);
-						if (TSObject.exists(callback)) {
-							callback(null);
-						}
+						callback(null);
 						return false;
 					}
 				);
@@ -62,7 +60,6 @@ class ActiveRecordObject implements IActiveRecordObject {
 					(tx, e) => {
 						ActiveRecordHelper.executeErrorHandler(tx, e);
 						callback(null);
-
 						return false;
 					}
 				);
@@ -79,15 +76,14 @@ class ActiveRecordObject implements IActiveRecordObject {
 	
 		this._database.transaction(
 			(tx) => {
-				var request : StringBuffer;
+				var data : Array<any>;
 
-				request = new StringBuffer('SELECT * FROM ' + table);
-				request.append(' WHERE ' + selector.getFirst());
-				request.append(' = "' + selector.getSecond() + '"');
+				data = new Array<any>();
+				data.push(selector.getSecond());
 
 				tx.execute(
-					request.toString(),
-					[],
+					'SELECT * FROM ' + table + ' WHERE ' + selector.getFirst() + ' = ?',
+					data,
 					(tx, outcome) => {
 						var s : SQLRowSet;
 
@@ -114,7 +110,6 @@ class ActiveRecordObject implements IActiveRecordObject {
 					(tx, e) => {
 						ActiveRecordHelper.executeErrorHandler(tx, e);
 						callback(null);
-
 						return false;
 					}
 				);
@@ -124,12 +119,11 @@ class ActiveRecordObject implements IActiveRecordObject {
 	}
 
 	insert(table : string, data : IList<any>, callback? : Action<boolean>) : void {
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (!TSObject.exists(data)) {
 			Log.error(new ActiveRecordException('insert(): Provided data are undefined'));
-			if (TSObject.exists(callback)) {
-				callback(false);
-			}
+			callback(false);
 			return;
 		}
 
@@ -152,15 +146,11 @@ class ActiveRecordObject implements IActiveRecordObject {
 					'INSERT INTO ' + table + ' VALUES ' + s.toString(),
 					data.toArray(),
 					(tx, outcome) => {
-						if (TSObject.exists(callback)) {
-							callback(true);
-						}
+						callback(true);
 					},
 					(tx, error) => {
 						ActiveRecordHelper.executeErrorHandler(tx, error);
-						if (TSObject.exists(callback)) {
-							callback(false);
-						}
+						callback(false);
 						return false;
 					}
 				);
@@ -175,11 +165,11 @@ class ActiveRecordObject implements IActiveRecordObject {
 		data : IDictionary<string, any>,
 		callback? : Action<boolean>) : void {
 
+		callback = ActionHelper.getValueOrDefault(callback);
+
 		if (!TSObject.exists(data)) {
 			Log.error(new ActiveRecordException('update(): Provided data are undefined'));
-			if (TSObject.exists(callback)) {
-				callback(false);
-			}
+			callback(false);
 			return;
 		}
 
@@ -209,15 +199,11 @@ class ActiveRecordObject implements IActiveRecordObject {
 					'UPDATE ' + table + ' SET ' + marks.toString() + ' WHERE ' + selector.getFirst() + ' = ?',
 					args.toArray(),
 					(tx, outcome) => {
-						if (TSObject.exists(callback)) {
-							callback(true);
-						}
+						callback(true);
 					},
 					(tx, error) => {
 						ActiveRecordHelper.executeErrorHandler(tx, error);
-						if (TSObject.exists(callback)) {
-							callback(false);
-						}
+						callback(false);
 						return false;
 					}
 				);
@@ -227,9 +213,9 @@ class ActiveRecordObject implements IActiveRecordObject {
 	}
 
 	delete(table : string, selector : Pair<string, any>, callback? : Action<boolean>) : void {
-		ActiveRecordObject._init();
+		callback = ActionHelper.getValueOrDefault(callback);
 
-		ActiveRecordObject._currentDB.transaction(
+		this._database.transaction(
 			(tx) => {
 				var request : StringBuffer;
 
@@ -241,17 +227,11 @@ class ActiveRecordObject implements IActiveRecordObject {
 					request.toString(),
 					[selector.getSecond()],
 					(tx, outcome) => {
-						if (callback !== null) {
-							callback(true);
-						}
+						callback(true);
 					},
 					(tx, error) => {
 						ActiveRecordHelper.executeErrorHandler(tx, error);
-
-						if (TSObject.exists(callback)) {
-							callback(false);
-						}
-
+						callback(false);
 						return false;
 					}
 				);

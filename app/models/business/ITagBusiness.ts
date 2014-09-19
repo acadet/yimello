@@ -39,5 +39,5 @@ interface ITagBusiness {
 	 */
 	merge(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void;
 
-	sortByLabelAsc(callback : Action<IList<Tag>>) : void;
+	sortByLabelAsc(callback : Action<IList<Tag>>, errorHandler? : Action<string>) : void;
 }

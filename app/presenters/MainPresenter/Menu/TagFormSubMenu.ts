@@ -157,7 +157,7 @@ class TagFormSubMenu extends SubMenu {
 		super.show();
 	}
 
-	showToUpdate(tag : TagDAO) : void {
+	showToUpdate(tag : Tag) : void {
 		this._input.setValue(tag.getLabel());
 		this._isUpdating = true;
 		this._currentUpdatedTag = tag;

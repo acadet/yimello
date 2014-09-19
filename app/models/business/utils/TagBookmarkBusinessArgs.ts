@@ -9,7 +9,7 @@ class TagBookmarkBusinessArgs {
 
 	private _tagBookmarkDAO : ITagBookmarkDAO;
 
-	private _tagBusiness : IInternalTagBusinnes;
+	private _tagBusiness : IInternalTagBusiness;
 
 	private _bookmarkBusiness : IInternalBookmarkBusiness;
 	
@@ -45,7 +45,7 @@ class TagBookmarkBusinessArgs {
 		return this;
 	}
 
-	getTabBookmarkDAO() : ITagBookmarkDAO {
+	getTagBookmarkDAO() : ITagBookmarkDAO {
 		return this._tagBookmarkDAO;
 	}
 
@@ -54,11 +54,11 @@ class TagBookmarkBusinessArgs {
 		return this;
 	}
 
-	getTagBusiness() : IInternalTagBusinnes {
+	getTagBusiness() : IInternalTagBusiness {
 		return this._tagBusiness;
 	}
 
-	setTagBusiness(value : IInternalTagBusinnes) : TagBookmarkBusinessArgs {
+	setTagBusiness(value : IInternalTagBusiness) : TagBookmarkBusinessArgs {
 		this._tagBusiness = value;
 		return this;
 	}

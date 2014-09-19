@@ -53,13 +53,38 @@ class BusinessFactory {
 
 	static buildTagBookmark(callback : Action<ITagBookmarkBusiness>) : void {
 		if (!TSObject.exists(BusinessFactory._tagBk)) {
+			var args : TagBookmarkBusinessArgs;
+
+			args = new TagBookmarkBusinessArgs();
+
 			DAOFactory.buildTag(
 				(tagDAO) => {
+					args.setTagDAO(tagDAO);
+
 					DAOFactory.buildBookmark(
 						(bookmarkDAO) => {
-							BusinessFactory._tagBk = new TagBookmarkBusiness(tagDAO, bookmarkDAO);
+							args.setBookmarkDAO(bookmarkDAO);
 
-							callback(BusinessFactory._tagBk);
+							DAOFactory.buildTagBookmark(
+								(tgBkDAO) => {
+									args.setTagBookmarkDAO(tgBkDAO);
+
+									InternalBusinessFactory.buildTag(
+										(tagBusiness) => {
+											args.setTagBusiness(tagBusiness);
+
+											InternalBusinessFactory.buildBookmark(
+												(bkBusiness) => {
+													args.setBookmarkBusiness(bkBusiness);
+
+													BusinessFactory._tagBk = new TagBookmarkBusiness(args);
+													callback(BusinessFactory._tagBk);
+												}
+											);
+										}
+									);
+								}
+							);
 						}
 					);
 				}

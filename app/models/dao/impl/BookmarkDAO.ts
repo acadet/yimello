@@ -1,4 +1,4 @@
-/// <reference path="../../dependencies.ts" />
+/// <reference path="../../../dependencies.ts" />
 
 /**
  * An implementation of IBookmarkDAO
@@ -58,6 +58,27 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 		};
 
 		this.getARO().insert(DAOTables.Bookmarks, l, f);
+	}
+
+	addRaw(bookmark : Bookmark, callback? : Action<boolean>) : void {
+		var data : IList<any>;
+
+		callback = ActionHelper.getValueOrDefault(callback);
+
+		data = new ArrayList<any>();
+		data.add(bookmark.getId());
+		data.add(bookmark.getURL());
+		data.add(bookmark.getTitle());
+		data.add(bookmark.getDescription());
+		data.add(bookmark.getViews());
+
+		this
+			.getARO()
+			.insert(
+				DAOTables.Bookmarks,
+				data,
+				callback
+			);
 	}
 
 	update(bookmark : Bookmark, callback? : Action<Bookmark>) : void {

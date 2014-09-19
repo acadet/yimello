@@ -26,7 +26,7 @@ class TagList {
 	
 	//region Private Methods
 	
-	private _buildDOMTag(tag : TagDAO) : DOMElement {
+	private _buildDOMTag(tag : Tag) : DOMElement {
 		var s : StringBuffer;
 		var e : DOMElement;
 
@@ -169,7 +169,7 @@ class TagList {
 		tag = new Tag();
 		tag.setId(id);
 		
-		BusinessFactory.buldTag(
+		BusinessFactory.buildTag(
 			(business) => {
 				// TODO : test success
 				business.delete(tag);

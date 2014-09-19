@@ -74,13 +74,19 @@
 /// <reference path="models/dao/utils/DAOException.ts" />
 /// <reference path="models/dao/IBookmarkDAO.ts" />
 /// <reference path="models/dao/ITagDAO.ts" />
+/// <reference path="models/dao/ITagBookmarkDAO.ts" />
+/// <reference path="models/dao/utils/DataAccessObject.ts" />
 /// <reference path="models/dao/impl/BookmarkDAO.ts" />
 /// <reference path="models/dao/impl/TagDAO.ts" />
+/// <reference path="models/dao/impl/TagBookmarkDAO.ts" />
 /// <reference path="models/dao/utils/DAOTables.ts" />
-/// <reference path="models/dao/utils/DataAccessObject.ts" />
 /// <reference path="models/utils/DAOFactory.ts" />
 
 // Business part
+/// <reference path="models/business/utils/IInternalBookmarkBusiness.ts" />
+/// <reference path="models/business/utils/IInternalTagBusiness.ts" />
+/// <reference path="models/business/utils/InternalBusinessFactory.ts" />
+/// <reference path="models/business/utils/TagBookmarkBusinessArgs.ts" />
 /// <reference path="models/business/utils/BusinessException.ts" />
 /// <reference path="models/business/IBookmarkBusiness.ts" />
 /// <reference path="models/business/impl/BookmarkBusiness.ts" />
@@ -94,8 +100,6 @@
 // Presenters part
 
 /// <reference path="presenters/utils/NotificationMessage.ts" />
-/// <reference path="presenters/utils/PresenterException.ts" />
-/// <reference path="presenters/Presenter.ts" />
 /// <reference path="presenters/YimelloPresenter.ts" />
 /// <reference path="presenters/IntroPresenter.ts" />
 /// <reference path="presenters/TourPresenter.ts" />
@@ -119,4 +123,5 @@
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
+
 //grunt-end

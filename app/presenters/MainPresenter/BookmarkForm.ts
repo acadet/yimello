@@ -113,7 +113,7 @@ class BookmarkForm {
 						(business) => {
 							this._currentUpdatedBookmark.setViews(this._currentUpdatedBookmark.getViews() + 1);
 							// TODO: test errors
-							business.update(bookmark);
+							business.update(this._currentUpdatedBookmark);
 							NodeWindow.openExternal(this._currentUpdatedBookmark.getURL());
 						}
 					);
@@ -411,7 +411,7 @@ class BookmarkForm {
 
 	private _reset() : void {
 		// Reset current tag list
-		this._currentTags = new ArrayList<TagDAO>();
+		this._currentTags = new ArrayList<Tag>();
 		this._tagList.getChildren().forEach(e => e.remove());
 
 		// Reset tag suggestions
@@ -458,7 +458,7 @@ class BookmarkForm {
 		this._bookmarkIcon.setAttribute('src', FaviconHelper.getDefaultSrc());
 	}
 
-	resetToUpdate(bookmark : BookmarkDAO) : void {
+	resetToUpdate(bookmark : Bookmark) : void {
 		this._reset();
 		this._isUpdating = true;
 		this._currentUpdatedBookmark = bookmark;

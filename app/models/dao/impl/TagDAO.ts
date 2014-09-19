@@ -1,4 +1,4 @@
-/// <reference path="../../dependencies.ts" />
+/// <reference path="../../../dependencies.ts" />
 
 /**
  * An implementation of ITagDAO
@@ -40,7 +40,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 
 		data = new ArrayList<any>();
 		data.add(id);
-		data.add(this.getLabel());
+		data.add(tag.getLabel());
 
 		outcome = new Tag();
 		tag.hydrate(outcome);
@@ -48,13 +48,31 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 
 		f = (success) => {
 			if (success) {
-				callback(t);
+				callback(outcome);
 			} else {
 				callback(null);
 			}
 		};
 
 		this.getARO().insert(DAOTables.Tags, data, f);
+	}
+
+	addRaw(tag : Tag, callback? : Action<boolean>) : void {
+		var data : IList<any>;
+
+		callback = ActionHelper.getValueOrDefault(callback);
+
+		data = new ArrayList<any>();
+		data.add(tag.getId());
+		data.add(tag.getLabel());
+
+		this
+			.getARO()
+			.insert(
+				DAOTables.Tags,
+				data,
+				callback
+			);
 	}
 
 	update(tag : Tag, callback? : Action<Tag>) : void {
@@ -105,7 +123,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 		this
 			._tagBkDAO
 			.removeTagRelations(
-				tag.get,
+				tag,
 				(success1) => {
 					this
 						.getARO()
@@ -137,7 +155,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 	}
 
 	get(callback : Action<IList<Tag>>) : void {
-		ActiveRecordObject.get<TagDAO>(DAOTables.Tags, callback, Tag.fromObject);
+		this.getARO().get<Tag>(DAOTables.Tags, callback, Tag.fromObject);
 	}
 
 	find(id : string, callback : Action<Tag>) : void {
@@ -158,7 +176,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 				DAOTables.Tags,
 				new Pair<string, any>('label', label),
 				callback,
-				TagDAO.fromObject
+				Tag.fromObject
 			);
 	}
 

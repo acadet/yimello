@@ -1,4 +1,4 @@
-/// <reference path="../../dependencies.ts" />
+/// <reference path="../../../dependencies.ts" />
 
 /**
  * Existing tables into DB
