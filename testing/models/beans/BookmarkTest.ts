@@ -1,6 +1,6 @@
 /// <reference path="../../test_dependencies.ts" />
 
-class BookmarkBusinessTest extends UnitTestClass {
+class BookmarkTest extends UnitTestClass {
 	private _bookmark : Bookmark;
 
 	setUp() : void {
@@ -167,4 +167,4 @@ class BookmarkBusinessTest extends UnitTestClass {
 	}
 }
 
-UnitTestClass.handle(new BookmarkBusinessTest());
+UnitTestClass.handle(new BookmarkTest());

@@ -118,8 +118,7 @@ class DAOFactory {
 		DAOFactory._init(
 			() => {
 				if (!TSObject.exists(DAOFactory._tagBk)) {
-					// TODO
-					//DAOFactory._tagBk = new 
+					DAOFactory._tagBk = new TagBookmarkDAO(DAOFactory._aro);
 				}
 				callback(DAOFactory._tagBk);
 			}

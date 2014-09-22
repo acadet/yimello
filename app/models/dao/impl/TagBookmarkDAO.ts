@@ -241,15 +241,16 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 		var request : StringBuffer;
 
 		request = new StringBuffer('SELECT bk.id AS id, bk.url as url, bk.title AS title, bk.description AS description, ');
-		request.append('bk.views AS views, outcome.tagId AS tagId, outcome.tagLabel AS tagLabel ');
-		request.append('FROM ' + DAOTables.Bookmarks + ' AS bk ');
-		request.append('LEFT JOIN (');
-		request.append('SELECT t.id AS tagId, t.label AS tagLabel, tbk.bookmark_id AS bkId FROM ');
-		request.append(DAOTables.Tags + ' AS t INNER JOIN ');
-		request.append(DAOTables.TagBookmark + ' AS tbk ON ');
-		request.append('t.id = tbk.tag_id) AS outcome ');
-		request.append('ON bk.id = outcome.bkId ');
-		request.append('ORDER BY LOWER(bk.title) ASC, LOWER(outcome.tagLabel) ASC');
+		request
+			.append('bk.views AS views, outcome.tagId AS tagId, outcome.tagLabel AS tagLabel ')
+			.append('FROM ' + DAOTables.Bookmarks + ' AS bk ')
+			.append('LEFT JOIN (')
+			.append('SELECT t.id AS tagId, t.label AS tagLabel, tbk.bookmark_id AS bkId FROM ')
+			.append(DAOTables.Tags + ' AS t INNER JOIN ')
+			.append(DAOTables.TagBookmark + ' AS tbk ON ')
+			.append('t.id = tbk.tag_id) AS outcome ')
+			.append('ON bk.id = outcome.bkId ')
+			.append('ORDER BY LOWER(bk.title) ASC, LOWER(outcome.tagLabel) ASC');
 
 		this
 			.getARO()

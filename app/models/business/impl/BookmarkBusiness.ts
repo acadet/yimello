@@ -32,7 +32,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		}
 
 		if (!URLHelper.isValid(bookmark.getURL())) {
-			Log.error(new BusinessException('Failed to save: url is not valid'));
+			Log.error(new BusinessException('Failed to save: URL is not valid'));
 			errorHandler('Ow! Your URL is invalid. Please check it again');
 			return false;
 		}
@@ -82,9 +82,11 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		}
 
 		url = bookmark.getURL();
-		url = StringHelper.trim(url);
-		url = SecurityHelper.disarm(url);
-		bookmark.setURL(url);
+		if (TSObject.exists(url)) {
+			url = StringHelper.trim(url);
+			url = SecurityHelper.disarm(url);
+			bookmark.setURL(url);
+		}
 
 		title = bookmark.getTitle();
 		if (!TSObject.exists(title) || title === '') {

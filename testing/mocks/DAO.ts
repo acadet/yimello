@@ -3,7 +3,7 @@
 module Mocks {
 	export module DAO {
 		export class ActiveRecordObject implements IActiveRecordObject {
-			private _executeSQLOutcome : any;
+			private _executeSQLOutcome : SQLResultSet;
 			private _getOutcome : IList<any>;
 			private _findOutcome : any;
 			private _insertOutcome : boolean;
@@ -92,8 +92,20 @@ module Mocks {
 
 			//endregion IActiveRecordObject
 
-			setExecuteSQLOutcome(value : any) : Mocks.DAO.ActiveRecordObject {
-				this._executeSQLOutcome = value;
+			setExecuteSQLOutcome(value : Array<any>) : Mocks.DAO.ActiveRecordObject {
+				var mockRowSet : Mocks.ARO.SQLRowSet;
+				var mockSet : Mocks.ARO.SQLSet;
+
+				mockRowSet = new Mocks.ARO.SQLRowSet();
+				for (var i = 0; i < value.length; i++) {
+					mockRowSet.push(value[i]);
+				}
+
+				mockSet = new Mocks.ARO.SQLSet();
+				mockSet.rows = mockRowSet;
+
+				this._executeSQLOutcome = new SQLResultSet(mockSet);
+
 				return this;
 			}
 
@@ -162,12 +174,153 @@ module Mocks {
 				return this._insertArgs;
 			}
 
-			updateArs() : Array<any> {
+			updateArgs() : Array<any> {
 				return this._updateArgs;
 			}
 
 			deleteArgs() : Array<any> {
 				return this._deleteArgs;
+			}
+		}
+
+		export class BookmarkDAO implements IBookmarkDAO {
+			private _addOutcome : Bookmark;
+
+			private _addTimes : number;
+
+			private _addArgs : Array<any>;
+
+			constructor() {
+				this._addTimes = 0;
+			}
+			
+			add(bookmark : Bookmark, callback? : Action<Bookmark>) : void {
+				this._addTimes++;
+				this._addArgs = [bookmark, callback];
+
+				if (TSObject.exists(callback)) {
+					callback(this._addOutcome);
+				}
+			}
+
+			addRaw(bookmark : Bookmark, callback? : Action<boolean>) : void {}
+
+			update(bookmark : Bookmark, callback? : Action<Bookmark>) : void {}
+
+			delete(bookmark : Bookmark, callback? : Action<boolean>) : void {}
+
+			get(callback : Action<IList<Bookmark>>) : void {}
+
+			find(id : string, callback : Action<Bookmark>) : void {}
+			
+			sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void {}
+
+			sortByTitleAsc(callback : Action<IList<Bookmark>>) : void {}
+
+			setAddOutcome(value : Bookmark) : Mocks.DAO.BookmarkDAO {
+				this._addOutcome = value;
+				return this;
+			}
+
+			addTimes() : number {
+				return this._addTimes;
+			}
+
+			addArgs() : Array<any> {
+				return this._addArgs;
+			}
+		}
+
+		export class TagDAO implements ITagDAO {
+			add(tag : Tag, callback? : Action<Tag>) : void {}
+
+			addRaw(tag : Tag, callback? : Action<boolean>) : void {}
+
+			update(tag : Tag, callback? : Action<Tag>) : void {}
+
+			delete(tag : Tag, callback? : Action<boolean>) : void {}
+
+			get(callback : Action<IList<Tag>>) : void {}
+
+			find(id : string, callback : Action<Tag>) : void {}
+
+			findByLabel(label : string, callback : Action<Tag>) : void {}
+
+			sortByLabelAsc(callback : Action<IList<Tag>>) : void {}
+		}
+
+		export class TagBookmarkDAO implements ITagBookmarkDAO {
+			private _removeBookmarkRelationsOutcome : boolean;
+			private _removeTagRelationsOutcome : boolean;
+
+			private _removeBookmarkRelationsTimes : number;
+			private _removeTagRelationsTimes : number;
+
+			private _removeBookmarkRelationsArgs : Array<any>;
+			private _removeTagRelationsArgs : Array<any>;
+
+			constructor() {
+				this._removeBookmarkRelationsTimes = 0;
+				this._removeTagRelationsTimes = 0;
+			}
+
+			addRelation(tag : Tag, bookmark : Bookmark, callback? : Action<boolean>) : void {}
+
+			addMultipleTagRelations(bookmark : Bookmark, tags : IList<Tag>, callback? : Action<boolean>) : void {}
+
+			updateBookmarkRelations(bookmark : Bookmark, tags : IList<Tag>, callback? : Action<boolean>) : void {} 
+
+			removeBookmarkRelations(bookmark : Bookmark, callback? : Action<boolean>) : void {
+				this._removeBookmarkRelationsTimes++;
+				this._removeBookmarkRelationsArgs = [bookmark, callback];
+
+				if (TSObject.exists(callback)) {
+					callback(this._removeBookmarkRelationsOutcome);
+				}
+			}
+
+			removeTagRelations(tag : Tag, callback? : Action<boolean>) : void {
+				this._removeTagRelationsTimes++;
+				this._removeTagRelationsArgs = [tag, callback];
+
+				if (TSObject.exists(callback)) {
+					callback(this._removeTagRelationsOutcome);
+				}
+			}
+
+			getRaw(callback : Action<IList<any>>) : void {}
+
+			sortTagsByLabelAscForBookmark(bookmark : Bookmark, callback : Action<IList<Tag>>) : void {}
+
+			sortBookmarksByTitleAscForTag(tag : Tag, callback : Action<IList<Bookmark>>) : void {}
+
+			sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void {}
+
+
+			setRemoveBookmarkRelationsOutcome(value : boolean) : Mocks.DAO.TagBookmarkDAO {
+				this._removeBookmarkRelationsOutcome = value;
+				return this;
+			}
+
+			setRemoveTagRelationsOutcome(value : boolean) : Mocks.DAO.TagBookmarkDAO {
+				this._removeTagRelationsOutcome = value;
+				return this;
+			}
+
+			removeBookmarkRelationsTimes() : number {
+				return this._removeBookmarkRelationsTimes;
+			}
+
+			removeTagRelationsTimes() : number {
+				return this._removeTagRelationsTimes;
+			}
+
+			removeBookmarkRelationsArgs() : Array<any> {
+				return this._removeBookmarkRelationsArgs;
+			}
+
+			removeTagRelationsArgs() : Array<any> {
+				return this._removeTagRelationsArgs;
 			}
 		}
 	}

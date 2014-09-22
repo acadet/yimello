@@ -1,170 +1,13 @@
 /// <reference path="../../../test_dependencies.ts" />
 
-/**
- * Wraps extra data used for ARO testing
- */
-module ActiveRecordObjectTestUtils {
-	export class Person extends TSObject {
-		id : number;
-		firstName : string;
-		lastName : string;
-
-		static toPerson(o : any) : Person {
-			var p : Person = new Person();
-			p.id = o.id;
-			p.firstName = o.firstName;
-			p.lastName = o.lastName;
-
-			return p;
-		}
-
-		fromPerson() : any {
-			var o : any = {};
-
-			o.id = this.id;
-			o.firstName = this.firstName;
-			o.lastName = this.lastName;
-
-			return o;
-		}
-
-		equals(obj : any) : boolean {
-			var p : Person;
-
-			if (obj instanceof Person) {
-				p = <Person> obj;
-
-				if (this.id !== p.id) {
-					return false;
-				}
-
-				if (this.firstName !== p.firstName) {
-					return false;
-				}
-
-				if (this.lastName !== p.lastName) {
-					return false;
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-	}
-}
-
-module ActiveRecordObjectTestMocks {
-	export class MockSQLRowSet {
-		private _content : Array<any>;
-
-		length : number;
-
-		constructor() {
-			this._content = new Array<any>();
-			this.length = 0;
-		}
-
-		item(i : number) : any {
-			return this._content[i];
-		}
-
-		push(o : any) : MockSQLRowSet {
-			this._content.push(o);
-			this.length++;
-			return this;
-		}
-	}
-
-	class MockSQLSet {
-		rows : any;
-	}
-
-	export class MockTransaction {
-		private _successOutcome : any;
-		private _errorOutcome : any;
-		private _mustFail : boolean;
-		private _statement : string;
-		private _arguments : Array<any>;
-
-		constructor() {
-			this._mustFail = false;
-		}
-
-		executeSql(
-			statement : string,
-			arguments : Array<any>,
-			success : any,
-			error : any) : void {
-
-			this._statement = statement;
-			this._arguments = arguments;
-
-			if (this._mustFail) {
-				error(this, this._errorOutcome);
-			} else {
-				success(this, this._successOutcome);
-			}
-		}
-
-		getStatement() : string {
-			return this._statement;
-		}
-
-		getArguments() : Array<any> {
-			return this._arguments;
-		}
-
-		setSuccessOutcome(obj : MockSQLRowSet) : MockTransaction {
-			var set : MockSQLSet;
-
-			set = new MockSQLSet();
-			set.rows = obj;
-			this._successOutcome = set;
-
-			return this;
-		}
-
-		setErrorOutcome(obj : MockSQLRowSet) : MockTransaction {
-			var set : MockSQLSet;
-
-			set = new MockSQLSet();
-			set.rows = obj;
-			this._errorOutcome = set;
-
-			return this;
-		}
-
-		mustFail() : MockTransaction {
-			this._mustFail = true;
-			return this;
-		}
-	}
-
-	export class MockDatabase implements ISQLDatabase {
-		private _transaction : MockTransaction;
-
-		transaction(success : ISQLTransactionCallback, error? : ISQLTransactionErrorCallback) : void {
-			success(new SQLTransaction(this._transaction));
-		}
-
-		setTransaction(transaction : MockTransaction) : void {
-			this._transaction = transaction;
-		}
-	}
-}
-
-/**
- * Tests ARO
- */
 class ActiveRecordObjectTest extends UnitTestClass {
 	private _aro : ActiveRecordObject;
-	private _database : ActiveRecordObjectTestMocks.MockDatabase;
-	private _transaction : ActiveRecordObjectTestMocks.MockTransaction;
+	private _database : Mocks.ARO.Database;
+	private _transaction : Mocks.ARO.Transaction;
 
 	private _setUp() : void {
-		this._transaction = new ActiveRecordObjectTestMocks.MockTransaction();
-		this._database = new ActiveRecordObjectTestMocks.MockDatabase();
+		this._transaction = new Mocks.ARO.Transaction();
+		this._database = new Mocks.ARO.Database();
 		this._database.setTransaction(this._transaction);
 		this._aro = new ActiveRecordObject(this._database);
 	}
@@ -180,7 +23,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 		var aro : ActiveRecordObject;
 		var database : ISQLDatabase;
 
-		database = new ActiveRecordObjectTestMocks.MockDatabase();
+		database = new Mocks.ARO.Database();
 
 		// Act
 		aro = new ActiveRecordObject(database);
@@ -205,7 +48,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 				p2.firstName = 'Sean';
 				p2.lastName = 'Connery';
 
-				this._transaction.setSuccessOutcome(new ActiveRecordObjectTestMocks.MockSQLRowSet().push(p1).push(p2));
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p1).push(p2));
 
 				// Act
 				this._aro.get(
@@ -215,13 +58,13 @@ class ActiveRecordObjectTest extends UnitTestClass {
 						this.areIdentical('SELECT * FROM foo', this._transaction.getStatement());
 						this.isTrue(TSObject.exists(outcome));
 						this.areIdentical(2, outcome.getLength());
-						this.isTrue(ActiveRecordObjectTestUtils.Person.toPerson(p1).equals(outcome.getAt(0)));
-						this.isTrue(ActiveRecordObjectTestUtils.Person.toPerson(p2).equals(outcome.getAt(1)));
+						this.isTrue(Mocks.Utils.Person.toPerson(p1).equals(outcome.getAt(0)));
+						this.isTrue(Mocks.Utils.Person.toPerson(p2).equals(outcome.getAt(1)));
 
 						this._tearDown();
 						UnitTestClass.done();
 					},
-					ActiveRecordObjectTestUtils.Person.toPerson
+					Mocks.Utils.Person.toPerson
 				);
 			}
 		);
@@ -243,7 +86,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 				p2.firstName = 'Sean';
 				p2.lastName = 'Connery';
 
-				this._transaction.setSuccessOutcome(new ActiveRecordObjectTestMocks.MockSQLRowSet().push(p1).push(p2));
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p1).push(p2));
 
 				// Act
 				this._aro.get(
@@ -276,7 +119,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 				p.firstName = 'Al';
 				p.lastName = 'Pacino';
 
-				this._transaction.setSuccessOutcome(new ActiveRecordObjectTestMocks.MockSQLRowSet().push(p));
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p));
 
 				// Act
 				this._aro.find(
@@ -287,12 +130,12 @@ class ActiveRecordObjectTest extends UnitTestClass {
 						this.areIdentical('SELECT * FROM foo WHERE id = ?', this._transaction.getStatement());
 						this.areIdentical(15, this._transaction.getArguments()[0]);
 						this.isTrue(TSObject.exists(outcome));
-						this.isTrue(ActiveRecordObjectTestUtils.Person.toPerson(p).equals(outcome));
+						this.isTrue(Mocks.Utils.Person.toPerson(p).equals(outcome));
 
 						this._tearDown();
 						UnitTestClass.done();
 					},
-					ActiveRecordObjectTestUtils.Person.toPerson
+					Mocks.Utils.Person.toPerson
 				);
 			}
 		);
@@ -310,7 +153,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 				p.firstName = 'Al';
 				p.lastName = 'Pacino';
 
-				this._transaction.setSuccessOutcome(new ActiveRecordObjectTestMocks.MockSQLRowSet().push(p));
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p));
 
 				// Act
 				this._aro.find(

@@ -34,7 +34,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 		var data : IList<any>;
 		var id : string;
 
-		callback = (TSObject.exists(callback)) ? callback : ((tg) => { return; });
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		id = Guid.newGuid();
 
@@ -79,7 +79,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 		var dict : IDictionary<string, any>;
 		var selector : Pair<string, any>;
 
-		callback = (TSObject.exists(callback)) ? callback : ((tg) => { return; });
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (!TSObject.exists(tag.getId()) || tag.getId() === '') {
 			Log.error(new DAOException('Unable to update: no id was specified'));
@@ -110,7 +110,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 	}
 
 	delete(tag : Tag, callback? : Action<boolean>) : void {
-		callback = (TSObject.exists(callback)) ? callback : ((s) => { return; });
+		callback = ActionHelper.getValueOrDefault(callback);
 
 		if (!TSObject.exists(tag.getId()) || tag.getId() === '') {
 			Log.error(new DAOException('Failed to delete: an id must be provided'));
@@ -136,22 +136,6 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 						);
 				}
 			);
-		// this
-		// 	.getARO()
-		// 	.executeSQL(
-		// 		'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE tag_id = "' + id + '"',
-		// 		(outcome) => {
-		// 			this
-		// 				.getARO()
-		// 				.delete(
-		// 					DAOTables.Tags,
-		// 					new Pair<string, any>('id', tag.getId()),
-		// 					(success) => {
-		// 						callback(success);
-		// 					}
-		// 				);
-		// 		}
-		// 	);
 	}
 
 	get(callback : Action<IList<Tag>>) : void {

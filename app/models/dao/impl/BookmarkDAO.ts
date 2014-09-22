@@ -143,22 +143,6 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 						);
 				}
 			);
-		// this
-		// 	.getARO()
-		// 	.executeSQL(
-		// 		'DELETE FROM ' + DAOTables.TagBookmark + ' WHERE bookmark_id = "' + id + '"',
-		// 		(outcome) => {
-		// 			this
-		// 				.getARO()
-		// 				.delete(
-		// 					DAOTables.Bookmarks,
-		// 					new Pair<string, any>('id', bookmark.getId()),
-		// 					(b) => {
-		// 						callback(b);
-		// 					}
-		// 				);
-		// 		}
-		// 	);
 	}
 
 	get(callback : Action<IList<Bookmark>>) : void {
