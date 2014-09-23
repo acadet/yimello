@@ -9,8 +9,7 @@ interface ITagBusiness {
 	// TODO : test
 	isAlreadyExisting(label : string, callback : Action<boolean>) : void;
 
-	// TODO : test
-	compare(newLabel : string, exisitingLabel : string) : boolean;
+	// compare(newLabel : string, exisitingLabel : string) : boolean;
 
 	add(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void;
 

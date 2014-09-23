@@ -127,15 +127,15 @@ class TagBusiness implements IInternalTagBusiness {
 		);
 	}
 
-	compare(newLabel : string, existingLabel : string) : boolean {
-		var tag : Tag;
+	// compare(newLabel : string, existingLabel : string) : boolean {
+	// 	var tag : Tag;
 
-		tag = new Tag();
-		tag.setLabel(existingLabel);
-		this.engineTag(tag);
+	// 	tag = new Tag();
+	// 	tag.setLabel(existingLabel);
+	// 	this.engineTag(tag);
 
-		return StringHelper.compare(newLabel, tag.getLabel());
-	}
+	// 	return StringHelper.compare(newLabel, tag.getLabel());
+	// }
 
 	add(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void {
 		callback = ActionHelper.getValueOrDefault(callback);
@@ -206,8 +206,7 @@ class TagBusiness implements IInternalTagBusiness {
 	}
 
 	delete(tag : Tag, callback? : Action0, errorHandler? : Action<string>) : void {
-		var id : string;
-
+		
 		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
@@ -217,7 +216,6 @@ class TagBusiness implements IInternalTagBusiness {
 			return;
 		}
 
-		id = tag.getId();
 		this._dao.delete(
 			tag,
 			(success) => {

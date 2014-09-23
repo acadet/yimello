@@ -185,13 +185,29 @@ module Mocks {
 
 		export class BookmarkDAO implements IBookmarkDAO {
 			private _addOutcome : Bookmark;
+			private _updateOutcome : Bookmark;
+			private _deleteOutcome : boolean;
+			private _findOutcome : Bookmark;
+			private _sortByViewsDescThenByTitleAscOutcome : IList<Bookmark>;
 
 			private _addTimes : number;
+			private _updateTimes : number;
+			private _deleteTimes : number;
+			private _findTimes : number;
+			private _sortByViewsDescThenByTitleAscTimes : number;
 
 			private _addArgs : Array<any>;
+			private _updateArgs : Array<any>;
+			private _deleteArgs : Array<any>;
+			private _findArgs : Array<any>;
+			private _sortByViewsDescThenByTitleAscArgs : Array<any>;
 
 			constructor() {
 				this._addTimes = 0;
+				this._updateTimes = 0;
+				this._deleteTimes = 0;
+				this._findTimes = 0;
+				this._sortByViewsDescThenByTitleAscTimes = 0;
 			}
 			
 			add(bookmark : Bookmark, callback? : Action<Bookmark>) : void {
@@ -205,15 +221,38 @@ module Mocks {
 
 			addRaw(bookmark : Bookmark, callback? : Action<boolean>) : void {}
 
-			update(bookmark : Bookmark, callback? : Action<Bookmark>) : void {}
+			update(bookmark : Bookmark, callback? : Action<Bookmark>) : void {
+				this._updateTimes++;
+				this._updateArgs = [bookmark, callback];
 
-			delete(bookmark : Bookmark, callback? : Action<boolean>) : void {}
+				if (TSObject.exists(callback)) {
+					callback(this._updateOutcome);
+				}
+			}
+
+			delete(bookmark : Bookmark, callback? : Action<boolean>) : void {
+				this._deleteTimes++;
+				this._deleteArgs = [bookmark, callback];
+
+				if (TSObject.exists(callback)) {
+					callback(this._deleteOutcome);
+				}
+			}
 
 			get(callback : Action<IList<Bookmark>>) : void {}
 
-			find(id : string, callback : Action<Bookmark>) : void {}
+			find(id : string, callback : Action<Bookmark>) : void {
+				this._findTimes++;
+				this._findArgs = [id, callback];
+
+				callback(this._findOutcome);
+			}
 			
-			sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void {}
+			sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void {
+				this._sortByViewsDescThenByTitleAscTimes++;
+				this._sortByViewsDescThenByTitleAscArgs = [callback];
+				callback(this._sortByViewsDescThenByTitleAscOutcome);
+			}
 
 			sortByTitleAsc(callback : Action<IList<Bookmark>>) : void {}
 
@@ -222,31 +261,179 @@ module Mocks {
 				return this;
 			}
 
+			setUpdateOutcome(value : Bookmark) : Mocks.DAO.BookmarkDAO {
+				this._updateOutcome = value;
+				return this;
+			}
+
+			setDeleteOutcome(value : boolean) : Mocks.DAO.BookmarkDAO {
+				this._deleteOutcome = value;
+				return this;
+			}
+
+			setFindOutcome(value : Bookmark) : Mocks.DAO.BookmarkDAO {
+				this._findOutcome = value;
+				return this;
+			}
+
+			setSortByViewsDescThenByTitleAscOutcome(value : IList<Bookmark>) : Mocks.DAO.BookmarkDAO {
+				this._sortByViewsDescThenByTitleAscOutcome = value;
+				return this;
+			}
+
 			addTimes() : number {
 				return this._addTimes;
+			}
+
+			updateTimes() : number {
+				return this._updateTimes;
+			}
+
+			deleteTimes() : number {
+				return this._deleteTimes;
+			}
+
+			findTimes() : number {
+				return this._findTimes;
+			}
+
+			sortByViewsDescThenByTitleAscTimes() : number {
+				return this._sortByViewsDescThenByTitleAscTimes++;
 			}
 
 			addArgs() : Array<any> {
 				return this._addArgs;
 			}
+
+			updateArgs() : Array<any> {
+				return this._updateArgs;
+			}
+
+			deleteArgs() : Array<any> {
+				return this._deleteArgs;
+			}
+
+			findArgs() : Array<any> {
+				return this._findArgs;
+			}
+
+			sortByViewsDescThenByTitleAscArgs() : Array<any> {
+				return this._sortByViewsDescThenByTitleAscArgs;
+			}
 		}
 
 		export class TagDAO implements ITagDAO {
-			add(tag : Tag, callback? : Action<Tag>) : void {}
+			private _addOutcome : Tag;
+			private _updateOutcome : Tag;
+			private _deleteOutcome : boolean;
+			private _findByLabelOutcome : Tag;
+
+			private _addTimes : number;
+			private _updateTimes : number;
+			private _deleteTimes : number;
+			private _findByLabelTimes : number;
+
+			private _addArgs : Array<any>;
+			private _updateArgs : Array<any>;
+			private _deleteArgs : Array<any>;
+			private _findByLabelArgs : Array<any>;
+
+			constructor() {
+				this._addTimes = 0;
+				this._updateTimes = 0;
+				this._deleteTimes = 0;
+				this._findByLabelTimes = 0;
+			}
+
+			add(tag : Tag, callback? : Action<Tag>) : void {
+				this._addTimes++;
+				this._addArgs = [tag, callback];
+				if (TSObject.exists(callback)) {
+					callback(this._addOutcome);
+				}
+			}
 
 			addRaw(tag : Tag, callback? : Action<boolean>) : void {}
 
-			update(tag : Tag, callback? : Action<Tag>) : void {}
+			update(tag : Tag, callback? : Action<Tag>) : void {
+				this._updateTimes++;
+				this._updateArgs = [tag, callback];
+				if (TSObject.exists(callback)) {
+					callback(this._updateOutcome);
+				}
+			}
 
-			delete(tag : Tag, callback? : Action<boolean>) : void {}
+			delete(tag : Tag, callback? : Action<boolean>) : void {
+				this._deleteTimes++;
+				this._deleteArgs = [tag, callback];
+				if (TSObject.exists(callback)) {
+					callback(this._deleteOutcome);
+				}
+			}
 
 			get(callback : Action<IList<Tag>>) : void {}
 
 			find(id : string, callback : Action<Tag>) : void {}
 
-			findByLabel(label : string, callback : Action<Tag>) : void {}
+			findByLabel(label : string, callback : Action<Tag>) : void {
+				this._findByLabelTimes++;
+				this._findByLabelArgs = [label, callback];
+				callback(this._findByLabelOutcome);
+			}
 
 			sortByLabelAsc(callback : Action<IList<Tag>>) : void {}
+
+			setAddOutcome(value : Tag) : Mocks.DAO.TagDAO {
+				this._addOutcome = value;
+				return this;
+			}
+
+			setUpdateOutcome(value : Tag) : Mocks.DAO.TagDAO {
+				this._updateOutcome = value;
+				return this;
+			}
+
+			setDeleteOutcome(value : boolean) : Mocks.DAO.TagDAO {
+				this._deleteOutcome = value;
+				return this;
+			}
+
+			setFindByLabelOutcome(value : Tag) : Mocks.DAO.TagDAO {
+				this._findByLabelOutcome = value;
+				return this;
+			}
+
+			addTimes() : number {
+				return this._addTimes;
+			}
+
+			updateTimes() : number {
+				return this._updateTimes;
+			}
+
+			deleteTimes() : number {
+				return this._deleteTimes;
+			}
+
+			findByLabelTimes() : number {
+				return this._findByLabelTimes;
+			}
+
+			addArgs() : Array<any> {
+				return this._addArgs;
+			}
+
+			updateArgs() : Array<any> {
+				return this._updateArgs;
+			}
+
+			deleteArgs() : Array<any> {
+				return this._deleteArgs;
+			}
+
+			findByLabelArgs() : Array<any> {
+				return this._findByLabelArgs;
+			}
 		}
 
 		export class TagBookmarkDAO implements ITagBookmarkDAO {

@@ -238,7 +238,6 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 	}
 
 	delete(bookmark : Bookmark, callback? : Action0, errorHandler? : Action<string>) : void {
-		var id : string;
 
 		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
@@ -249,7 +248,6 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 			return;
 		}
 
-		id = bookmark.getId();
 		this._dao.delete(
 			bookmark,
 			(success) => {
