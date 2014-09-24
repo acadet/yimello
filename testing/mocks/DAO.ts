@@ -326,23 +326,31 @@ module Mocks {
 			private _addOutcome : Tag;
 			private _updateOutcome : Tag;
 			private _deleteOutcome : boolean;
+			private _getOutcome : IList<Tag>;
 			private _findByLabelOutcome : Tag;
+			private _sortByLabelAscOutcome : IList<Tag>;
 
 			private _addTimes : number;
 			private _updateTimes : number;
 			private _deleteTimes : number;
+			private _getTimes : number;
 			private _findByLabelTimes : number;
+			private _sortByLabelAscTimes : number;
 
 			private _addArgs : Array<any>;
 			private _updateArgs : Array<any>;
 			private _deleteArgs : Array<any>;
+			private _getArgs : Array<any>;
 			private _findByLabelArgs : Array<any>;
+			private _sortByLabelAscArgs : Array<any>;
 
 			constructor() {
 				this._addTimes = 0;
 				this._updateTimes = 0;
 				this._deleteTimes = 0;
+				this._getTimes = 0;
 				this._findByLabelTimes = 0;
+				this._sortByLabelAscTimes = 0;
 			}
 
 			add(tag : Tag, callback? : Action<Tag>) : void {
@@ -371,7 +379,11 @@ module Mocks {
 				}
 			}
 
-			get(callback : Action<IList<Tag>>) : void {}
+			get(callback : Action<IList<Tag>>) : void {
+				this._getTimes++;
+				this._getArgs = [callback];
+				callback(this._getOutcome);
+			}
 
 			find(id : string, callback : Action<Tag>) : void {}
 
@@ -381,7 +393,11 @@ module Mocks {
 				callback(this._findByLabelOutcome);
 			}
 
-			sortByLabelAsc(callback : Action<IList<Tag>>) : void {}
+			sortByLabelAsc(callback : Action<IList<Tag>>) : void {
+				this._sortByLabelAscTimes++;
+				this._sortByLabelAscArgs = [callback];
+				callback(this._sortByLabelAscOutcome);
+			}
 
 			setAddOutcome(value : Tag) : Mocks.DAO.TagDAO {
 				this._addOutcome = value;
@@ -398,8 +414,18 @@ module Mocks {
 				return this;
 			}
 
+			setGetOutcome(value : IList<Tag>) : Mocks.DAO.TagDAO {
+				this._getOutcome = value;
+				return this;
+			}
+
 			setFindByLabelOutcome(value : Tag) : Mocks.DAO.TagDAO {
 				this._findByLabelOutcome = value;
+				return this;
+			}
+
+			setSortByLabelAscOutcome(value : IList<Tag>) : Mocks.DAO.TagDAO {
+				this._sortByLabelAscOutcome = value;
 				return this;
 			}
 
@@ -415,8 +441,16 @@ module Mocks {
 				return this._deleteTimes;
 			}
 
+			getTimes() : number {
+				return this._getTimes;
+			}
+
 			findByLabelTimes() : number {
 				return this._findByLabelTimes;
+			}
+
+			sortByLabelAscTimes() : number {
+				return this._sortByLabelAscTimes;
 			}
 
 			addArgs() : Array<any> {
@@ -431,31 +465,71 @@ module Mocks {
 				return this._deleteArgs;
 			}
 
+			getArgs() : Array<any> {
+				return this._getArgs;
+			}
+
 			findByLabelArgs() : Array<any> {
 				return this._findByLabelArgs;
+			}
+
+			sortByLabelAscArgs() : Array<any> {
+				return this._sortByLabelAscArgs;
 			}
 		}
 
 		export class TagBookmarkDAO implements ITagBookmarkDAO {
+			private _addMultipleTagRelationsOutcome : boolean;
+			private _updateBookmarkRelationsOutcome : boolean;
 			private _removeBookmarkRelationsOutcome : boolean;
 			private _removeTagRelationsOutcome : boolean;
+			private _sortTagsByLabelAscForBookmarkOutcome : IList<Tag>;
+			private _sortBookmarksByTitleAscForTagOutcome : IList<Bookmark>;
+			private _sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome : IList<Pair<Bookmark, IList<Tag>>>;
 
+			private _addMultipleTagRelationsTimes : number;
+			private _updateBookmarkRelationsTimes : number;
 			private _removeBookmarkRelationsTimes : number;
 			private _removeTagRelationsTimes : number;
+			private _sortTagsByLabelAscForBookmarkTimes : number;
+			private _sortBookmarksByTitleAscForTagTimes : number;
+			private _sortBookmarksByTitleAscWithBoundTagsByLabelAscTimes : number;
 
+			private _addMultipleTagRelationsArgs : Array<any>;
+			private _updateBookmarkRelationsArgs : Array<any>;
 			private _removeBookmarkRelationsArgs : Array<any>;
 			private _removeTagRelationsArgs : Array<any>;
+			private _sortTagsByLabelAscForBookmarkArgs : Array<any>;
+			private _sortBookmarksByTitleAscForTagArgs : Array<any>;
+			private _sortBookmarksByTitleAscWithBoundTagsByLabelAscArgs : Array<any>;
 
 			constructor() {
+				this._addMultipleTagRelationsTimes = 0;
+				this._updateBookmarkRelationsTimes = 0;
 				this._removeBookmarkRelationsTimes = 0;
 				this._removeTagRelationsTimes = 0;
+				this._sortTagsByLabelAscForBookmarkTimes = 0;
+				this._sortBookmarksByTitleAscForTagTimes = 0;
+				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscTimes = 0;
 			}
 
 			addRelation(tag : Tag, bookmark : Bookmark, callback? : Action<boolean>) : void {}
 
-			addMultipleTagRelations(bookmark : Bookmark, tags : IList<Tag>, callback? : Action<boolean>) : void {}
+			addMultipleTagRelations(bookmark : Bookmark, tags : IList<Tag>, callback? : Action<boolean>) : void {
+				this._addMultipleTagRelationsTimes++;
+				this._addMultipleTagRelationsArgs = [bookmark, tags, callback];
+				if (TSObject.exists(callback)) {
+					callback(this._addMultipleTagRelationsOutcome);
+				}
+			}
 
-			updateBookmarkRelations(bookmark : Bookmark, tags : IList<Tag>, callback? : Action<boolean>) : void {} 
+			updateBookmarkRelations(bookmark : Bookmark, tags : IList<Tag>, callback? : Action<boolean>) : void {
+				this._updateBookmarkRelationsTimes++;
+				this._updateBookmarkRelationsArgs = [bookmark, tags, callback];
+				if (TSObject.exists(callback)) {
+					callback(this._updateBookmarkRelationsOutcome);
+				}
+			}
 
 			removeBookmarkRelations(bookmark : Bookmark, callback? : Action<boolean>) : void {
 				this._removeBookmarkRelationsTimes++;
@@ -477,12 +551,34 @@ module Mocks {
 
 			getRaw(callback : Action<IList<any>>) : void {}
 
-			sortTagsByLabelAscForBookmark(bookmark : Bookmark, callback : Action<IList<Tag>>) : void {}
+			sortTagsByLabelAscForBookmark(bookmark : Bookmark, callback : Action<IList<Tag>>) : void {
+				this._sortTagsByLabelAscForBookmarkTimes++;
+				this._sortTagsByLabelAscForBookmarkArgs = [bookmark, callback];
+				callback(this._sortTagsByLabelAscForBookmarkOutcome);
+			}
 
-			sortBookmarksByTitleAscForTag(tag : Tag, callback : Action<IList<Bookmark>>) : void {}
+			sortBookmarksByTitleAscForTag(tag : Tag, callback : Action<IList<Bookmark>>) : void {
+				this._sortBookmarksByTitleAscForTagTimes++;
+				this._sortBookmarksByTitleAscForTagArgs = [tag, callback];
+				callback(this._sortBookmarksByTitleAscForTagOutcome);
+			}
 
-			sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void {}
+			sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void {
+				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscTimes++;
+				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscArgs = [callback];
+				callback(this._sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome);
+			}
 
+
+			setAddMultipleTagsRelationsOutcome(value : boolean) : Mocks.DAO.TagBookmarkDAO {
+				this._addMultipleTagRelationsOutcome = value;
+				return this;
+			}
+
+			setUpdateBookmarkRelationsOutcome(value : boolean) : Mocks.DAO.TagBookmarkDAO {
+				this._updateBookmarkRelationsOutcome = value;
+				return this;
+			}
 
 			setRemoveBookmarkRelationsOutcome(value : boolean) : Mocks.DAO.TagBookmarkDAO {
 				this._removeBookmarkRelationsOutcome = value;
@@ -494,6 +590,29 @@ module Mocks {
 				return this;
 			}
 
+			setSortTagsByLabelAscForBookmarkOutcome(value : IList<Tag>) : Mocks.DAO.TagBookmarkDAO {
+				this._sortTagsByLabelAscForBookmarkOutcome = value;
+				return this;
+			}
+
+			setSortBookmarksByTitleAscForTagOutcome(value : IList<Bookmark>) : Mocks.DAO.TagBookmarkDAO {
+				this._sortBookmarksByTitleAscForTagOutcome = value;
+				return this;
+			}
+
+			setSortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome(value : IList<Pair<Bookmark, IList<Tag>>>) : Mocks.DAO.TagBookmarkDAO {
+				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome = value;
+				return this;
+			}
+
+			addMultipleTagRelationsTimes() : number {
+				return this._addMultipleTagRelationsTimes;
+			}
+
+			updateBookmarkRelationsTimes() : number {
+				return this._updateBookmarkRelationsTimes;
+			}
+
 			removeBookmarkRelationsTimes() : number {
 				return this._removeBookmarkRelationsTimes;
 			}
@@ -502,12 +621,44 @@ module Mocks {
 				return this._removeTagRelationsTimes;
 			}
 
+			sortTagsByLabelAscForBookmarkTimes() : number {
+				return this._sortTagsByLabelAscForBookmarkTimes;
+			}
+
+			sortBookmarksByTitleAscForTagTimes() : number {
+				return this._sortBookmarksByTitleAscForTagTimes;
+			}
+
+			sortBookmarksByTitleAscWithBoundTagsByLabelAscTimes() : number {
+				return this._sortBookmarksByTitleAscWithBoundTagsByLabelAscTimes;
+			}
+
+			addMultipleTagRelationsArgs() : Array<any> {
+				return this._addMultipleTagRelationsArgs;
+			}
+
+			updateBookmarkRelationsArgs() : Array<any> {
+				return this._updateBookmarkRelationsArgs;
+			}
+
 			removeBookmarkRelationsArgs() : Array<any> {
 				return this._removeBookmarkRelationsArgs;
 			}
 
 			removeTagRelationsArgs() : Array<any> {
 				return this._removeTagRelationsArgs;
+			}
+
+			sortTagsByLabelAscForBookmarkArgs() : Array<any> {
+				return this._sortTagsByLabelAscForBookmarkArgs;
+			}
+
+			sortBookmarksByTitleAscForTagArgs() : Array<any> {
+				return this._sortBookmarksByTitleAscForTagArgs;
+			}
+
+			sortBookmarksByTitleAscWithBoundTagsByLabelAscArgs() : Array<any> {
+				return this._sortBookmarksByTitleAscWithBoundTagsByLabelAscArgs;
 			}
 		}
 	}

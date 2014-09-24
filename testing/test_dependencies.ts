@@ -14,6 +14,7 @@
 /// <reference path="models/beans/BookmarkTest.ts" />
 /// <reference path="models/beans/TagTest.ts" />
 /// <reference path="models/business/impl/BookmarkBusinessTest.ts" />
+/// <reference path="models/business/impl/TagBookmarkBusinessTest.ts" />
 /// <reference path="models/business/impl/TagBusinessTest.ts" />
 /// <reference path="models/business/utils/ScoredBookmarkTest.ts" />
 /// <reference path="models/business/utils/TagBookmarkBusinessArgsTest.ts" />

@@ -400,7 +400,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	// TODO : test
-	search(input : string, callback : Action<IList<Bookmark>>, errorHandler? : Action<string>) : void {
+	search(input : string, callback : Action<IList<ScoredBookmark>>, errorHandler? : Action<string>) : void {
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		this
@@ -440,8 +440,11 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 									if (r.test(sbk.getTitle())) {
 										currentScore += 20.0;
 									}
+									if (r.test(sbk.getURL())) {
+										currentScore += 10.0;
+									}
 									if (r.test(sbk.getDescription())) {
-										currentScore += 2.0;
+										currentScore += 5.0;
 									}
 
 									tagList.forEach(
