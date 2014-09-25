@@ -6,6 +6,8 @@ class DOMElementEvents {
 	static DragOver : string = 'dragover';
 	static DragEnd : string = 'dragend';
 	static Drop : string = 'drop';
+	static Focus : string = 'focus';
+	static FocusOut : string = 'focusout';
 	static KeyDown : string = 'keydown';
 	static KeyUp : string = 'keyup';
 	static MouseEnter : string = 'mouseenter';

@@ -7,6 +7,7 @@ $app-width: 800px;
 $app-height: 525px;
 $header-height: 25px;
 $body-height: $app-height - $header-height;
+
 $red: #dd381d;
 $green: #7eb530;
 $orange: #eb6841;
@@ -60,8 +61,6 @@ a {
         li {
             display: inline-block;
 
-            width: 15px;
-            height: 15px;
             margin: 0 5px;
             padding: 0;
 
@@ -70,14 +69,7 @@ a {
             @include border-radius(50%);
 
             &:hover {
-                opacity: 0.60;
-            }
-
-            &.exit-trigger {
-                background-color: $red;
-            }
-            &.minimize-trigger {
-                background-color: $orange;
+                opacity: .60;
             }
         }
     }

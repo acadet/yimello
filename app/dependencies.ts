@@ -123,5 +123,6 @@
 /// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
 
 //grunt-start
-
+/// <reference path="presenters/MainPresenter/SearchBar.ts" />
+/// <reference path="presenters/MainPresenter/templates/BookmarkTemplate.ts" />
 //grunt-end

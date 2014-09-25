@@ -20,7 +20,9 @@ class Presenter {
 			this.onDestroy();
 		});
 
-		this.onStart();
+		if (TSObject.exists(this.onStart)) {
+			this.onStart();
+		}
 	}
 
 	//endregion Constructors
@@ -32,17 +34,23 @@ class Presenter {
 	private _onResume() : void {
 		if (this._isPaused) {
 			this._isPaused = false;
-			this.onResume();
+			if (TSObject.exists(this.onResume)) {
+				this.onResume();
+			}
 		}
 	}
 
 	private _onPause() : void {
 		this._isPaused = true;
-		this.onPause();
+		if (TSObject.exists(this.onPause)) {
+			this.onPause();
+		}
 	}
 
 	private _onDestroy() : void {
-		this.onDestroy();
+		if (TSObject.exists(this.onDestroy)) {
+			this.onDestroy();
+		}
 		NodeWindow.close();
 	}
 

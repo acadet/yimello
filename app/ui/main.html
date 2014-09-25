@@ -26,8 +26,44 @@
             </ul>
         </header>
 
-        <div class="body">
-            <div class="main-view-wrapper js-main-view-wrapper">
+        <div class="body js-body">
+            
+            <div class="main-view-wrapper">
+                <div class="aside-menu js-menu">
+                    <ul>
+                        <li>Browse tags</li>
+                        <li>Add bookmark</li>
+                        <li>Add bag</li>
+                        <li>Get a tour again</li>
+                        <li>Import from browser</li>
+                        <li>Export from browser</li>
+                        <li>Import backup</li>
+                        <li>Create backup</li>
+                    </ul>    
+                </div>
+
+                <div class="main-view js-main-view">
+                    <div class="main-view-header">
+                        <img src="assets/img/menu-icon.png" class="js-menu-trigger">
+                        <p class="js-current-label">Most popular</p>
+                    </div>
+
+                    <div class="main-view-content">
+                        <ul class="bookmark-list js-bookmark-list"></ul>
+                    </div>
+
+                    <div class="search-bar js-search-bar">
+                        <ul>
+                            <li class="icon"><img src="assets/img/search-icon.png"></li>
+                            <li><input type="text"></li>
+                            <li class="clickable-icon hidden js-clear-search-bar"><img src="assets/img/clear-icon.png"></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+    
+
+            <!-- <div class="main-view-wrapper js-main-view-wrapper">
 
                 <div class="panel-wrapper js-panel-wrapper">
                     <div class="icon-wrapper js-icon-wrapper">
@@ -67,10 +103,10 @@
                         <input type="text" name="searchField" placeholder="Type something to search" />
                     </form>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Bookmark form -->
-            <div class="bookmark-form-wrapper js-bookmark-form-wrapper">
+            <!-- <div class="bookmark-form-wrapper js-bookmark-form-wrapper">
                 <ul class="bookmark-form-wrapper-list">
                     <li class="column">
                         <img src="assets/img/right-arrow-icon.png" class="cancel-trigger js-cancel-trigger" />
@@ -102,9 +138,9 @@
                         </form>
                     </li>
                     <li class="column"></li>
-            </div>
+            </div> -->
 
-            <div class="overlay js-overlay">
+            <!-- <div class="overlay js-overlay">
                 <div class="tag-form-wrapper js-tag-form-wrapper">
                     <form action="#" method="post">
                         <p><input type="text" name="tag" placeholder="My amazing tag" /></p>
@@ -122,16 +158,16 @@
                         <li class="js-import-backup">Import a backup file</li>
                     </ul>
                 </div>
-            </div>
+            </div> -->
 
-            <div class="drag-area js-drag-area">
+            <!-- <div class="drag-area js-drag-area">
                 <h1>Drag your file here</h1>
                 <h2>Otherwise, just click</h2>
-            </div>
+            </div> -->
 
-            <div class="error-message js-error-message">
+            <!-- <div class="error-message js-error-message">
                 <p></p>
-            </div>
+            </div> -->
         </div>
     </body>
 </html>
