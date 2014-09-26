@@ -14,7 +14,7 @@
         </script>
         <script type="text/javascript">
             var _mainClass = 'MainPresenter';
-            var _libs = ['jquery', 'jqueryUI'];
+            var _libs = ['jquery', 'jqueryClickout'];
         </script>
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
@@ -31,8 +31,8 @@
             <div class="main-view-wrapper">
                 <div class="aside-menu js-menu">
                     <ul>
-                        <li>Browse tags</li>
-                        <li>Add bookmark</li>
+                        <li class="js-tag-list-trigger">Browse tags</li>
+                        <li class="js-bookmark-form-trigger">Add bookmark</li>
                         <li>Add bag</li>
                         <li>Get a tour again</li>
                         <li>Import from browser</li>
@@ -45,7 +45,7 @@
                 <div class="main-view js-main-view">
                     <div class="main-view-header">
                         <img src="assets/img/menu-icon.png" class="js-menu-trigger">
-                        <p class="js-current-label">Most popular</p>
+                        <p class="js-current-tag">Most popular</p>
                     </div>
 
                     <div class="main-view-content">
@@ -55,10 +55,35 @@
                     <div class="search-bar js-search-bar">
                         <ul>
                             <li class="icon"><img src="assets/img/search-icon.png"></li>
-                            <li><input type="text"></li>
+                            <li><input type="text" placeholder="Type anything to start searching"></li>
                             <li class="clickable-icon hidden js-clear-search-bar"><img src="assets/img/clear-icon.png"></li>
                         </ul>
                     </div>
+                </div>
+            </div>
+
+            <div class="tag-list-menu-wrapper js-tag-list-menu-wrapper">
+                <div class="overlay-menu js-tag-list-menu"></div>
+            </div>
+
+            <div class="bookmark-form-menu-wrapper js-bookmark-form-menu-wrapper">
+                <div class="overlay-menu js-bookmark-form-menu">
+                    <form action="#" method="post">
+                        <p>
+                            <img src="assets/img/default-bookmark-icon.png" class="bookmark-icon js-bookmark-icon">
+                            <input type="text" name="url" placeholder="http://">
+                        </p>
+                        <p><input type="text" name="title" placeholder="An awesome title"></p>
+                        <p>
+                            <textarea name="description" placeholder="Write something useful about your bookmark"></textarea>
+                        </p>
+                        <ul class="js-available-tags"></ul>
+                        <p><input type="text" name="tag" placeholder="I want another one"></p>
+                        <p>
+                            <input type="submit" value="Save">
+                            <a href="#" class="js-bookmark-form-cancel cancel-button">Cancel</a>
+                        </p>
+                    </form>
                 </div>
             </div>
     
@@ -168,6 +193,13 @@
             <!-- <div class="error-message js-error-message">
                 <p></p>
             </div> -->
+        </div>
+
+         <div class="context-menu js-bookmark-context-menu">
+            <ul>
+                <li>Edit</li>
+                <li>Remove</li>
+            </ul>
         </div>
     </body>
 </html>

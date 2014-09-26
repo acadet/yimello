@@ -4,6 +4,7 @@ class BookmarkList {
 	//region Fields
 
 	private _source : DOMElement;
+	private _ctxtMenu : BookmarkContextMenu;
 	
 	//endregion Fields
 	
@@ -11,6 +12,7 @@ class BookmarkList {
 
 	constructor() {
 		this._source = DOMTree.findSingle('.js-bookmark-list');
+		this._ctxtMenu = new BookmarkContextMenu();
 	}
 	
 	//endregion Constructors
@@ -18,6 +20,39 @@ class BookmarkList {
 	//region Methods
 	
 	//region Private Methods
+
+	private _build(values : IList<Bookmark>) : void {
+		this._source.setHTML(BookmarkTemplate.build(values));
+		this
+			._source
+			.find('li')
+			.forEach(
+				(e) => {
+					e.on(
+						DOMElementEvents.MouseDown,
+						(args) => {
+							if (args.getWhich() === 1) {
+								BusinessFactory.buildBookmark(
+									(business) => {
+										business.find(
+											e.getData('id'),
+											(bookmark) => {
+												bookmark.setViews(bookmark.getViews());
+
+												business.update(bookmark);
+												NodeWindow.openExternal(bookmark.getURL());
+											}
+										);
+									}
+								);
+							} else if (args.getWhich() === 3) {
+								this._ctxtMenu.show(args.getPageY(), args.getPageX());
+							}
+						}
+					);
+				}
+			);
+	}
 	
 	//endregion Private Methods
 	
@@ -28,7 +63,44 @@ class BookmarkList {
 			(business) => {
 				business.sortByViewsDescThenByTitleAsc(
 					(outcome) => {
-						outcome.forEach((e) => this._source.append(BookmarkTemplate.build(e)));
+						this._build(outcome);
+					}
+				);
+			}
+		);
+	}
+
+	sortForTag(tag : Tag) : void {
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.sortBookmarksByTitleAscForTag(
+					tag,
+					(outcome) => {
+						this._build(outcome);
+					}
+				);
+			}
+		);
+	}
+
+	search(input : string) : void {
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.search(
+					input,
+					(outcome) => {
+						var values : IList<Bookmark>;
+
+						values = new ArrayList<Bookmark>();
+						outcome.forEach(
+							(e) => {
+								if (e.getScore() > 0.05) {
+									values.add(e);
+								}
+							}
+						);
+
+						this._build(values);
 					}
 				);
 			}

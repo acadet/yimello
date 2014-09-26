@@ -3,13 +3,18 @@
 class SearchBar {
 	//region Fields
 
+	private _listener : ISearchBarListener;
 	private _bar : DOMElement;
+	private _input : DOMElement;
+	private _clear : DOMElement;
+	private _delayer : Timer;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor() {
+	constructor(listener : ISearchBarListener) {
+		this._listener = listener;
 		this._setUp();
 	}
 	
@@ -19,37 +24,58 @@ class SearchBar {
 	
 	//region Private Methods
 
+	private _startTimer() : void {
+		var value : string;
+
+		value = this._input.getValue();
+
+		if (TSObject.exists(this._delayer)) {
+			this._delayer.stop();
+		}
+
+		this._delayer = new Timer(
+			(o) => {
+				if (value.length > 0) {
+					this._listener.onSearchRequest(value);
+				} else {
+					this._listener.onSearchCancel();
+				}
+			},
+			700
+		);
+	}
+
+	private _hideClear() : void {
+		if (!this._clear.hasClass('hidden')) {
+			this._clear.addClass('hidden');
+		}
+	}
+
 	private _setUp() : void {
-		var input : DOMElement, clear : DOMElement;
-		var hideClear : Action0, showClear : Action0;
+		var showClear : Action0;
 
 		this._bar = DOMTree.findSingle('.js-search-bar');
-		input = this._bar.findSingle('input');
-		clear = this._bar.findSingle('.js-clear-search-bar');
-
-		hideClear = () => {
-			if (!clear.hasClass('hidden')) {
-				clear.addClass('hidden');
-			}
-		};
+		this._input = this._bar.findSingle('input');
+		this._clear = this._bar.findSingle('.js-clear-search-bar');
 
 		showClear = () => {
-			if (clear.hasClass('hidden')) {
-				clear.removeClass('hidden');
+			if (this._clear.hasClass('hidden')) {
+				this._clear.removeClass('hidden');
 			}
 		};
 
-		clear.on(
+		this._clear.on(
 			DOMElementEvents.Click,
 			(args) => {
-				if (input.getValue().length > 0) {
-					input.setValue('');
-					hideClear();
-					input.focus();
+				if (this._input.getValue().length > 0) {
+					this._input.setValue('');
+					this._hideClear();
+					this._input.focus();
+					this._startTimer();
 				}
 			}
 		);
-		input.on(
+		this._input.on(
 			DOMElementEvents.Focus,
 			(args) => {
 				if (!this._bar.hasClass('active')) {
@@ -57,26 +83,28 @@ class SearchBar {
 				}
 			}
 		);
-		input.on(
+		this._input.on(
 			DOMElementEvents.Blur,
 			(args) => {
-				if (input.getValue().length < 1) {
-					hideClear();
+				if (this._input.getValue().length < 1) {
+					this._hideClear();
 					this._bar.removeClass('active');
 				}
 			}
 		);
-		input.on(
+		this._input.on(
 			DOMElementEvents.KeyDown,
 			(args) => {
 				var value : string;
 
-				value = input.getValue();
+				value = this._input.getValue();
 				if (value.length > 0) {
 					showClear();
 				} else {
-					hideClear();
+					this._hideClear();
 				}
+
+				this._startTimer();
 			}
 		);
 	}
@@ -85,6 +113,15 @@ class SearchBar {
 	
 	//region Public Methods
 	
+	reset() : void {
+		if (TSObject.exists(this._delayer)) {
+			this._delayer.stop();
+		}
+		this._hideClear();
+		this._input.setValue('');
+		this._input.blur();
+	}
+
 	//endregion Public Methods
 	
 	//endregion Methods

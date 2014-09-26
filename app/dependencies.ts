@@ -105,24 +105,32 @@
 /// <reference path="presenters/TourPresenter.ts" />
 
 // Main presenter
+/// <reference path="presenters/MainPresenter/context-menus/ContextMenu.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/BookmarkContextMenu.ts" />
 
-/// <reference path="presenters/MainPresenter/utils/MainPresenterMediator.ts" />
-/// <reference path="presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/Menu/interfaces/IMenuControlSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/Menu/interfaces/ISubMenuOwner.ts" />
-/// <reference path="presenters/MainPresenter/TagList.ts" />
-/// <reference path="presenters/MainPresenter/BookmarkForm.ts" />
-/// <reference path="presenters/MainPresenter/BookmarkList.ts" />
-/// <reference path="presenters/MainPresenter/MainPresenter.ts" />
-/// <reference path="presenters/MainPresenter/Menu/SubMenu.ts" />
-/// <reference path="presenters/MainPresenter/Menu/TagFormSubMenu.ts" />
-/// <reference path="presenters/MainPresenter/Menu/MenuSubMenu.ts" />
-/// <reference path="presenters/MainPresenter/Menu/MenuControl.ts" />
-/// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/OverlayMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/BookmarkFormMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/TagListMenu.ts" />
+
 
 //grunt-start
+/// <reference path="presenters/MainPresenter/BookmarkList.ts" />
+/// <reference path="presenters/MainPresenter/MainPresenter.ts" />
 /// <reference path="presenters/MainPresenter/SearchBar.ts" />
+/// <reference path="presenters/MainPresenter/TagList.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/ISearchBarListener.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/MenuControl.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/MenuSubMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/SubMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/TagFormSubMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IMenuControlSubscriber.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ISubMenuOwner.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagListMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/utils/DragFileArea.ts" />
 /// <reference path="presenters/MainPresenter/templates/BookmarkTemplate.ts" />
+/// <reference path="presenters/MainPresenter/templates/TagListTemplate.ts" />
+/// <reference path="presenters/MainPresenter/utils/MainPresenterMediator.ts" />
 //grunt-end

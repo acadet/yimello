@@ -1,10 +1,18 @@
 /// <reference path="../../dependencies.ts" />
 
-class MainPresenter extends YimelloPresenter {
+class MainPresenter
+	extends YimelloPresenter
+	implements
+		ITagListMenuListener,
+	 	ISearchBarListener {
 	//region Fields
 
 	private _searchBar : SearchBar;
 	private _bookmarkList : BookmarkList;
+	private _tagListMenu : TagListMenu;
+	private _bookmarkFormMenu : BookmarkFormMenu;
+
+	private _currentTag : DOMElement;
 	
 	//endregion Fields
 	
@@ -61,6 +69,18 @@ class MainPresenter extends YimelloPresenter {
 				}
 			}
 		);
+
+		menu
+			.find('li')
+			.forEach(
+				(e) => {
+					e.on(DOMElementEvents.Click, (args) => hideMenu());
+				}
+			);
+	}
+
+	private _setCurrentTag(value : string) : void {
+		this._currentTag.setText(value);
 	}
 	
 	//endregion Private Methods
@@ -71,11 +91,44 @@ class MainPresenter extends YimelloPresenter {
 		super.onStart();
 
 		this._setMenu();
-		this._searchBar = new SearchBar();
+		this._searchBar = new SearchBar(this);
 		this._bookmarkList = new BookmarkList();
+		this._tagListMenu = new TagListMenu(this);
+		this._bookmarkFormMenu = new BookmarkFormMenu();
 
-		this._bookmarkList.sortMostPopular();
+		this._currentTag = DOMTree.findSingle('.js-current-tag');
+
+		this.onMostPopularSelection();
 	}
+
+	//region ITagListMenuSubscriber
+
+	onMostPopularSelection() : void {
+		this._searchBar.reset();
+		this._bookmarkList.sortMostPopular();
+		this._setCurrentTag('Most popular');
+	}
+
+	onTagSelection(t : Tag) : void {
+		this._searchBar.reset();
+		this._bookmarkList.sortForTag(t);
+		this._setCurrentTag(t.getLabel());
+	}
+
+	//endregion ITagListMenuSubscriber
+
+	//region ISearchBarListener
+
+	onSearchRequest(input : string) : void {
+		this._bookmarkList.search(input);
+		this._setCurrentTag('Search Results');
+	}
+
+	onSearchCancel() : void {
+		this.onMostPopularSelection();
+	}
+
+	//endregion
 	
 	//endregion Public Methods
 	

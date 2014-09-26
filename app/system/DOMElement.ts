@@ -3,6 +3,7 @@
 class DOMElementEvents {
 	static Blur : string = 'blur';
 	static Click : string = 'click';
+	static ClickOut : string = 'clickout';
 	static DragOver : string = 'dragover';
 	static DragEnd : string = 'dragend';
 	static Drop : string = 'drop';
@@ -10,6 +11,7 @@ class DOMElementEvents {
 	static FocusOut : string = 'focusout';
 	static KeyDown : string = 'keydown';
 	static KeyUp : string = 'keyup';
+	static MouseDown : string = 'mousedown';
 	static MouseEnter : string = 'mouseenter';
 	static MouseLeave : string = 'mouseleave';
 	static Submit : string = 'submit';
@@ -117,6 +119,10 @@ class DOMElement extends TSObject {
 	append(e : DOMElement) : DOMElement {
 		this._element.append(e.toJQuery());
 		return this;
+	}
+
+	blur() : void {
+		this._element.blur();
 	}
 
 	centerize(reference = new DOMElement($('body'))) : void {
@@ -247,43 +253,43 @@ class DOMElement extends TSObject {
 		return this._element.hasClass(c);
 	}
 
-	hide(effect : string, duration : number, callback : DOMElementAnimationCallback = null) : void {
-		this._element.hide({
-			effect : effect,
-			duration : duration,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			}
-		});
-	}
+	// hide(effect : string, duration : number, callback : DOMElementAnimationCallback = null) : void {
+	// 	this._element.hide({
+	// 		effect : effect,
+	// 		duration : duration,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		}
+	// 	});
+	// }
 
-	hideEasing(effect : string, duration : number, easing : string, callback : DOMElementAnimationCallback = null) : void {
-		this._element.hide({
-			effect : effect,
-			duration : duration,
-			easing : easing,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			}
-		});
-	}
+	// hideEasing(effect : string, duration : number, easing : string, callback : DOMElementAnimationCallback = null) : void {
+	// 	this._element.hide({
+	// 		effect : effect,
+	// 		duration : duration,
+	// 		easing : easing,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		}
+	// 	});
+	// }
 
-	hideDrop(duration : number, direction : string, callback : DOMElementAnimationCallback = null) {
-		this._element.hide({
-			effect : 'drop',
-			direction : direction,
-			duration : duration,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			}
-		});
-	}
+	// hideDrop(duration : number, direction : string, callback : DOMElementAnimationCallback = null) {
+	// 	this._element.hide({
+	// 		effect : 'drop',
+	// 		direction : direction,
+	// 		duration : duration,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		}
+	// 	});
+	// }
 
 	horizontalCenterize(reference = new DOMElement($('body'))) : void {
 		this.setCss({
@@ -350,57 +356,57 @@ class DOMElement extends TSObject {
 		this._element.val(value);
 	}
 
-	show(effect : string, duration : number, callback : DOMElementAnimationCallback = null) : void {
-		this._element.show({
-			effect : effect,
-			duration : duration,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			}
-		});
-	}
+	// show(effect : string, duration : number, callback : DOMElementAnimationCallback = null) : void {
+	// 	this._element.show({
+	// 		effect : effect,
+	// 		duration : duration,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		}
+	// 	});
+	// }
 
-	showEasing(effect : string, duration : number, easing : string, callback : DOMElementAnimationCallback = null) {
-		this._element.show({
-			effect : effect,
-			duration : duration,
-			easing : easing,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			}
-		});
-	}
+	// showEasing(effect : string, duration : number, easing : string, callback : DOMElementAnimationCallback = null) {
+	// 	this._element.show({
+	// 		effect : effect,
+	// 		duration : duration,
+	// 		easing : easing,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		}
+	// 	});
+	// }
 
-	showDrop(duration : number, direction : string, callback : DOMElementAnimationCallback = null) : void {
-		this._element.show({
-			effect : 'drop',
-			duration : duration,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			},
-			direction : direction
-		});
-	}
+	// showDrop(duration : number, direction : string, callback : DOMElementAnimationCallback = null) : void {
+	// 	this._element.show({
+	// 		effect : 'drop',
+	// 		duration : duration,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		},
+	// 		direction : direction
+	// 	});
+	// }
 
-	showDropEasing(duration : number, easing : string, direction : string, callback : DOMElementAnimationCallback = null) : void {
-		this._element.show({
-			effect : 'drop',
-			duration : duration,
-			easing : easing,
-			complete : () => {
-				if (callback !== null) {
-					callback(this);
-				}
-			},
-			direction : direction
-		});
-	}
+	// showDropEasing(duration : number, easing : string, direction : string, callback : DOMElementAnimationCallback = null) : void {
+	// 	this._element.show({
+	// 		effect : 'drop',
+	// 		duration : duration,
+	// 		easing : easing,
+	// 		complete : () => {
+	// 			if (callback !== null) {
+	// 				callback(this);
+	// 			}
+	// 		},
+	// 		direction : direction
+	// 	});
+	// }
 
 	toJQuery() : any {
 		return this._element;

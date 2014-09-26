@@ -1,5 +1,3 @@
-_libs.push('output');
-
 require.config({
 	baseUrl : 'js',
 	paths : {
@@ -16,6 +14,12 @@ define('jqueryUI', ['jquery'], function() {
 	require(['libs/jquery-ui-1.10.4.min']);
 });
 
+define('jqueryClickout', ['jquery'], function() {
+	require(['libs/jquery.clickout']);
+});
+
 require(_libs, function() {
-	var _bootClass = eval('new ' + _mainClass + '()');
+	require(['output'], function() {
+		var _bootClass = eval('new ' + _mainClass + '()');
+	});
 });

@@ -22,12 +22,12 @@ $main-view-search-bar-height : 40px;
 	background : transparentize(white, 0.9);
 }
 ::-webkit-scrollbar-thumb {
-	background : transparentize(black, 0.5);
+	background : transparentize(white, 0.5);
 }
 ::-webkit-scrollbar-corner       { /* 6 */ }
 ::-webkit-resizer                { /* 7 */ }
 
-.main-view-wrapper, ._overlay-menu {
+.main-view-wrapper, ._overlay-menu-wrapper {
 	position : absolute;
 	top : 0;
 	left : 0;
@@ -80,9 +80,12 @@ $main-view-search-bar-height : 40px;
 	}
 }
 
+.main-view, ._overlay-menu-wrapper {
+	background-image : url($img-folder + 'main-background.jpg');
+}
+
 .main-view {
 	width : 100%;
-	background-image : url($img-folder + 'main-background.jpg');
 
 	&.background {
 		left : $aside-menu-width;
@@ -108,10 +111,10 @@ $main-view-search-bar-height : 40px;
 		display : inline-block;
 		vertical-align : middle;
 		margin : 0px 5px;
+		cursor : pointer;
 	}
 
 	img {
-		cursor : pointer;
 		@include transition(opacity, 0.5s, ease);
 
 		&:hover {
@@ -125,7 +128,6 @@ $main-view-search-bar-height : 40px;
 			family : $oxygen;
 			size : 1em;
 		}
-		cursor : default;
 	}
 }
 
@@ -138,7 +140,7 @@ $main-view-search-bar-height : 40px;
 	@include transition(background-color, 0.5s, ease);
 
 	&.active, &:hover:not(.active) {
-		background-color : transparentize(black, 0.70);
+		background-color : transparentize(black, 0.5);
 	}
 
 	ul {
@@ -170,22 +172,32 @@ $main-view-search-bar-height : 40px;
 				opacity : 0;
 				cursor : default;
 			}
+		}
+	}
 
-			input {
-				width : $app-width - (30 * 2) - 20 - 10;
-				height : 100%;
-				border : none;
-				outline : none;
-				padding : 0 5px 0 20px;
-				background : transparent;
-				color : white;
-				@include box-sizing(border-box);
+	ul li input {
+		width : $app-width - (30 * 2) - 20 - 10;
+		height : 100%;
+		border : none;
+		outline : none;
+		padding : 0 5px 0 20px;
+		background : transparent;
+		color : white;
+		@include box-sizing(border-box);
 
-				font : {
-					family : $oxygen;
-					size : 0.9em;
-				}
-			}
+		font : {
+			family : $oxygen;
+			size : 0.9em;
+		}
+
+		&::-webkit-input-placeholder {
+			opacity : 0;
+			@include transition(opacity, 0.5s, ease);
+		}
+
+		&:focus::-webkit-input-placeholder, &:hover::-webkit-input-placeholder {
+			color : transparentize(white, 0.25);
+			opacity : 1;
 		}
 	}
 }
@@ -197,7 +209,7 @@ $main-view-search-bar-height : 40px;
 	z-index : 1;
 
 	ul {
-		margin : 10px 20px;
+		margin : 10px 20px 30px 20px;
 		padding : 0;
 		list-style-type : none;
 		overflow-x : hidden;
@@ -228,6 +240,7 @@ $main-view-search-bar-height : 40px;
 
 		.bookmark-details-wrapper {
 			width : 75%;
+			margin : 1em 0;
 		}
 
 		img {
@@ -247,28 +260,113 @@ $main-view-search-bar-height : 40px;
 			font-weight : normal;
 			color : white;
 			font-size : 1em;
+			line-height : 1.8em;
 		}
 
 		p {
 			color : #ccc;
 			font-size : 0.8em;
 			text-align : justify;
+			line-height : 1.6em;
 		}
 	}
 }
 
-._overlay-menu {
+._overlay-menu-wrapper {
 	z-index : 2;
-	background-color : transparentize(black, 0.75);
 	display : none;
-	padding : 20px;
+	opacity : 0;
 	@include box-sizing(border-box);
+	overflow : auto;
+	overflow-X : hidden;
+
+	.overlay-menu {
+		margin : 30px;
+	}
 }
 
-.tag-list-menu {
-	@extend ._overlay-menu;
+.tag-list-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+
+	h2, li {
+		color : white;
+		font-family : $oxygen;
+		word-break : break-word;
+	}
+
+	ul {
+		margin : 0;
+		padding : 0;
+		list-style-type : none;
+
+		li {
+			display : inline-block;
+			margin : 10px 2.5%;
+			width : 28%;
+			font-size : 0.9em;
+			cursor : pointer;
+			vertical-align : top;
+		}
+	}
+
+	h2 {
+		margin : 1.5em 0 0.5em 0;
+		font-size : 1.2em;
+		font-weight : normal;
+		padding : 0 50px 2px 10px;
+
+		&.index {
+			border-bottom : 2px solid transparentize(white, 0.70);
+			color : transparentize(white, 0.70);
+			margin-right : $app-width * .70;
+		}
+
+		&:not(.index) {
+			cursor : pointer;
+		}
+	}
+}
+
+.bookmark-form-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
 
 
+}
+
+.context-menu {
+	position : absolute;
+	display : none;
+	z-index : 99;
+	width : 150px;
+
+	background-color : white;
+	@include border-radius(5px);
+	box-shadow : 5px 5px 5px 0 transparentize(black, 0.5);
+
+	&.visible {
+		display : block;
+	}
+
+	ul {
+		margin : 5px 0;
+		padding : 0;
+		list-style-type: none;
+
+		li {
+			color : $black;
+			font : {
+				family : $oxygen;
+				size : 0.9em;
+			}
+			padding : 5px 5px 5px 20px;
+			word-break : break-word;
+			cursor : pointer;
+
+			&:hover {
+				background-color : $blue;
+			}
+		}
+	}
 }
 
 // .main-view-wrapper {
