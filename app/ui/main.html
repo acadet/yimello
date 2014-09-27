@@ -69,19 +69,17 @@
             <div class="bookmark-form-menu-wrapper js-bookmark-form-menu-wrapper">
                 <div class="overlay-menu js-bookmark-form-menu">
                     <form action="#" method="post">
-                        <p>
-                            <img src="assets/img/default-bookmark-icon.png" class="bookmark-icon js-bookmark-icon">
-                            <input type="text" name="url" placeholder="http://">
-                        </p>
+                        <img src="assets/img/default-bookmark-icon.png" class="bookmark-icon js-bookmark-icon">
+                        <p><input type="text" name="url" placeholder="http://"></p>
                         <p><input type="text" name="title" placeholder="An awesome title"></p>
                         <p>
                             <textarea name="description" placeholder="Write something useful about your bookmark"></textarea>
                         </p>
                         <ul class="js-available-tags"></ul>
-                        <p><input type="text" name="tag" placeholder="I want another one"></p>
+                        <p><input type="text" name="tag" placeholder="Press enter to add a new tag"></p>
                         <p>
-                            <input type="submit" value="Save">
-                            <a href="#" class="js-bookmark-form-cancel cancel-button">Cancel</a>
+                            <input type="submit" value="Save" class="confirm-button">
+                            <button type="button" class="js-bookmark-form-cancel cancel-button">Cancel</button>
                         </p>
                     </form>
                 </div>

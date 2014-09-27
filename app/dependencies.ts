@@ -131,6 +131,7 @@
 /// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagListMenuListener.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/utils/DragFileArea.ts" />
 /// <reference path="presenters/MainPresenter/templates/BookmarkTemplate.ts" />
+/// <reference path="presenters/MainPresenter/templates/TagBookmarkFormTemplate.ts" />
 /// <reference path="presenters/MainPresenter/templates/TagListTemplate.ts" />
 /// <reference path="presenters/MainPresenter/utils/MainPresenterMediator.ts" />
 //grunt-end

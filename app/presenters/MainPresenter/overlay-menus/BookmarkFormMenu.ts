@@ -2,6 +2,13 @@
 
 class BookmarkFormMenu extends OverlayMenu {
 	//region Fields
+
+	private _bookmarkIcon : DOMElement;
+	private _urlInput : DOMElement;
+	private _titleInput : DOMElement;
+	private _descriptionInput : DOMElement;
+	private _tagList : DOMElement;
+	private _tagAdditionInput : DOMElement;
 	
 	//endregion Fields
 	
@@ -19,19 +26,70 @@ class BookmarkFormMenu extends OverlayMenu {
 	//region Private Methods
 
 	private _setUp() : void {
+		var menu : DOMElement, form : DOMElement;;
+
+		menu = DOMTree.findSingle('.js-bookmark-form-menu');
+
 		DOMTree
 			.findSingle('.js-bookmark-form-trigger')
 			.on(
 				DOMElementEvents.Click,
 				(args) => {
-					super.show();
+					this.prepareAddition();
 				}
 			);
+
+		form = menu.findSingle('form');
+		form.on(
+			DOMElementEvents.Submit,
+			(args) => {
+				args.preventDefault();
+			}
+		);
+
+		this._bookmarkIcon = form.findSingle('.js-bookmark-icon');
+		this._urlInput = form.findSingle('input[name="url"]');
+		this._titleInput = form.findSingle('input[name="title"]');
+		this._descriptionInput = form.findSingle('textarea[name="description"]');
+		this._tagList = form.findSingle('.js-available-tags');
+		this._tagAdditionInput = form.findSingle('input[name="tag"]');
 	}
 	
 	//endregion Private Methods
 	
 	//region Public Methods
+
+	prepareAddition() : void {
+		this._bookmarkIcon.setAttribute('src', FaviconHelper.getDefaultSrc());
+		this._urlInput.setValue('');
+		this._titleInput.setValue('');
+		this._descriptionInput.setValue('');
+		this._tagAdditionInput.setValue('');
+
+		BusinessFactory.buildTag(
+			(business) => {
+				business.sortByLabelAsc(
+					(outcome) => {
+						this._tagList.setHTML(TagBookmarkTemplate.build(outcome));
+						this
+							._tagList
+							.find('li')
+							.forEach(
+								(e) => {
+									e.on(DOMElementEvents.Click, (args) => e.toggleClass('active'));
+								}
+							);
+
+						super.show();
+					}
+				);
+			}
+		);
+	}
+
+	prepareUpdate(bookmark : Bookmark) : void {
+		super.show();
+	}
 	
 	//endregion Public Methods
 	

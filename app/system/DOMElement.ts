@@ -356,6 +356,10 @@ class DOMElement extends TSObject {
 		this._element.val(value);
 	}
 
+	toggleClass(value : string) : void {
+		this._element.toggleClass(value);
+	}
+
 	// show(effect : string, duration : number, callback : DOMElementAnimationCallback = null) : void {
 	// 	this._element.show({
 	// 		effect : effect,

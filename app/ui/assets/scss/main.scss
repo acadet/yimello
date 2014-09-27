@@ -27,6 +27,41 @@ $main-view-search-bar-height : 40px;
 ::-webkit-scrollbar-corner       { /* 6 */ }
 ::-webkit-resizer                { /* 7 */ }
 
+._button {
+	min-width : 125px;
+	padding : 5px 10px;
+	margin : 0 5px;
+	display : inline-block;
+	border : 1px solid transparent;
+	font : {
+		family : $oxygen;
+		size : 0.9em;
+	}
+	color : white;
+	background : transparentize(white, 0.75);
+	outline : none;
+	cursor : pointer;
+
+	@include transition(background-color, .25s, ease);
+	@include border-radius(5px);
+}
+
+.confirm-button {
+	@extend ._button;
+
+	&:hover {
+		background-color : $blue;
+	}
+}
+
+.cancel-button {
+	@extend ._button;
+
+	&:hover {
+		background-color : $red;
+	}
+}
+
 .main-view-wrapper, ._overlay-menu-wrapper {
 	position : absolute;
 	top : 0;
@@ -330,7 +365,72 @@ $main-view-search-bar-height : 40px;
 .bookmark-form-menu-wrapper {
 	@extend ._overlay-menu-wrapper;
 
+	form {
+		text-align : center;
 
+		.bookmark-icon {
+			width : 16px;
+			padding : 15px;
+			background-color : transparentize(white, 0.75);
+			@include border-radius(50%);
+		}
+
+		textarea, input[type="text"] {
+			width : 250px;
+			padding : 10px;
+			outline : none;
+			border : none;
+			background-color : transparentize(black, 0.75);
+			font : {
+				family : $oxygen;
+				size : 0.9em;
+			}
+			color : white;
+			@include border-radius(5px);
+
+			@include transition(background-color, .5s, ease);
+
+			&:focus {
+				background-color : transparentize(black, 0.5);
+			}
+
+			&::-webkit-input-placeholder {
+				color : transparentize(white, 0.25);
+			}
+		}
+
+		textarea {
+			height : 150px;
+		}
+	}
+
+	form ul {
+		width : 300px;
+		margin : 0;
+		padding : 0;
+		list-style-type : none;
+		display : inline-block;
+
+		li {
+			display : inline-block;
+			vertical-align : middle;
+			padding : 2.5px 10px;
+			margin : 5px;
+			font : {
+				family : $oxygen;
+				size : 0.8em;
+			}
+			color : white;
+			background-color : transparentize(white, 0.75);
+			cursor : pointer;
+
+			@include transition(background-color, .5s, ease);
+
+			&:hover, &.active {
+				background-color : $blue;
+			}
+		}
+	}
 }
 
 .context-menu {
