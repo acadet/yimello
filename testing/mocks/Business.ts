@@ -27,7 +27,7 @@ module Mocks {
 				return true;
 			}
 
-			isAlreadyExisting(label : string, callback : Action<boolean>) : void {}
+			isNotAlreadyExisting(label : string, callback : Action<boolean>) : void {}
 
 			compare(newLabel : string, exisitingLabel : string) : boolean {
 				return true;

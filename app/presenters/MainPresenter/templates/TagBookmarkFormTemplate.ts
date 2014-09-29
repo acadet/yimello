@@ -1,13 +1,17 @@
 /// <reference path="../../../dependencies.ts" />
 
 class TagBookmarkTemplate {
-	static build(values : IList<Tag>) : string {
+	static build(value : Tag) : string {
+		return '<li data-id="' + value.getId() + '">' + value.getLabel() + '</li>';
+	}
+
+	static buildList(values : IList<Tag>) : string {
 		var outcome : StringBuffer;
 
 		outcome = new StringBuffer();
 
 		values.forEach((e) => {
-			outcome.append('<li data-id="' + e.getId() + '">' + e.getLabel() + '</li>');
+			outcome.append(this.build(e));
 		});
 
 		return outcome.toString();

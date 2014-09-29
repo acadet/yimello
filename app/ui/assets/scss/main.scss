@@ -1,10 +1,5 @@
 @import "common";
 
-// $black: #333;
-//$blue: #0c7cbb;
-$blue : #22a8e8;
-$black : #3d3e44;
-
 $aside-menu-width : 200px;
 //$main-view-header-height : 40px;
 $main-view-search-bar-height : 40px;
@@ -29,7 +24,7 @@ $main-view-search-bar-height : 40px;
 
 ._button {
 	min-width : 125px;
-	padding : 5px 10px;
+	padding : 5px 15px;
 	margin : 0 5px;
 	display : inline-block;
 	border : 1px solid transparent;
@@ -116,7 +111,7 @@ $main-view-search-bar-height : 40px;
 }
 
 .main-view, ._overlay-menu-wrapper {
-	background-image : url($img-folder + 'main-background.jpg');
+	background-image : url($img-folder + 'background.png');
 }
 
 .main-view {
@@ -305,18 +300,60 @@ $main-view-search-bar-height : 40px;
 			line-height : 1.6em;
 		}
 	}
+
+	.default-bookmark-list {
+		display : none;
+		font: {
+			size : 1.2em;
+			family : $oxygen;
+		}
+		margin : 3em 1em;
+		color : transparentize(white, 0.25);
+		text-align : center;
+	}
 }
 
 ._overlay-menu-wrapper {
 	z-index : 2;
 	display : none;
 	opacity : 0;
-	@include box-sizing(border-box);
 	overflow : auto;
 	overflow-X : hidden;
 
 	.overlay-menu {
 		margin : 30px;
+
+		form {
+			text-align : center;
+
+			textarea, input[type="text"] {
+				width : 250px;
+				padding : 10px;
+				outline : none;
+				border : none;
+				background-color : transparentize(black, 0.75);
+				font : {
+					family : $oxygen;
+					size : 0.9em;
+				}
+				color : white;
+				@include border-radius(5px);
+
+				@include transition(background-color, .5s, ease);
+
+				&:focus {
+					background-color : transparentize(black, 0.5);
+				}
+
+				&::-webkit-input-placeholder {
+					color : transparentize(white, 0.25);
+				}
+			}
+
+			textarea {
+				height : 150px;
+			}
+		}
 	}
 }
 
@@ -365,43 +402,11 @@ $main-view-search-bar-height : 40px;
 .bookmark-form-menu-wrapper {
 	@extend ._overlay-menu-wrapper;
 
-	form {
-		text-align : center;
-
-		.bookmark-icon {
-			width : 16px;
-			padding : 15px;
-			background-color : transparentize(white, 0.75);
-			@include border-radius(50%);
-		}
-
-		textarea, input[type="text"] {
-			width : 250px;
-			padding : 10px;
-			outline : none;
-			border : none;
-			background-color : transparentize(black, 0.75);
-			font : {
-				family : $oxygen;
-				size : 0.9em;
-			}
-			color : white;
-			@include border-radius(5px);
-
-			@include transition(background-color, .5s, ease);
-
-			&:focus {
-				background-color : transparentize(black, 0.5);
-			}
-
-			&::-webkit-input-placeholder {
-				color : transparentize(white, 0.25);
-			}
-		}
-
-		textarea {
-			height : 150px;
-		}
+	form .bookmark-icon {
+		width : 16px;
+		padding : 15px;
+		background-color : transparentize(white, 0.75);
+		@include border-radius(50%);
 	}
 
 	form ul {
@@ -426,10 +431,40 @@ $main-view-search-bar-height : 40px;
 
 			@include transition(background-color, .5s, ease);
 
-			&:hover, &.active {
+			&:hover:not(.active) {
+				background-color : transparentize(white, .5);
+			}
+
+			&.active {
 				background-color : $blue;
 			}
 		}
+	}
+}
+
+.bookmark-deletion-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+
+	.overlay-menu {
+		margin-top : 200px;
+	}
+
+	p {
+		color : white;
+		font : {
+			family : $oxygen;
+			size : 1.2em;
+		}
+		text-align : center;
+		margin : 1em;
+	}
+}
+
+.tag-form-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+
+	.overlay-menu {
+		margin-top : 180px;
 	}
 }
 

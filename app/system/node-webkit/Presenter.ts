@@ -3,7 +3,6 @@
 class Presenter {
 
 	//region Fields
-
 	private _isPaused : boolean;
 	
 	//endregion Fields
@@ -17,12 +16,10 @@ class Presenter {
 		NodeWindow.on(NodeWindowEvents.Focus, this._onResume);
 		NodeWindow.on(NodeWindowEvents.Close, this._onDestroy);
 		NodeWindow.on(NodeWindowEvents.Move, () => {
-			this.onDestroy();
+			if (TSObject.exists(this.onDestroy)) {
+				this.onDestroy();
+			}
 		});
-
-		if (TSObject.exists(this.onStart)) {
-			this.onStart();
-		}
 	}
 
 	//endregion Constructors

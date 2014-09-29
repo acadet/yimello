@@ -1,9 +1,7 @@
 /// <reference path="../../../../dependencies.ts" />
 
-interface IMenuControlSubscriber {
+interface ITagFormMenuListener {
 	onTagAddition() : void;
 
 	onTagUpdate() : void;
-
-	onTagCancellation() : void;
 }

@@ -2,8 +2,8 @@
 
 class YimelloPresenter extends Presenter {
 	//region Fields
-	
-	private _notificationItem : NotificationMessage;
+
+	private _notifier : Notifier;
 
 	//endregion Fields
 	
@@ -12,7 +12,7 @@ class YimelloPresenter extends Presenter {
 	constructor() {
 		super();
 
-		this._notificationItem = new NotificationMessage();
+		this._notifier = new Notifier();
 
 		DOMTree
 			.findSingle('.js-exit-trigger')
@@ -45,6 +45,7 @@ class YimelloPresenter extends Presenter {
 
 	onStart() : void {
 		super.onStart();
+
 		DOMTree.findSingle('.js-body').animate(
 			{
 				opacity : 1
@@ -53,16 +54,8 @@ class YimelloPresenter extends Presenter {
 		);
 	}
 
-	showError(msg : string) : void {
-		this._notificationItem.alert(msg);
-	}
-
-	showWarning(msg : string) : void {
-		this._notificationItem.warn(msg);
-	}
-
-	showNotification(msg : string) : void {
-		this._notificationItem.inform(msg);
+	getNotifier() : Notifier {
+		return this._notifier;
 	}
 
 	//endregion Public Methods

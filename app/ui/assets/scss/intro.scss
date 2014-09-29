@@ -1,7 +1,7 @@
 @import "common";
 
 .body {
-	background: url($img-folder + 'patchwork_bg.jpg');
+	background: url($img-folder + 'background.png');
 	background-position: center;
 }
 
@@ -38,7 +38,7 @@
 
 	h1 {
 		font : {
-			family : $ptSans;
+			family : $oxygen;
 			size : 1.3em;
 		}
 

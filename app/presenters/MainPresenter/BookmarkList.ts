@@ -1,18 +1,32 @@
 /// <reference path="../../dependencies.ts" />
 
-class BookmarkList {
+enum BookmarkListStates {
+	MostPopular,
+	Tag,
+	Search
+}
+
+class BookmarkList implements IBookmarkContextMenuListener {
 	//region Fields
 
+	private _listener : IBookmarkListListener;
+
 	private _source : DOMElement;
+	private _defaultContent : DOMElement;
 	private _ctxtMenu : BookmarkContextMenu;
+
+	private _state : BookmarkListStates;
+	private _currentTag : Tag;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor() {
+	constructor(listener : IBookmarkListListener) {
+		this._listener = listener;
 		this._source = DOMTree.findSingle('.js-bookmark-list');
-		this._ctxtMenu = new BookmarkContextMenu();
+		this._defaultContent = DOMTree.findSingle('.js-default-bookmark-list');
+		this._ctxtMenu = new BookmarkContextMenu(this);
 	}
 	
 	//endregion Constructors
@@ -22,6 +36,14 @@ class BookmarkList {
 	//region Private Methods
 
 	private _build(values : IList<Bookmark>) : void {
+		if (values.getLength() === 0) {
+			this._defaultContent.setCss({ display : 'block'});
+			this._source.setHTML('');
+			return;
+		} else {
+			this._defaultContent.setCss({ display : 'none'});
+		}
+
 		this._source.setHTML(BookmarkTemplate.build(values));
 		this
 			._source
@@ -46,7 +68,7 @@ class BookmarkList {
 									}
 								);
 							} else if (args.getWhich() === 3) {
-								this._ctxtMenu.show(args.getPageY(), args.getPageX());
+								this._ctxtMenu.show(e.getData('id'), args.getPageY(), args.getPageX());
 							}
 						}
 					);
@@ -59,6 +81,7 @@ class BookmarkList {
 	//region Public Methods
 
 	sortMostPopular() : void {
+		this._state = BookmarkListStates.MostPopular;
 		BusinessFactory.buildBookmark(
 			(business) => {
 				business.sortByViewsDescThenByTitleAsc(
@@ -71,6 +94,8 @@ class BookmarkList {
 	}
 
 	sortForTag(tag : Tag) : void {
+		this._state = BookmarkListStates.Tag;
+		this._currentTag = tag;
 		BusinessFactory.buildTagBookmark(
 			(business) => {
 				business.sortBookmarksByTitleAscForTag(
@@ -84,6 +109,7 @@ class BookmarkList {
 	}
 
 	search(input : string) : void {
+		this._state = BookmarkListStates.Search;
 		BusinessFactory.buildTagBookmark(
 			(business) => {
 				business.search(
@@ -106,6 +132,31 @@ class BookmarkList {
 			}
 		);
 	}
+
+	refresh() : void {
+		switch (this._state) {
+			case BookmarkListStates.MostPopular:
+				this.sortMostPopular();
+				break;
+			case BookmarkListStates.Tag:
+				this.sortForTag(this._currentTag);
+				break;
+			default:
+				break;
+		}
+	}
+
+	//region IBookmarkContextMenuListener
+
+	requestEdition(id : string) : void {
+		this._listener.onBookmarkUpdateRequest(id);
+	}
+
+	requestDeletion(id : string) : void {
+		this._listener.onBookmarkDeletionRequest(id);
+	}
+
+	//endregion IBookmarkContextMenuListener
 	
 	//endregion Public Methods
 	

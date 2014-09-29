@@ -3,6 +3,10 @@
 class BookmarkFormMenu extends OverlayMenu {
 	//region Fields
 
+	private _updatingBookmark : Bookmark;
+	private _notifier : Notifier;
+	private _listener : IBookmarkFormMenuListener;
+
 	private _bookmarkIcon : DOMElement;
 	private _urlInput : DOMElement;
 	private _titleInput : DOMElement;
@@ -14,8 +18,12 @@ class BookmarkFormMenu extends OverlayMenu {
 	
 	//region Constructors
 
-	constructor() {
+	constructor(subscriber : IBookmarkFormMenuListener, notifier : Notifier) {
 		super(DOMTree.findSingle('.js-bookmark-form-menu-wrapper'));
+
+		this._listener = subscriber;
+		this._notifier = notifier;
+
 		this._setUp();
 	}
 	
@@ -26,7 +34,7 @@ class BookmarkFormMenu extends OverlayMenu {
 	//region Private Methods
 
 	private _setUp() : void {
-		var menu : DOMElement, form : DOMElement;;
+		var menu : DOMElement, form : DOMElement;
 
 		menu = DOMTree.findSingle('.js-bookmark-form-menu');
 
@@ -44,6 +52,12 @@ class BookmarkFormMenu extends OverlayMenu {
 			DOMElementEvents.Submit,
 			(args) => {
 				args.preventDefault();
+
+				if (TSObject.exists(this._updatingBookmark)) {
+					this._update();
+				} else {
+					this._add();
+				}
 			}
 		);
 
@@ -53,6 +67,183 @@ class BookmarkFormMenu extends OverlayMenu {
 		this._descriptionInput = form.findSingle('textarea[name="description"]');
 		this._tagList = form.findSingle('.js-available-tags');
 		this._tagAdditionInput = form.findSingle('input[name="tag"]');
+
+		this._setUpURLInput();
+		this._setUpTagAdditionInput();
+
+		form
+			.findSingle('.js-bookmark-form-cancel')
+			.on(
+				DOMElementEvents.Click,
+				(args) => {
+					super.hide();
+				}
+			);
+	}
+
+	private _setUpURLInput() : void {
+		var callback : Action<DOMElementEventObject>;
+
+		callback = (args) => {
+			var url : string;
+
+			url = this._urlInput.getValue();
+
+			if (!FormHelper.isFilled(url)) {
+				return;
+			}
+
+			this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(url));
+
+			if (FormHelper.isFilled(this._titleInput.getValue())
+				|| FormHelper.isFilled(this._descriptionInput.getValue())) {
+				return;
+			}
+
+			this._notifier.inform('Processing URL...');
+
+			URLDetailsProvider.getDetails(
+				url,
+				(title, description) => {
+					this._notifier.inform('Done!');
+					this._titleInput.setValue(title);
+					this._descriptionInput.setValue(description);
+				},
+				(type, msg) => {
+					Log.warn('An error has occured while processing URL: ' + msg);
+					this._notifier.warn('Ouch! I failed pulling data from your URL... Please check it again');
+				}
+			);
+		};
+
+		this._urlInput.on(
+			DOMElementEvents.KeyDown,
+			(args) => {
+				if (args.getWhich() === 13) {
+					callback(args);
+				}
+			}
+		);
+
+		this._urlInput.on(
+			DOMElementEvents.Blur,
+			callback
+		);
+	}
+
+	private _setUpTagAdditionInput() : void {
+		this._tagAdditionInput.on(
+			DOMElementEvents.KeyDown,
+			(args) => {
+				if (args.getWhich() === 13) {
+					BusinessFactory.buildTag(
+						(business) => {
+							var value : string;
+
+							value = this._tagAdditionInput.getValue();
+							this._tagAdditionInput.setValue('');
+
+							if (business.isValueValid(value)) {
+								var children : IList<DOMElement>;
+								var newElement : DOMElement;
+								var comparableValue : string;
+
+								children = this._tagList.getChildren();
+								value = SecurityHelper.disarm(StringHelper.trim(value));
+								comparableValue = value.toLowerCase();
+
+								for (var i = 0; i < children.getLength(); i++) {
+									var e : DOMElement = children.getAt(i);
+
+									if (e.getText().toLowerCase() === comparableValue) {
+										e.addClass('active');
+										return;
+									}
+								}
+
+								newElement = DOMElement.fromString(TagBookmarkTemplate.build(new Tag().setLabel(value)));
+								newElement.addClass('active');
+								newElement.on(
+									DOMElementEvents.Click,
+									(args) => {
+										newElement.remove();
+									}
+								);
+								this._tagList.append(newElement);
+							}
+						}
+					);
+				}
+			}
+		);
+	}
+
+	private _getSelectedTags() : IList<Tag> {
+		var outcome : IList<Tag>;
+		var children : IList<DOMElement>;
+
+		outcome = new ArrayList<Tag>();
+		children = this._tagList.getChildren();
+
+		children.forEach(
+			(e) => {
+				if (e.hasClass('active')) {
+					var t : Tag;
+
+					t = new Tag();
+					t
+						.setId(e.getData('id'))
+						.setLabel(e.getData('label'));
+
+					outcome.add(t);
+				}
+			}
+		);
+
+		return outcome;
+	}
+
+	private _add() : void {
+		var b : Bookmark;
+
+		b = new Bookmark();
+		b.setURL(this._urlInput.getValue());
+		b.setTitle(this._titleInput.getValue());
+		b.setDescription(this._descriptionInput.getValue());
+
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.addMergeAndBind(
+					b,
+					this._getSelectedTags(),
+					() => {
+						this._listener.onBookmarkAddition();
+						super.hide();
+					},
+					(msg) => this._notifier.alert(msg)
+				);
+			}
+		);
+	}
+
+	private _update() : void {
+		this._updatingBookmark.setURL(this._urlInput.getValue());
+		this._updatingBookmark.setTitle(this._titleInput.getValue());
+		this._updatingBookmark.setDescription(this._descriptionInput.getValue());
+
+		BusinessFactory.buildTagBookmark(
+			(business) => {
+				business.updateMergeAndBind(
+					this._updatingBookmark,
+					this._getSelectedTags(),
+					() => {
+						this._listener.onBookmarkUpdate();
+						super.hide();
+					},
+					(msg) => this._notifier.alert(msg)
+				);
+			}
+		);
 	}
 	
 	//endregion Private Methods
@@ -60,6 +251,8 @@ class BookmarkFormMenu extends OverlayMenu {
 	//region Public Methods
 
 	prepareAddition() : void {
+		this._updatingBookmark = null;
+
 		this._bookmarkIcon.setAttribute('src', FaviconHelper.getDefaultSrc());
 		this._urlInput.setValue('');
 		this._titleInput.setValue('');
@@ -70,7 +263,7 @@ class BookmarkFormMenu extends OverlayMenu {
 			(business) => {
 				business.sortByLabelAsc(
 					(outcome) => {
-						this._tagList.setHTML(TagBookmarkTemplate.build(outcome));
+						this._tagList.setHTML(TagBookmarkTemplate.buildList(outcome));
 						this
 							._tagList
 							.find('li')
@@ -88,497 +281,58 @@ class BookmarkFormMenu extends OverlayMenu {
 	}
 
 	prepareUpdate(bookmark : Bookmark) : void {
-		super.show();
+		this._updatingBookmark = bookmark;
+
+		this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(bookmark.getURL()));
+		this._urlInput.setValue(bookmark.getURL());
+		this._titleInput.setValue(bookmark.getTitle());
+		this._descriptionInput.setValue(bookmark.getDescription());
+		this._tagAdditionInput.setValue('');
+
+		BusinessFactory.buildTag(
+			(business) => {
+				business.sortByLabelAsc(
+					(tags) => {
+						this._tagList.setHTML(TagBookmarkTemplate.buildList(tags));
+
+						BusinessFactory.buildTagBookmark(
+							(business) => {
+								business.sortTagsByLabelAscForBookmark(
+									this._updatingBookmark,
+									(outcome) => {
+										var i : number;
+
+										i = 0;
+										this
+											._tagList
+											.find('li')
+											.forEach(
+												(e) => {
+													if (TSObject.exists(
+															outcome.findFirst(
+																(o) => (o.getId() === tags.getAt(i).getId())
+															)
+														)) {
+														e.addClass('active');
+													}
+
+													e.on(DOMElementEvents.Click, (args) => e.toggleClass('active'));
+													i++;
+												}
+											);
+
+										super.show();
+									}
+								);
+							}
+						);
+					}
+				);
+			}
+		);
 	}
 	
 	//endregion Public Methods
 	
 	//endregion Methods
 }
-
-// class BookmarkForm {
-// 	//region Fields
-	
-// 	/**
-// 	 * URL input
-// 	 */
-// 	private _urlInput : DOMElement;
-
-// 	/**
-// 	 * Title input
-// 	 */
-// 	private _titleInput : DOMElement;
-
-// 	/**
-// 	 * Description input
-// 	 */
-// 	private _descriptionInput : DOMElement;
-
-// 	/**
-// 	 * Tags input
-// 	 */
-// 	private _tagsInput : DOMElement;
-
-// 	/**
-// 	 * List where tags are displayed
-// 	 */
-// 	private _tagList : DOMElement;
-
-// 	/**
-// 	 * DataList where tags are appended (suggested tags for user)
-// 	 */
-// 	private _tagDataList : DOMElement;
-
-// 	private _bookmarkIcon : DOMElement;
-
-// 	private _deleteButton : DOMElement;
-
-// 	/**
-// 	 * List of current tags
-// 	 */
-// 	private _currentTags : IList<Tag>;
-
-// 	/**
-// 	 * Subscriber to form event
-// 	 */
-// 	private _subscriber : IBookmarkFormSubscriber;
-
-// 	private _isUpdating : boolean;
-
-// 	private _currentUpdatedBookmark : Bookmark;
-
-// 	private _notificationObj : NotificationMessage;
-
-// 	//endregion Fields
-	
-// 	//region Constructors
-	
-// 	constructor(subscriber : IBookmarkFormSubscriber, notificationObj : NotificationMessage) {
-// 		var wrapper : DOMElement = DOMTree.findSingle('.js-bookmark-form-wrapper');
-
-// 		this._subscriber = subscriber;
-// 		this._notificationObj = notificationObj;
-
-// 		// First, grab all dom elements
-// 		this._urlInput = wrapper.findSingle('input[name="url"]');
-// 		this._titleInput = wrapper.findSingle('input[name="title"]');
-// 		this._descriptionInput = wrapper.findSingle('textarea[name="description"]');
-// 		this._tagsInput = wrapper.findSingle('input[name="tags"]');
-// 		this._tagList = wrapper.findSingle('.js-form-tag-list');
-// 		this._tagDataList = wrapper.findSingle('.js-tag-suggestions');
-// 		this._deleteButton = wrapper.findSingle('.js-delete-button');
-// 		this._bookmarkIcon = wrapper.findSingle('.js-bookmark-icon');
-
-// 		// Cancel button
-// 		var cancelTrigger : DOMElement = wrapper.findSingle('.js-cancel-trigger');
-// 		cancelTrigger.verticalCenterizeWithMargin();
-// 		cancelTrigger.on(
-// 				DOMElementEvents.Click,
-// 				(e) => {
-// 					this._subscriber.onBookmarkCancellation();
-// 				}
-// 			);
-
-// 		// Save button
-// 		wrapper
-// 			.findSingle('.js-save-button')
-// 			.on(
-// 				DOMElementEvents.Click,
-// 				(e) => {
-// 					if (this._isUpdating) {
-// 						this._onUpdate();
-// 					} else {
-// 						this._onAdd();
-// 					}
-// 				}
-// 			);
-
-// 		// Delete button
-// 		this._deleteButton.on(
-// 			DOMElementEvents.Click,
-// 			(e) => {
-// 				this._onDelete();
-// 			}
-// 		);
-
-// 		this._bookmarkIcon.on(
-// 			DOMElementEvents.Click,
-// 			(e) => {
-// 				if (this._isUpdating) {
-// 					BusinessFactory.buildBookmark(
-// 						(business) => {
-// 							this._currentUpdatedBookmark.setViews(this._currentUpdatedBookmark.getViews() + 1);
-// 							// TODO: test errors
-// 							business.update(this._currentUpdatedBookmark);
-// 							NodeWindow.openExternal(this._currentUpdatedBookmark.getURL());
-// 						}
-// 					);
-// 				}
-// 			}
-// 		);
-
-// 		this._prepareTagsInput();
-// 		this._prepareURLInput();
-// 	}
-
-// 	//endregion Constructors
-	
-// 	//region Methods
-	
-// 	//region Private Methods
-	
-// 	private _engineFormInputs() : boolean {
-// 		var url : string = this._urlInput.getValue();
-// 		var title : string = this._titleInput.getValue();
-
-// 		this._urlInput.removeClass('error');
-// 		this._titleInput.removeClass('error');
-// 		this._tagsInput.removeClass('error');
-
-// 		// Test if all values have been provided
-// 		if (!FormHelper.isFilled(url)) {
-// 			this._notificationObj.alert('Your bookmark will be nicer with an address');
-// 			this._urlInput.addClass('error');
-// 			return false;
-// 		}
-
-// 		if (!FormHelper.isFilled(title)) {
-// 			this._notificationObj.alert('Sorry, but a title is needed too!');
-// 			this._titleInput.addClass('error');
-// 			return false;
-// 		}
-
-// 		if (this._currentTags.getLength() < 1) {
-// 			this._notificationObj.alert('Oh no! Don\'t let your bookmark alone! Introduce him some tags');
-// 			this._tagsInput.addClass('error');
-// 			return false;
-// 		}
-
-// 		return true;
-// 	}
-
-// 	/**
-// 	 * Called when user asks for saving
-// 	 */
-// 	private _onAdd() : void {
-// 		var b : Bookmark;
-// 		var url : string = this._urlInput.getValue();
-// 		var title : string = this._titleInput.getValue();
-// 		var description : string = this._descriptionInput.getValue();
-
-// 		if (!this._engineFormInputs()) {
-// 			return;
-// 		}
-
-// 		b = new Bookmark();
-// 		b
-// 			.setURL(url)
-// 			.setTitle(title)
-// 			.setDescription(description);
-
-// 		// Process: add new bookmark
-// 		// Then save new tags
-// 		// Finally bind tags to bookmark
-// 		BusinessFactory.buildBookmark(
-// 			(bkBusiness) => {
-// 				bkBusiness.add(
-// 					b,
-// 					(outcome) => {
-// 						b = outcome;
-
-// 						BusinessFactory.buildTag(
-// 							(tagBusiness) => {
-// 								tagBusiness.merge(
-// 									this._currentTags,
-// 									(outcome) => {
-// 										BusinessFactory.buildTagBookmark(
-// 											(tagBkBusiness) => {
-// 												tagBkBusiness.bindTags(
-// 													b,
-// 													outcome,
-// 													() => {
-// 														this._subscriber.onBookmarkAddition();
-// 													},
-// 													this._notificationObj.alert
-// 												);
-// 											}
-// 										);
-// 									},
-// 									this._notificationObj.alert
-// 								);
-// 							}
-// 						);
-// 					},
-// 					this._notificationObj.alert
-// 				);
-// 			}
-// 		);
-// 	}
-
-// 	private _onUpdate() : void {
-// 		var url : string = this._urlInput.getValue();
-// 		var title : string = this._titleInput.getValue();
-// 		var description : string = this._descriptionInput.getValue();
-
-// 		if (!this._engineFormInputs()) {
-// 			return;
-// 		}
-
-// 		this._currentUpdatedBookmark
-// 			.setURL(url)
-// 			.setTitle(title)
-// 			.setDescription(description);
-
-// 		// TODO: replace by a single function
-// 		BusinessFactory.buildBookmark(
-// 			(bkBusiness) => {
-// 				bkBusiness.update(
-// 					this._currentUpdatedBookmark,
-// 					(outcome) => {
-// 						this._currentUpdatedBookmark = outcome;
-
-// 						BusinessFactory.buildTag(
-// 							(tagBusiness) => {
-// 								tagBusiness.merge(
-// 									this._currentTags,
-// 									(outcome) => {
-// 										BusinessFactory.buildTagBookmark(
-// 											(tagBkBusiness) => {
-// 												tagBkBusiness.updateTagBinding(
-// 													this._currentUpdatedBookmark,
-// 													outcome,
-// 													() => {
-// 														this._subscriber.onBookmarkUpdate();
-// 													},
-// 													this._notificationObj.alert
-// 												);
-// 											}
-// 										);
-// 									},
-// 									this._notificationObj.alert
-// 								);
-// 							}
-// 						);
-// 					},
-// 					this._notificationObj.alert
-// 				);
-// 			}
-// 		);
-// 	}
-
-// 	private _onDelete() : void {
-// 		var isOk : boolean;
-
-// 		if (!this._isUpdating) {
-// 			return;
-// 		}
-
-// 		isOk = confirm('Do you want to remove this bookmark?');
-// 		if (!isOk) {
-// 			return;
-// 		}
-
-// 		BusinessFactory.buildBookmark(
-// 			(business) => {
-// 				business.delete(
-// 					this._currentUpdatedBookmark,
-// 					() => {
-// 						this._subscriber.onBookmarkDeletion();
-// 					},
-// 					this._notificationObj.alert
-// 				);
-// 			}
-// 		);
-// 	}
-
-// 	/**
-// 	 * Called when a new tag is added by user
-// 	 * @param {string} value [description]
-// 	 */
-// 	private _addTag(value : string) : void {
-// 		var tag : Tag;
-// 		var e : DOMElement;
-// 		var test : Tag;
-// 		var s : StringBuffer;
-
-// 		// Do nothing with empty strings
-// 		if (StringHelper.trim(value) === '') {
-// 			return;
-// 		}
-
-// 		// Avoid harmful values
-// 		value = SecurityHelper.disarm(value);
-
-// 		// Test if tag is not already in list
-// 		test = this._currentTags.findFirst(
-// 			(o) => {
-// 				return StringHelper.compare(o.getLabel(), value);
-// 			}
-// 		);
-
-// 		if (test !== null) {
-// 			// A similar value is already in list, do nothing
-// 			return;
-// 		}
-
-// 		tag = new Tag();
-// 		tag.setLabel(value);
-// 		this._currentTags.add(tag);
-
-// 		s = new StringBuffer('<li><p>' + tag.getLabel() + '</p>');
-// 		s.append('<img src="assets/img/x-mark-icon-2.png" data-label="' + tag.getLabel() + '" /></li>');
-// 		e = DOMElement.fromString(s.toString());
-
-// 		e
-// 			.findSingle('img')
-// 			.on(
-// 				DOMElementEvents.Click,
-// 				(arg) => {
-// 					this._currentTags.removeIf(
-// 						e => StringHelper.compare(arg.getTarget().getData('label'), e.getLabel())
-// 					);
-// 					e.remove();
-// 				}
-// 			);
-
-// 		this._tagList.append(e);
-// 	}
-
-// 	/**
-// 	 * Binds events to tag input
-// 	 */
-// 	private _prepareTagsInput() : void {
-// 		this._tagsInput.on(
-// 			DOMElementEvents.KeyDown,
-// 			(e) => {
-// 				if (e.getWhich() === 13) {
-// 					this._addTag(e.getTarget().getValue());
-// 					e.getTarget().setValue('');
-// 				}
-// 			}
-// 		);
-// 	}
-
-// 	/**
-// 	 * Binds events to url input
-// 	 */
-// 	private _prepareURLInput() : void {
-// 		var callback : DOMElementEventHandler;
-
-// 		callback = (e) => {
-// 			var title : string;
-// 			var description : string;
-
-// 			title = this._titleInput.getValue();
-// 			description = this._descriptionInput.getValue();
-
-// 			if (FormHelper.isFilled(title) || FormHelper.isFilled(description)) {
-// 				// Fill title and description only if they are not already
-// 				// filled
-// 				return;
-// 			}
-
-// 			// Get details from provided url
-// 			URLDetailsProvider.getDetails(
-// 				e.getTarget().getValue(),
-// 				(title, description) => {
-// 					this._titleInput.setValue(title);
-// 					this._descriptionInput.setValue(description);
-
-// 					this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(e.getTarget().getValue()));
-// 				},
-// 				(type, error) => {
-// 					// TODO
-// 				}
-// 			);
-// 		};
-
-// 		// Handler can be triggered on blur or enter key pressed
-// 		this._urlInput.on(DOMElementEvents.Blur, callback);
-// 		this._urlInput.on(
-// 			DOMElementEvents.KeyDown,
-// 			(e) => {
-// 				if (e.getWhich() === 13) {
-// 					callback(e);
-// 				}
-// 			}
-// 		);
-// 	}
-
-// 	private _reset() : void {
-// 		// Reset current tag list
-// 		this._currentTags = new ArrayList<Tag>();
-// 		this._tagList.getChildren().forEach(e => e.remove());
-
-// 		// Reset tag suggestions
-// 		this._tagDataList.getChildren().forEach(e => e.remove());
-// 		BusinessFactory.buildTag(
-// 			(business) => {
-// 				business.sortByLabelAsc(
-// 					(outcome) => {
-// 						outcome.forEach(
-// 							(tag)  => {
-// 								var e : DOMElement;
-// 								e = DOMElement.fromString('<option value="' + tag.getLabel() + '"></option>');
-
-// 								this._tagDataList.append(e);
-// 							}
-// 						);
-// 					}
-// 				);
-// 			}
-// 		);
-
-// 		// Reset inputs
-// 		this._urlInput.setValue('');
-// 		this._titleInput.setValue('');
-// 		this._descriptionInput.setValue('');
-// 		this._tagsInput.setValue('');
-
-// 		this._deleteButton.setCss({display : 'none'});
-// 	}
-
-// 	//endregion Private Methods
-	
-// 	//region Public Methods
-	
-// 	resetToAdd() : void {
-// 		this._reset();
-// 		this._isUpdating = false;
-
-// 		// Reset all fields
-// 		this._urlInput.setValue('');
-// 		this._titleInput.setValue('');
-// 		this._descriptionInput.setValue('');
-
-// 		this._bookmarkIcon.setAttribute('src', FaviconHelper.getDefaultSrc());
-// 	}
-
-// 	resetToUpdate(bookmark : Bookmark) : void {
-// 		this._reset();
-// 		this._isUpdating = true;
-// 		this._currentUpdatedBookmark = bookmark;
-
-// 		this._urlInput.setValue(bookmark.getURL());
-// 		this._titleInput.setValue(bookmark.getTitle());
-// 		this._descriptionInput.setValue(bookmark.getDescription());
-
-// 		this._deleteButton.setCss({display : 'inline-block'});
-// 		this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(bookmark.getURL()));
-
-// 		BusinessFactory.buildTagBookmark(
-// 			(business) => {
-// 				business.sortTagsByLabelAscForBookmark(
-// 					bookmark,
-// 					(outcome) => {
-// 						outcome.forEach(e => this._addTag(e.getLabel()));
-// 					}
-// 				);
-// 			}
-// 		);
-// 	}
-
-// 	//endregion Public Methods
-	
-// 	//endregion Methods
-// }

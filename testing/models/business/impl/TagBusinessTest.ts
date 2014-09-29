@@ -105,7 +105,7 @@ class TagBusinessTest extends UnitTestClass {
 
 	//endregion isValueValid
 
-	TagBusinessIsAlreadyExistingTest() : void {
+	TagBusinessIsNotAlreadyExistingTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
@@ -113,7 +113,7 @@ class TagBusinessTest extends UnitTestClass {
 				this._dao.setFindByLabelOutcome(null);
 
 				// Act
-				this._business.isAlreadyExisting(
+				this._business.isNotAlreadyExisting(
 					'  foo< ',
 					(success) => {
 						// Assert

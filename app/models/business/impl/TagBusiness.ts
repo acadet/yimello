@@ -114,15 +114,40 @@ class TagBusiness implements IInternalTagBusiness {
 		return true;
 	}
 
-	isAlreadyExisting(label : string, callback : Action<boolean>) : void {
-		var s : string;
+	isNotAlreadyExisting(label : string, callback : Action<boolean>) : void {
+		var t : Tag;
 
-		s = SecurityHelper.disarm(StringHelper.trim(label));
+		t = new Tag();
+		t.setLabel(label);
+		this.engineTag(t);
 
 		this._dao.findByLabel(
-			s,
+			t.getLabel(),
 			(outcome) => {
 				callback(!TSObject.exists(outcome));
+			}
+		);
+	}
+
+	isNotAlreadyExistingButNotProvided(label : string, tag : Tag, callback : Action<boolean>) : void {
+		var t : Tag;
+
+		t = new Tag();
+		t.setLabel(label);
+		this.engineTag(t);
+
+		this._dao.findByLabel(
+			t.getLabel(),
+			(outcome) => {
+				if (TSObject.exists(outcome)) {
+					if (outcome.getId() === tag.getId()) {
+						callback(true);
+					} else {
+						callback(false);
+					}
+				} else {
+					callback(true);
+				}
 			}
 		);
 	}

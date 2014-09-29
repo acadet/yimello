@@ -10,8 +10,10 @@ $body-height: $app-height - $header-height;
 
 $red: #dd381d;
 $green: #7eb530;
-$orange: #eb6841;
+$orange: #eb6c17;
 $yellow: #f6e741;
+$blue : #22a8e8;
+$black : #3d3e44;
 
 body {
     position: absolute;
@@ -85,6 +87,40 @@ a {
     height: $body-height;
 
     opacity: 0;
+}
+
+.notifier {
+    position : fixed;
+    z-index : 99;
+    display : none;
+    width : 200px;
+
+    &.inform {
+        background-color : $blue;
+    }
+
+    &.warn {
+        background-color : $orange;
+    }
+
+    &.alert {
+        background-color : $red;
+    }
+
+    .notifier-content {
+        background-color : white;
+        width : 195px;
+        margin : 0 0 0 5px;
+        padding : 10px 15px;
+        @include box-sizing(border-box);
+
+        font : {
+            family : $oxygen;
+            size : 0.8em;
+        }
+
+        color : $black;
+    }
 }
 
 // .error-message {

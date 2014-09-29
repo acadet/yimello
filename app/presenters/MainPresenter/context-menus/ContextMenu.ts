@@ -40,7 +40,7 @@ class ContextMenu {
 	
 	//region Public Methods
 
-	show(top : number, left : number) : void {
+	_show(top : number, left : number) : void {
 		if (this._target.hasClass('visible')) {
 			return;
 		}

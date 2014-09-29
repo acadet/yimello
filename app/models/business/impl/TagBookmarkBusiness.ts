@@ -239,6 +239,58 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			);
 	}
 
+	addMergeAndBind(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void {
+		this
+			._args
+			.getBookmarkBusiness()
+			.add(
+				bookmark,
+				(outcome) => {
+					var bk : Bookmark;
+
+					bk = outcome;
+
+					this
+						._args
+						.getTagBusiness()
+						.merge(
+							tags,
+							(outcome) => {
+								this.bindTags(bk, outcome, callback, errorHandler);
+							},
+							errorHandler
+						);
+				},
+				errorHandler
+			);
+	}
+
+	updateMergeAndBind(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void {
+		this
+			._args
+			.getBookmarkBusiness()
+			.update(
+				bookmark,
+				(outcome) => {
+					var bk : Bookmark;
+
+					bk = outcome;
+
+					this
+						._args
+						.getTagBusiness()
+						.merge(
+							tags,
+							(outcome) => {
+								this.updateTagBinding(bk, outcome, callback, errorHandler);
+							},
+							errorHandler
+						);
+				},
+				errorHandler
+			);
+	}
+
 	bindTags(
 		bookmark : Bookmark,
 		tags : IList<Tag>,

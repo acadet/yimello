@@ -6,6 +6,12 @@ interface ITagBookmarkBusiness {
 		callback : Action<IList<Tag>>,
 		errorHandler? : Action<string>) : void;
 
+	// TODO : test
+	addMergeAndBind(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void;
+
+	// TODO : test
+	updateMergeAndBind(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void;
+
 	/**
 	 * Binds multiple tags to a bookmark
 	 */

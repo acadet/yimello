@@ -21,5 +21,6 @@ define('jqueryClickout', ['jquery'], function() {
 require(_libs, function() {
 	require(['output'], function() {
 		var _bootClass = eval('new ' + _mainClass + '()');
+		_bootClass.onStart();
 	});
 });

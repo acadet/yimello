@@ -260,11 +260,11 @@ class TourPresenter extends YimelloPresenter {
 							);
 						},
 						(errorMsg) => {
-							this.showError(errorMsg);
+							super.getNotifier().alert(errorMsg);
 							this._urlInput.addClass('error');
 						},
 						(warningMsg) => {
-							this.showWarning(warningMsg);
+							super.getNotifier().warn(warningMsg);
 						}
 					);
 				}
@@ -329,7 +329,7 @@ class TourPresenter extends YimelloPresenter {
 														);
 													},
 													(errorMsg) => {
-														this.showError(errorMsg);
+														super.getNotifier().alert(errorMsg);
 														this._tagInput.addClass('error');
 													}
 												);
@@ -337,18 +337,18 @@ class TourPresenter extends YimelloPresenter {
 										);
 									},
 									(errorMsg) => {
-										this.showError(errorMsg);
+										super.getNotifier().alert(errorMsg);
 										this._tagInput.addClass('error');
 									}
 								);
 							}
 						);
 					} else {
-						this.showError('Damn! You were too fast. Please add some tags before saving');
+						super.getNotifier().alert('Damn! You were too fast. Please add some tags before saving');
 						this._tagInput.addClass('error');
 					}
 				} else {
-					this.showError('Whoops, you forgot a step! Define a bookmark before dealing with tags');
+					super.getNotifier().alert('Whoops, you forgot a step! Define a bookmark before dealing with tags');
 					this._urlInput.addClass('error');
 					this._swapSlide(TourPresenterSlides.URL);
 				}

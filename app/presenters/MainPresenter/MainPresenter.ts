@@ -3,14 +3,20 @@
 class MainPresenter
 	extends YimelloPresenter
 	implements
+		IBookmarkListListener,
 		ITagListMenuListener,
-	 	ISearchBarListener {
+	 	ISearchBarListener,
+	 	IBookmarkFormMenuListener,
+	 	IBookmarkDeletionMenuListener,
+	 	ITagFormMenuListener {
 	//region Fields
 
 	private _searchBar : SearchBar;
 	private _bookmarkList : BookmarkList;
 	private _tagListMenu : TagListMenu;
 	private _bookmarkFormMenu : BookmarkFormMenu;
+	private _bookmarkDeletionMenu : BookmarkDeletionMenu;
+	private _tagFormMenu : TagFormMenu;
 
 	private _currentTag : DOMElement;
 	
@@ -63,8 +69,8 @@ class MainPresenter
 
 		DOMTree.getDocument().on(
 			DOMElementEvents.KeyDown,
-			(arg) => {
-				if (arg.getWhich() === 27) {
+			(args) => {
+				if (args.getWhich() === 27) {
 					hideMenu();
 				}
 			}
@@ -74,7 +80,15 @@ class MainPresenter
 			.find('li')
 			.forEach(
 				(e) => {
-					e.on(DOMElementEvents.Click, (args) => hideMenu());
+					e.on(
+						DOMElementEvents.Click,
+						(args) => {
+							hideMenu();
+							if (e.hasClass('js-tour-trigger')) {
+								NodeWindow.moveTo('tour.html');
+							}
+						}
+					);
 				}
 			);
 	}
@@ -92,14 +106,46 @@ class MainPresenter
 
 		this._setMenu();
 		this._searchBar = new SearchBar(this);
-		this._bookmarkList = new BookmarkList();
+		this._bookmarkList = new BookmarkList(this);
 		this._tagListMenu = new TagListMenu(this);
-		this._bookmarkFormMenu = new BookmarkFormMenu();
+		this._bookmarkFormMenu = new BookmarkFormMenu(this, super.getNotifier());
+		this._bookmarkDeletionMenu = new BookmarkDeletionMenu(this, super.getNotifier());
+		this._tagFormMenu = new TagFormMenu(this, super.getNotifier());
 
 		this._currentTag = DOMTree.findSingle('.js-current-tag');
 
 		this.onMostPopularSelection();
 	}
+
+	//region IBookmarkListListener
+
+	onBookmarkUpdateRequest(id : string) : void {
+		BusinessFactory.buildBookmark(
+			(business) => {
+				business.find(
+					id,
+					(outcome) => {
+						this._bookmarkFormMenu.prepareUpdate(outcome);
+					}
+				);
+			}
+		);
+	}
+
+	onBookmarkDeletionRequest(id : string) : void {
+		BusinessFactory.buildBookmark(
+			(business) => {
+				business.find(
+					id,
+					(outcome) => {
+						this._bookmarkDeletionMenu.run(outcome);
+					}
+				);
+			}
+		);
+	}
+
+	//endregion IBookmarkListListener
 
 	//region ITagListMenuSubscriber
 
@@ -128,7 +174,41 @@ class MainPresenter
 		this.onMostPopularSelection();
 	}
 
-	//endregion
+	//endregion ISearchBarListener
+
+	//region IBookmarkFormMenuListener
+
+	onBookmarkAddition() : void {
+		super.getNotifier().inform('Yes! A new buddy is joining us :)');
+		this._bookmarkList.refresh();
+	}
+
+	onBookmarkUpdate() : void {
+		super.getNotifier().inform('All your changes have been saved');
+		this._bookmarkList.refresh();
+	}
+
+	//endregion IBookmarkFormMenuListener
+
+	//region IBookmarkDeletionMenuListener
+
+	onBookmarkDeletion() : void {
+		super.getNotifier().inform('Bye bye old chap :(');
+	}
+
+	//endregion IBookmarkDeletionMenuListener
+
+	//region ITagFormMenuListener
+
+	onTagAddition() : void {
+		super.getNotifier().inform('Welcome on board!');
+	}
+
+	onTagUpdate() : void {
+		super.getNotifier().inform('Alright, everything was stored');
+	}
+
+	//endregion ITagFormMenuListener
 	
 	//endregion Public Methods
 	
