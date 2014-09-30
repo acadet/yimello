@@ -40,8 +40,12 @@ class ContextMenu {
 	
 	//region Public Methods
 
+	isVisible() : boolean {
+		return this._target.hasClass('visible');
+	}
+
 	_show(top : number, left : number) : void {
-		if (this._target.hasClass('visible')) {
+		if (this.isVisible()) {
 			return;
 		}
 
@@ -53,7 +57,7 @@ class ContextMenu {
 	}
 
 	hide() : void {
-		if (!this._target.hasClass('visible')) {
+		if (!this.isVisible()) {
 			return;
 		}
 

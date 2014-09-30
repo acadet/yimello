@@ -4,9 +4,7 @@
         <title>Yimello</title>
 
         <link rel="stylesheet" type="text/css" href="assets/css/tour.css">
-        <script type="text/javascript">
-            var gui = require('nw.gui');
-            
+        <script type="text/javascript">            
             if (typeof(window.require) !== "undefined") {
                 window.requireNode = window.require;
                 window.require = undefined;
@@ -19,14 +17,14 @@
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
     <body>
-        <header class="header">
+         <header class="header">
             <ul>
                 <li><img src="assets/img/exit.png" class="js-exit-trigger" /></li>
                 <li><img src="assets/img/minus.png" class="js-minimize-trigger" /></li>
             </ul>
         </header>
 
-        <div class="body">
+        <div class="body js-body">
             <div class="slide-wrapper">
                 <ul class="slides js-slide-list">
                     <li class="slide js-slide">

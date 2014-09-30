@@ -2,8 +2,6 @@
 
 class IntroPresenter extends YimelloPresenter {
 	//region Fields
-	
-	private _hexagon : DOMElement;
 
 	private _mustExit : boolean;
 
@@ -22,35 +20,6 @@ class IntroPresenter extends YimelloPresenter {
 	//region Methods
 	
 	//region Private Methods
-	
-	private _animateHexagon(rounds : number) : void {
-		this._hexagon.setCss({
-			top : NumberHelper.toString(Random.get(20, 400)) + 'px',
-			left : NumberHelper.toString(Random.get(20, 700)) + 'px'
-		});
-
-		this._hexagon.animate(
-			{
-				opacity : 0.3
-			},
-			400,
-			(e) => {
-				e.animate(
-					{
-						opacity : 0
-					},
-					800,
-					(e) => {
-						if (rounds === 0) {
-							return;
-						} else {
-							this._animateHexagon(rounds - 1);
-						}
-					}
-				);
-			}
-		);
-	}
 
 	private _exit() : void {
 		if (CacheAPI.get('tour') === 'ok') {
@@ -62,18 +31,74 @@ class IntroPresenter extends YimelloPresenter {
 	}
 
 	private _testVersion() : void {
-		var notification : DOMElement;
-
-		notification = DOMTree.findSingle('.js-update-notification');
-
 		VersionHelper.isUpToDate(
 			(success) => {
 				if (!success) {
-					notification.setCss(
-						{
-							opacity : 1
+					var body : DOMElement, icon : DOMElement;
+					var originalWidth : number, originalHeight : number;
+
+					body = DOMTree.findSingle('.js-body');
+					icon = body.findSingle('.js-update-icon');
+					originalWidth = 50;
+					originalHeight = 50;
+
+					icon.on(
+						DOMElementEvents.Click,
+						(args) => {
+							NodeWindow.openExternal('http://yimello.adriencadet.com');
 						}
 					);
+
+					icon.setCss({
+						width : originalWidth,
+						height : originalHeight,
+						top : body.getHeight() - 100,
+						left : (body.getWidth() - originalWidth) / 2
+					});
+
+					icon.animateEasing(
+						{
+							opacity : 1,
+							width : originalWidth * 2,
+							height : originalHeight * 2,
+							top : body.getHeight() - 100 - (originalHeight / 2),
+							left : (body.getWidth() - originalWidth * 2) / 2
+						},
+						600,
+						'easeOutBack'
+					);
+
+					icon
+						.findSingle('img')
+						.animateEasing(
+							{
+								marginLeft : (originalWidth * 2 - 50) / 2,
+								marginTop : (originalHeight * 2 - 50) / 2
+							},
+							600,
+							'easeOutBack',
+							(o) => {
+								var t : Timer;
+
+								t = new Timer(
+									(o) => {
+										if (this._mustExit) {
+											this._exit();
+										} else {
+											this._mustExit = true;
+											icon.addClass('pulse');
+										}
+									},
+									350
+								);
+							}
+						);
+				} else {
+					if (this._mustExit) {
+						this._exit();
+					} else {
+						this._mustExit = true;
+					}
 				}
 			}
 		);
@@ -88,9 +113,12 @@ class IntroPresenter extends YimelloPresenter {
 
 		super.onStart();
 
-		DOMTree.findSingle('.js-strap-wrapper').centerize(DOMTree.findSingle('.body'));
-		this._hexagon = DOMTree.findSingle('.js-hexagon');
-		this._testVersion();
+		t = new Timer(
+			(o) => {
+				this._testVersion();
+			},
+			500
+		);
 
 		BusinessFactory.buildTagBookmark(
 			(business) => {
@@ -105,16 +133,6 @@ class IntroPresenter extends YimelloPresenter {
 				);
 			}
 		);
-
-		t = new Timer((o) => {
-			if (this._mustExit) {
-				this._exit();
-			} else {
-				this._mustExit = true;
-			}
-		}, 3000);
-
-		this._animateHexagon(100);
 	}
 
 	//endregion Public Methods

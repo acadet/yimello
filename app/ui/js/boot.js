@@ -1,3 +1,6 @@
+var gui = requireNode('nw.gui');
+var FileAPI = requireNode('fs');
+
 require.config({
 	baseUrl : 'js',
 	paths : {

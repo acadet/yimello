@@ -4,8 +4,10 @@ class DOMElementEvents {
 	static Blur : string = 'blur';
 	static Click : string = 'click';
 	static ClickOut : string = 'clickout';
-	static DragOver : string = 'dragover';
 	static DragEnd : string = 'dragend';
+	static DragEnter : string = 'dragenter';
+	static DragLeave : string = 'dragleave';
+	static DragOver : string = 'dragover';
 	static Drop : string = 'drop';
 	static Focus : string = 'focus';
 	static FocusOut : string = 'focusout';
@@ -301,6 +303,10 @@ class DOMElement extends TSObject {
 		this.setCss({
 			marginLeft: (reference.getWidth() - this.getWidth()) / 2
 		});
+	}
+
+	insertAfter(e : DOMElement) : void {
+		this._element.after(e);
 	}
 
 	off(event : DOMElementEvents) : void {

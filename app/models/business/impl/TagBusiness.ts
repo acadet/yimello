@@ -254,6 +254,18 @@ class TagBusiness implements IInternalTagBusiness {
 		);
 	}
 
+	find(id : string, callback : Action<Tag>, errorHandler? : Action<string>) : void {
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		if (!TSObject.exists(id)) {
+			Log.error(new BusinessException('Unable to find a tag: no id provided'));
+			errorHandler('Ouch! An internal error has occured. Please try again');
+			return;
+		}
+
+		this._dao.find(id, callback);
+	}
+
 	merge(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void {
 		var newOnes : IList<Tag>; // tags which are not in DB
 		var mergedList : IList<Tag>; // outcome to use for callback, will contains only tags into DB

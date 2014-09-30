@@ -527,9 +527,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			);
 	}
 
-	// TODO : test
-	backup(callback? : Action0, errorHandler? : Action<string>) : void {
-		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
+	rawBackup(callback : Action<any>, errorHandler? : Action<string>) : void {
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		this
@@ -582,24 +580,37 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 											result[DAOTables.TagBookmark] = new Array<any>();
 											tgBk.forEach(e => result[DAOTables.TagBookmark].push(e));
 
-											FileAPI.writeFile(
-												"backup.json",
-												JSON.stringify(result),
-												(error) => {
-													if (error) {
-														Log.error(new BusinessException(error));
-														errorHandler('Ouch! An internal error has occured. Please try again');
-													} else {
-														callback();
-													}
-												}
-											);
+											callback(result);
 										}
 									);
 							}
 						);
 				}
 			);
+	}
+
+	// TODO : test
+	backup(callback? : Action0, errorHandler? : Action<string>) : void {
+		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+		
+		this.rawBackup(
+			(result) => {
+				FileAPI.writeFile(
+					"backup.json",
+					JSON.stringify(result),
+					(error) => {
+						if (error) {
+							Log.error(new BusinessException(error));
+							errorHandler('Ouch! An internal error has occured. Please try again');
+						} else {
+							callback();
+						}
+					}
+				);
+			},
+			errorHandler
+		);
 	}
 
 	// TODO : test

@@ -99,7 +99,6 @@
 
 // Presenters part
 
-/// <reference path="presenters/utils/NotificationMessage.ts" />
 /// <reference path="presenters/YimelloPresenter.ts" />
 /// <reference path="presenters/IntroPresenter.ts" />
 /// <reference path="presenters/TourPresenter.ts" />
@@ -112,24 +111,30 @@
 /// <reference path="presenters/MainPresenter/overlay-menus/BookmarkFormMenu.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/TagListMenu.ts" />
 
-
 //grunt-start
 /// <reference path="presenters/MainPresenter/BookmarkList.ts" />
 /// <reference path="presenters/MainPresenter/MainPresenter.ts" />
 /// <reference path="presenters/MainPresenter/SearchBar.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/TagContextMenu.ts" />
 /// <reference path="presenters/MainPresenter/context-menus/interfaces/IBookmarkContextMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/interfaces/ITagContextMenuListener.ts" />
 /// <reference path="presenters/MainPresenter/interfaces/IBookmarkListListener.ts" />
 /// <reference path="presenters/MainPresenter/interfaces/ISearchBarListener.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/BookmarkDeletionMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/CreateBackupMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/ImportBackupMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/ImportBrowserMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/TagDeletionMenu.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/TagFormMenu.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IBookmarkDeletionMenuListener.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IBookmarkFormMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IImportBackupMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IImportBrowserMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagDeletionMenuListener.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagFormMenuListener.ts" />
 /// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagListMenuListener.ts" />
-/// <reference path="presenters/MainPresenter/overlay-menus/utils/DragFileArea.ts" />
 /// <reference path="presenters/MainPresenter/templates/BookmarkTemplate.ts" />
 /// <reference path="presenters/MainPresenter/templates/TagBookmarkFormTemplate.ts" />
 /// <reference path="presenters/MainPresenter/templates/TagListTemplate.ts" />
-/// <reference path="presenters/MainPresenter/utils/MainPresenterMediator.ts" />
 /// <reference path="presenters/utils/Notifier.ts" />
 //grunt-end

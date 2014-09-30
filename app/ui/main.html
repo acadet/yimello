@@ -4,9 +4,7 @@
         <title>Yimello</title>
 
         <link rel="stylesheet" type="text/css" href="assets/css/main.css">
-        <script type="text/javascript">
-            var gui = require('nw.gui');
-            
+        <script type="text/javascript">            
             if (typeof(window.require) !== "undefined") {
                 window.requireNode = window.require;
                 window.require = undefined;
@@ -35,10 +33,10 @@
                         <li class="js-bookmark-form-trigger">Add bookmark</li>
                         <li class="js-tag-form-trigger">Add tag</li>
                         <li class="js-tour-trigger">Get a tour again</li>
-                        <li>Import from browser</li>
-                        <li>Export from browser</li>
-                        <li>Import backup</li>
-                        <li>Create backup</li>
+                        <li class="js-import-browser-trigger">Import from browser</li>
+                        <li>Export to browser</li>
+                        <li class="js-import-backup-trigger">Import backup</li>
+                        <li class="js-create-backup-trigger">Create backup</li>
                     </ul>    
                 </div>
 
@@ -107,6 +105,40 @@
                             <button type="button" class="js-tag-form-cancel cancel-button">Cancel</button>
                         </p>
                     </form>
+                </div>
+            </div>
+
+            <div class="tag-deletion-menu-wrapper js-tag-deletion-menu-wrapper">
+                <div class="overlay-menu js-tag-deletion-menu">
+                    <p>Are you sure you want to remove this tag?</p>
+                    <p>
+                        <a href="#" class="confirm-button js-tag-deletion-confirm">Here we go</a>
+                        <a href="#" class="cancel-button js-tag-deletion-cancel">I change my mind</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="import-browser-menu-wrapper js-import-browser-menu-wrapper">
+                <div class="drag-file-area js-import-browser-menu">
+                    <h1>Drag your file here</h1>
+                    <div class="pulser js-spinner"></div>
+                    <p><a href="#" class="cancel-button js-import-browser-cancel">Cancel</a></p>
+                </div>
+            </div>
+
+            <div class="import-backup-menu-wrapper js-import-backup-menu-wrapper">
+                <div class="drag-file-area js-import-backup-menu">
+                    <h1>Drag your file here</h1>
+                    <div class="pulser js-spinner"></div>
+                    <p><a href="#" class="cancel-button js-import-backup-cancel">Cancel</a></p>
+                </div>
+            </div>
+
+            <div class="create-backup-menu-wrapper js-create-backup-menu-wrapper">
+                <div class="export-area js-create-backup-menu">
+                    <h1>Copy/Paste this content into a JSON file</h1>
+                    <textarea readonly></textarea>
+                    <p><a href="#" class="confirm-button js-create-backup-confirm">I am done</a></p>
                 </div>
             </div>
     
@@ -225,6 +257,15 @@
                     <li class="js-bookmark-context-menu-remove">Remove</li>
                 </ul>
             </div>
+
+             <div class="context-menu js-tag-context-menu">
+                <ul>
+                    <li class="js-tag-context-menu-edit">Edit</li>
+                    <li class="js-tag-context-menu-remove">Remove</li>
+                </ul>
+            </div>
+
+            <!-- Notifier -->
 
             <div class="notifier js-notifier">
                 <div class="notifier-content js-notifier-content"></div>

@@ -52,26 +52,30 @@ a {
 
     cursor: pointer;
 
-    background-color: #eee;
+    background-color: #1c1c1c;
 
     -webkit-app-region: drag;
+
     ul {
         margin: 5px 20px;
         padding: 0;
 
         list-style-type: none;
+
         li {
             display: inline-block;
-
             margin: 0 5px;
             padding: 0;
 
-            -webkit-app-region: no-drag;
+            img {
+                -webkit-app-region: no-drag;
+                opacity : 0.75;
 
-            @include border-radius(50%);
+                @include transition(opacity, .25s, ease);
 
-            &:hover {
-                opacity: .60;
+                &:hover {
+                    opacity: 1;
+                }
             }
         }
     }

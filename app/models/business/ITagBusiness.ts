@@ -33,6 +33,9 @@ interface ITagBusiness {
 	 */
 	delete(tag : Tag, callback? : Action0, errorHandler? : Action<string>) : void;
 
+	// TODO : test
+	find(id : string, callback : Action<Tag>, errorHandler? : Action<string>) : void;
+
 	/**
 	 * From specified tag list, adds new ones into DB and do nothing
 	 * with other ones. Used labels to compare

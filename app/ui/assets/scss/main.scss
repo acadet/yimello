@@ -1,4 +1,5 @@
 @import "common";
+@import "pulser";
 
 $aside-menu-width : 200px;
 //$main-view-header-height : 40px;
@@ -32,6 +33,7 @@ $main-view-search-bar-height : 40px;
 		family : $oxygen;
 		size : 0.9em;
 	}
+	text-align : center;
 	color : white;
 	background : transparentize(white, 0.75);
 	outline : none;
@@ -111,7 +113,7 @@ $main-view-search-bar-height : 40px;
 }
 
 .main-view, ._overlay-menu-wrapper {
-	background-image : url($img-folder + 'background.png');
+	background-image : url($img-folder + 'main-background.png');
 }
 
 .main-view {
@@ -442,7 +444,7 @@ $main-view-search-bar-height : 40px;
 	}
 }
 
-.bookmark-deletion-menu-wrapper {
+.bookmark-deletion-menu-wrapper, .tag-deletion-menu-wrapper {
 	@extend ._overlay-menu-wrapper;
 
 	.overlay-menu {
@@ -466,6 +468,52 @@ $main-view-search-bar-height : 40px;
 	.overlay-menu {
 		margin-top : 180px;
 	}
+}
+
+.drag-file-area, .export-area {
+	@extend .overlay-menu;
+
+	text-align : center;
+	height : $body-height - 70;
+
+	h1 {
+		font : {
+			family : $oxygen;
+			size : 2em;
+		}
+		margin : 1em;
+		color : white;
+	}
+}
+
+.drag-file-area {
+	.pulser {
+		@include pulser(white);
+		display : none;
+	}
+}
+
+.export-area {
+	textarea {
+		background : transparentize(black, 0.5);
+		color : white;
+		font : {
+			family : $oxygen;
+			size : 0.8em;
+		}
+		padding : 10px 15px;
+		height : 200px;
+		width : 300px;
+		outline : none;
+		border : none;
+		overflow : hidden;
+	}
+}
+
+.import-browser-menu-wrapper,
+.import-backup-menu-wrapper,
+.create-backup-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
 }
 
 .context-menu {
@@ -503,6 +551,7 @@ $main-view-search-bar-height : 40px;
 		}
 	}
 }
+
 
 // .main-view-wrapper {
 // 	position: absolute;

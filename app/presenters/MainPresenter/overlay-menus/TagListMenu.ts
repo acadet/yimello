@@ -1,9 +1,10 @@
 /// <reference path="../../../dependencies.ts" />
 
-class TagListMenu extends OverlayMenu {
+class TagListMenu extends OverlayMenu implements ITagContextMenuListener {
 	//region Fields
 
 	private _listener : ITagListMenuListener;
+	private _ctxtMenu : TagContextMenu;
 	
 	//endregion Fields
 	
@@ -11,7 +12,9 @@ class TagListMenu extends OverlayMenu {
 
 	constructor(listener : ITagListMenuListener) {
 		super(DOMTree.findSingle('.js-tag-list-menu-wrapper'));
+
 		this._listener = listener;
+		this._ctxtMenu = new TagContextMenu(this);
 		this._setUp();
 	}
 	
@@ -47,22 +50,28 @@ class TagListMenu extends OverlayMenu {
 								.forEach(
 									(e) => {
 										e.on(
-											DOMElementEvents.Click,
+											DOMElementEvents.MouseDown,
 											(args) => {
-												var t : Tag;
+												if (args.getWhich() === 3) {
+													this._ctxtMenu.show(e.getData('id'), args.getPageY(), args.getPageX());
+												} else if (args.getWhich() === 1) {
+													var t : Tag;
 
-												t = new Tag();
-												t.setId(e.getData('id'));
-												t.setLabel(e.getText());
-												this._listener.onTagSelection(t);
+													t = new Tag();
+													t.setId(e.getData('id'));
+													t.setLabel(e.getText());
+													this._listener.onTagSelection(t);
+												}
 											}
 										);
 									}
 								);
 							menu.on(
-								DOMElementEvents.Click,
+								DOMElementEvents.MouseDown,
 								(args) => {
-									super.hide();
+									if (args.getWhich() === 1 && !this._ctxtMenu.isVisible()) {
+										super.hide();
+									}
 								}
 							);
 							super.show();
@@ -89,6 +98,18 @@ class TagListMenu extends OverlayMenu {
 	//endregion Private Methods
 	
 	//region Public Methods
+
+	//region ITagContextMenuListener
+
+	requestEdition(id : string) : void {
+		this._listener.onTagEditionRequest(id);
+	}
+
+	requestDeletion(id : string) : void {
+		this._listener.onTagDeletionRequest(id);
+	}
+
+	//endregion ITagContextMenuListener
 
 	//endregion Public Methods
 	

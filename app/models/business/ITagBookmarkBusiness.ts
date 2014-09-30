@@ -37,6 +37,8 @@ interface ITagBookmarkBusiness {
 
 	search(input : string, callback : Action<IList<ScoredBookmark>>, errorHandler? : Action<string>) : void;
 
+	rawBackup(callback : Action<any>, errorHandler? : Action<string>) : void;
+
 	backup(callback? : Action0, errorHandler? : Action<string>) : void;
 
 	importBackup(dataTransfer : any, callback? : Action0, errorHandler? : Action<string>) : void;
