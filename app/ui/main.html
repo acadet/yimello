@@ -4,7 +4,10 @@
         <title>Yimello</title>
 
         <link rel="stylesheet" type="text/css" href="assets/css/main.css">
-        <script type="text/javascript">            
+        <script type="text/javascript">      
+            var gui = require('nw.gui');
+            var FileAPI = require('fs');
+                  
             if (typeof(window.require) !== "undefined") {
                 window.requireNode = window.require;
                 window.require = undefined;
@@ -34,7 +37,7 @@
                         <li class="js-tag-form-trigger">Add tag</li>
                         <li class="js-tour-trigger">Get a tour again</li>
                         <li class="js-import-browser-trigger">Import from browser</li>
-                        <li>Export to browser</li>
+                        <li class="js-export-browser-trigger">Export to browser</li>
                         <li class="js-import-backup-trigger">Import backup</li>
                         <li class="js-create-backup-trigger">Create backup</li>
                     </ul>    
@@ -79,8 +82,8 @@
                         <ul class="js-available-tags"></ul>
                         <p><input type="text" name="tag" placeholder="Press enter to add a new tag"></p>
                         <p>
-                            <input type="submit" value="Save" class="confirm-button">
-                            <button type="button" class="js-bookmark-form-cancel cancel-button">Cancel</button>
+                            <a href="#" class="js-confirm-button confirm-button">Save</a>
+                            <a href="#" class="js-bookmark-form-cancel cancel-button">Cancel</a>
                         </p>
                     </form>
                 </div>
@@ -123,6 +126,14 @@
                     <h1>Drag your file here</h1>
                     <div class="pulser js-spinner"></div>
                     <p><a href="#" class="cancel-button js-import-browser-cancel">Cancel</a></p>
+                </div>
+            </div>
+
+             <div class="export-browser-menu-wrapper js-export-browser-menu-wrapper">
+                <div class="export-area js-export-browser-menu">
+                    <h1>Copy/Paste this content into a HTML file</h1>
+                    <textarea readonly></textarea>
+                    <p><a href="#" class="confirm-button js-export-browser-confirm">I am done</a></p>
                 </div>
             </div>
 

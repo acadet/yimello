@@ -160,6 +160,17 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 			);
 	}
 
+	findByURL(url : string, callback : Action<Bookmark>) : void {
+		this
+			.getARO()
+			.find(
+				DAOTables.Bookmarks,
+				new Pair<string, any>('url', url),
+				callback,
+				Bookmark.fromObject
+			);
+	}
+
 	sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void {
 		var request : StringBuffer;
 

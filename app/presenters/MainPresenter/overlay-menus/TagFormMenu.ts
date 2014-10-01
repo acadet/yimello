@@ -8,13 +8,13 @@ class TagFormMenu extends OverlayMenu {
 	private _updatingTag : Tag;
 
 	private _listener : ITagFormMenuListener;
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(listener : ITagFormMenuListener, notifier : Notifier) {
+	constructor(listener : ITagFormMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-tag-form-menu-wrapper'));
 
 		this._listener = listener;
@@ -74,33 +74,18 @@ class TagFormMenu extends OverlayMenu {
 		value = this._labelInput.getValue();
 		BusinessFactory.buildTag(
 			(business) => {
-				if (!business.isValueValid(value)) {
-					this._notifier.alert('A tag needs a label!');
-					return;
-				}
+				var t : Tag;
 
-				business.isNotAlreadyExisting(
-					value,
-					(success) => {
-						if (success) {
-							var t : Tag;
+				t = new Tag();
+				t.setLabel(value);
 
-							t = new Tag();
-							t.setLabel(value);
-							business.add(
-								t,
-								(outcome) => {
-									this._listener.onTagAddition();
-									super.hide();
-								},
-								(msg) => {
-									this._notifier.alert(msg);
-								}
-							);
-						} else {
-							this._notifier.alert('A tag with same label is already exisiting. Please choose another one');
-						}
-					}
+				business.add(
+					t,
+					(outcome) => {
+						this._listener.onTagAddition();
+						super.hide();
+					},
+					(error) => this._notifier.alert(error)
 				);
 			}
 		);
@@ -112,36 +97,22 @@ class TagFormMenu extends OverlayMenu {
 		value = this._labelInput.getValue();
 		if (value === this._updatingTag.getLabel()) {
 			this._listener.onTagUpdate();
+			super.hide();
 			return;
 		}
 
 		BusinessFactory.buildTag(
 			(business) => {
-				if (!business.isValueValid(value)) {
-					this._notifier.alert('A tag needs a label!');
-					return;
-				}
 
-				business.isNotAlreadyExistingButNotProvided(
-					value,
+				this._updatingTag.setLabel(value);
+
+				business.update(
 					this._updatingTag,
-					(success) => {
-						if (success) {
-							this._updatingTag.setLabel(value);
-
-							business.update(
-								this._updatingTag,
-								(outcome) => {
-									this._listener.onTagUpdate();
-								},
-								(msg) => {
-									this._notifier.alert(msg);
-								}
-							);
-						} else {
-							this._notifier.alert('A tag with same label is already exisiting. Please choose another one');
-						}
-					}
+					(outcome) => {
+						this._listener.onTagUpdate();
+						super.hide();
+					},
+					(error) => this._notifier.alert(error)
 				);
 			}
 		);

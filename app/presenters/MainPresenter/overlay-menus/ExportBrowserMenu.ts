@@ -1,6 +1,6 @@
 /// <reference path="../../../dependencies.ts" />
 
-class CreateBackupMenu extends OverlayMenu {
+class ExportBrowserMenu extends OverlayMenu {
 	//region Fields
 
 	private _notifier : INotifier;
@@ -10,7 +10,7 @@ class CreateBackupMenu extends OverlayMenu {
 	//region Constructors
 
 	constructor(notifier : INotifier) {
-		super(DOMTree.findSingle('.js-create-backup-menu-wrapper'));
+		super(DOMTree.findSingle('.js-export-browser-menu-wrapper'));
 
 		this._notifier = notifier;
 
@@ -26,23 +26,23 @@ class CreateBackupMenu extends OverlayMenu {
 	private _setUp() : void {
 		var menu : DOMElement, output : DOMElement;
 
-		menu = DOMTree.findSingle('.js-create-backup-menu');
+		menu = DOMTree.findSingle('.js-export-browser-menu');
 		output = menu.findSingle('textarea');
 
 		DOMTree
-			.findSingle('.js-create-backup-trigger')
+			.findSingle('.js-export-browser-trigger')
 			.on(
 				DOMElementEvents.Click,
 				(args) => {
 					output.setText('');
-					this._notifier.inform(PresenterMessages.DOG);
+					this._notifier.inform(PresenterMessages.ERMINE);
 					super.show();
 
 					BusinessFactory.buildTagBookmark(
 						(business) => {
-							business.rawBackup(
+							business.exportToBrowser(
 								(outcome) => {
-									output.setText(JSON.stringify(outcome));
+									output.setText(outcome);
 									output.toJQuery().select();
 									this._notifier.inform(PresenterMessages.DONE);
 								},
@@ -54,7 +54,7 @@ class CreateBackupMenu extends OverlayMenu {
 			);
 
 		menu
-			.findSingle('.js-create-backup-confirm')
+			.findSingle('.js-export-browser-confirm')
 			.on(DOMElementEvents.Click, (args) => super.hide());
 	}
 	

@@ -4,14 +4,14 @@ class BookmarkDeletionMenu extends OverlayMenu {
 	//region Fields
 
 	private _listener : IBookmarkDeletionMenuListener;
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 	private _current : Bookmark;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(listener : IBookmarkDeletionMenuListener, notifier : Notifier) {
+	constructor(listener : IBookmarkDeletionMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-bookmark-deletion-menu-wrapper'));
 
 		this._listener = listener;

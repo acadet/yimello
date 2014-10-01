@@ -5,13 +5,13 @@ class ImportBrowserMenu extends OverlayMenu {
 
 	private _spinner : DOMElement;
 	private _listener : IImportBrowserMenuListener;
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(listener : IImportBrowserMenuListener, notifier : Notifier) {
+	constructor(listener : IImportBrowserMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-import-browser-menu-wrapper'));
 
 		this._listener = listener;
@@ -71,7 +71,7 @@ class ImportBrowserMenu extends OverlayMenu {
 			(args) => {
 				args.preventDefault();
 				this._showSpinner();
-				this._notifier.inform('Processing...');
+				this._notifier.inform(PresenterMessages.DINGO);
 
 				BusinessFactory.buildTagBookmark(
 					(business) => {

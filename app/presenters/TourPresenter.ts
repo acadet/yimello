@@ -344,11 +344,11 @@ class TourPresenter extends YimelloPresenter {
 							}
 						);
 					} else {
-						super.getNotifier().alert('Damn! You were too fast. Please add some tags before saving');
+						super.getNotifier().alert(PresenterMessages.BURRO);
 						this._tagInput.addClass('error');
 					}
 				} else {
-					super.getNotifier().alert('Whoops, you forgot a step! Define a bookmark before dealing with tags');
+					super.getNotifier().alert(PresenterMessages.RAM);
 					this._urlInput.addClass('error');
 					this._swapSlide(TourPresenterSlides.URL);
 				}

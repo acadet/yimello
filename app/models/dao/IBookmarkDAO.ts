@@ -40,6 +40,9 @@ interface IBookmarkDAO {
 	 * @param {Action<Bookmark>} callback [description]
 	 */
 	find(id : string, callback : Action<Bookmark>) : void;
+
+	// TODO : test
+	findByURL(url : string, callback : Action<Bookmark>) : void;
 	
 	/**
 	 * Sorts all bookmarks by desc number of views and asc title

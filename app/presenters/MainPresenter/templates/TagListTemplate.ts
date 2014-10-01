@@ -15,13 +15,13 @@ class TagListTemplate {
 			(e) => {
 				var pre : string;
 
-				pre = e.getLabel()[0];
+				pre = e.getLabel()[0].toUpperCase();
 				if (!TSObject.exists(currentIndex) || currentIndex !== pre) {
 					if (TSObject.exists(currentIndex)) {
 						outcome.append('</ul>');
 					}
 					if (isNaN(parseInt(pre))) {
-						currentIndex = pre;
+						currentIndex = pre.toUpperCase();
 					} else {
 						currentIndex = '#';
 					}

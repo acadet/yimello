@@ -27,13 +27,13 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to add: no bookmark provided'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return false;
 		}
 
 		if (!URLHelper.isValid(bookmark.getURL())) {
 			Log.error(new BusinessException('Failed to save: URL is not valid'));
-			errorHandler('Ow! Your URL is invalid. Please check it again');
+			errorHandler(BusinessMessages.COATI);
 			return false;
 		}
 
@@ -111,6 +111,32 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 		bookmark.setDescription(description);
 	}
 	
+	isNotAlreadyExisting(url : string, callback : Action<boolean>) : void {
+		this._dao.findByURL(
+			url,
+			(outcome) => {
+				callback(!TSObject.exists(outcome));
+			}
+		);
+	}
+
+	isNotAlreadyExistingButNotProvided(url : string, bookmark : Bookmark, callback : Action<boolean>) : void {
+		this._dao.findByURL(
+			url,
+			(outcome) => {
+				if (TSObject.exists(outcome)) {
+					if (outcome.getId() === bookmark.getId()) {
+						callback(true);
+					} else {
+						callback(false);
+					}
+				} else {
+					callback(true);
+				}
+			}
+		);
+	}
+
 	createFromURL(
 		url : string,
 		callback? : Action<Bookmark>,
@@ -146,7 +172,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 			(type, error) => {
 				if (type === URLDetailsProviderError.BadURL) {
 					Log.error(new BusinessException('Unable to create bookmark: provided URL is invalid'));
-					errorHandler('Ouch! Your URL is invalid. Please check it again');
+					errorHandler(BusinessMessages.COATI);
 				} else if (type === URLDetailsProviderError.Ajax) {
 					var bookmark : Bookmark;
 
@@ -154,7 +180,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 					bookmark.setURL(disarmedURL);
 
 					Log.warn('No data has been pulled: failed to reach target');
-					warningHandler('Hem... I was not able to connect website. You should check your Internet connection.');
+					warningHandler(BusinessMessages.MOOSE);
 					this.add(
 						bookmark,
 						(outcome) => {
@@ -164,7 +190,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 					);
 				} else {
 					Log.error(new BusinessException('Unable to create bookmark: an unknown error has occured ' + error));
-					errorHandler('Ouch! An internal error has occured. Please try again');
+					errorHandler(BusinessMessages.DEFAULT);
 				}
 			}
 		);
@@ -184,7 +210,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 			bookmark,
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
-					errorHandler('Ouch! An internal error has occured. Please try again');
+					errorHandler(BusinessMessages.DEFAULT);
 					return;
 				}
 				callback(outcome);
@@ -230,7 +256,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 			bookmark,
 			(outcome) => {
 				if (!TSObject.exists(outcome)) {
-					errorHandler('Ouch! An internal error has occured. Please try again');
+					errorHandler(BusinessMessages.DEFAULT);
 				}
 				callback(outcome);
 			}
@@ -244,7 +270,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to delete: provided bookmark is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -252,7 +278,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 			bookmark,
 			(success) => {
 				if (!success) {
-					errorHandler('Ouch! An internal error has occured. Please try again');
+					errorHandler(BusinessMessages.DEFAULT);
 					return;
 				}
 
@@ -273,7 +299,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 						callback(outcome);
 					} else {
 						Log.error(new BusinessException('No bookmark found with id: ' + id));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);
@@ -290,7 +316,7 @@ class BookmarkBusiness implements IInternalBookmarkBusiness {
 						callback(outcome);
 					} else {
 						Log.error(new BusinessException('Unable to sort: an error has occured when pulling'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);

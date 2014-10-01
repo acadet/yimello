@@ -70,8 +70,7 @@ class SearchBar {
 				if (this._input.getValue().length > 0) {
 					this._input.setValue('');
 					this._hideClear();
-					this._input.focus();
-					this._startTimer();
+					this._listener.onSearchCancel();
 				}
 			}
 		);

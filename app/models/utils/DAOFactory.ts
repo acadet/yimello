@@ -10,7 +10,7 @@ class DAOFactory {
 	private static _tag : ITagDAO;
 
 	private static _tagBk : ITagBookmarkDAO;
-	
+
 	//endregion Fields
 	
 	//region Constructors
@@ -39,26 +39,28 @@ class DAOFactory {
 
 		// Create tag table
 		tagRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');
-		tagRequest.append(DAOTables.Tags + ' (');
-		tagRequest.append('id VARCHAR(36) NOT NULL, ');
-		tagRequest.append('label VARCHAR(255) NOT NULL, ');
-		tagRequest.append('PRIMARY KEY (id, label))');
+		tagRequest
+			.append(DAOTables.Tags + ' (')
+			.append('id VARCHAR(36) PRIMARY KEY NOT NULL, ')
+			.append('label VARCHAR(255) NOT NULL)');
 
 		// Create bookmark table
 		bookmarkRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');
-		bookmarkRequest.append(DAOTables.Bookmarks + ' (');
-		bookmarkRequest.append('id VARCHAR(36) PRIMARY KEY NOT NULL, ');
-		bookmarkRequest.append('url VARCHAR(255), ');
-		bookmarkRequest.append('title VARCHAR(255), ');
-		bookmarkRequest.append('description TEXT(300), ');
-		bookmarkRequest.append('views INT)');
+		bookmarkRequest
+			.append(DAOTables.Bookmarks + ' (')
+			.append('id VARCHAR(36) PRIMARY KEY NOT NULL, ')
+			.append('url VARCHAR(255) NOT NULL, ')
+			.append('title VARCHAR(255), ')
+			.append('description TEXT(300), ')
+			.append('views INT)');
 
 		// Create tag bookmark relation table
 		tagBookmarkRequest = new StringBuffer('CREATE TABLE IF NOT EXISTS ');
-		tagBookmarkRequest.append(DAOTables.TagBookmark + ' (');
-		tagBookmarkRequest.append('tag_id VARCHAR(36) NOT NULL, ');
-		tagBookmarkRequest.append('bookmark_id VARCHAR(36) NOT NULL, ');
-		tagBookmarkRequest.append('PRIMARY KEY (tag_id, bookmark_id))');
+		tagBookmarkRequest
+			.append(DAOTables.TagBookmark + ' (')
+			.append('tag_id VARCHAR(36) NOT NULL, ')
+			.append('bookmark_id VARCHAR(36) NOT NULL, ')
+			.append('PRIMARY KEY (tag_id, bookmark_id))');
 
 		DAOFactory._aro = AROFactory.build(config);
 

@@ -4,7 +4,10 @@
         <title>Yimello</title>
 
         <link rel="stylesheet" type="text/css" href="assets/css/tour.css">
-        <script type="text/javascript">            
+        <script type="text/javascript">    
+            var gui = require('nw.gui');
+            var FileAPI = require('fs');        
+            
             if (typeof(window.require) !== "undefined") {
                 window.requireNode = window.require;
                 window.require = undefined;

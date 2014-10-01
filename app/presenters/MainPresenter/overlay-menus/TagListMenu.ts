@@ -103,10 +103,12 @@ class TagListMenu extends OverlayMenu implements ITagContextMenuListener {
 
 	requestEdition(id : string) : void {
 		this._listener.onTagEditionRequest(id);
+		super.hide();
 	}
 
 	requestDeletion(id : string) : void {
 		this._listener.onTagDeletionRequest(id);
+		super.hide();
 	}
 
 	//endregion ITagContextMenuListener

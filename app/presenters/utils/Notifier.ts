@@ -6,7 +6,7 @@ enum NotifierCodes {
 	Alert
 }
 
-class Notifier {
+class Notifier implements INotifier {
 	//region Fields
 
 	private _timer : Timer;

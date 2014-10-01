@@ -59,8 +59,7 @@ class BookmarkList implements IBookmarkContextMenuListener {
 										business.find(
 											e.getData('id'),
 											(bookmark) => {
-												bookmark.setViews(bookmark.getViews());
-
+												bookmark.setViews(bookmark.getViews() + 1);
 												business.update(bookmark);
 												NodeWindow.openExternal(bookmark.getURL());
 											}

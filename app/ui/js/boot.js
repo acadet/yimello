@@ -1,24 +1,21 @@
-var gui = requireNode('nw.gui');
-var FileAPI = requireNode('fs');
-
 require.config({
 	baseUrl : 'js',
 	paths : {
-		'jquery' : 'libs/jquery.1.10.2'
+		'jquery' : 'libs/jquery.1.10.2',
+		'jqueryUI' : 'libs/jquery-ui-1.10.4.min',
+		'jqueryClickout' : 'libs/jquery.clickout'
 	},
 	shim : {
 		'jquery' : {
 			exports: 'jQuery'
+		},
+		'jqueryUI' : {
+			deps : [ 'jquery' ]
+		},
+		'jqueryClickout' : {
+			deps : [ 'jquery' ]
 		}
 	}
-});
-
-define('jqueryUI', ['jquery'], function() {
-	require(['libs/jquery-ui-1.10.4.min']);
-});
-
-define('jqueryClickout', ['jquery'], function() {
-	require(['libs/jquery.clickout']);
 });
 
 require(_libs, function() {

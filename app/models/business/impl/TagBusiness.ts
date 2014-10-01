@@ -50,7 +50,7 @@ class TagBusiness implements IInternalTagBusiness {
 			(result) => {
 				if (!TSObject.exists(result)) {
 					Log.error(new BusinessException('Failed to add tag #' + index));
-					errorHandler('Ouch! An internal error has occured. Please try again');
+					errorHandler(BusinessMessages.DEFAULT);
 					return;
 				}
 
@@ -66,13 +66,13 @@ class TagBusiness implements IInternalTagBusiness {
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Provided tag is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return false;
 		}
 
 		if (!this.isValueValid(tag.getLabel())) {
 			Log.error(new BusinessException('Unable to add a tag: tag must have a label'));
-			errorHandler('What about adding a label?');
+			errorHandler(BusinessMessages.EWE);
 			return false;
 		}
 
@@ -172,14 +172,25 @@ class TagBusiness implements IInternalTagBusiness {
 
 		this.engineTag(tag);
 
-		this._dao.add(
-			tag,
-			(outcome) => {
-				if (!TSObject.exists(outcome)) {
-					errorHandler('Ouch! An internal error has occured. Please try again');
+		this.isNotAlreadyExisting(
+			tag.getLabel(),
+			(success) => {
+				if (!success) {
+					Log.error(new BusinessException('Unable to add tag, one with same label is already existing'));
+					errorHandler(BusinessMessages.CONY);
 					return;
 				}
-				callback(outcome);
+
+				this._dao.add(
+					tag,
+					(outcome) => {
+						if (!TSObject.exists(outcome)) {
+							errorHandler(BusinessMessages.DEFAULT);
+							return;
+						}
+						callback(outcome);
+					}
+				);
 			}
 		);
 	}
@@ -192,7 +203,7 @@ class TagBusiness implements IInternalTagBusiness {
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Provided tag list is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -217,15 +228,27 @@ class TagBusiness implements IInternalTagBusiness {
 
 		this.engineTag(tag);
 
-		this._dao.update(
+		this.isNotAlreadyExistingButNotProvided(
+			tag.getLabel(),
 			tag,
-			(outcome) => {
-				if (!TSObject.exists(outcome)) {
-					errorHandler('Ouch! An internal error has occured. Please try again');
+			(success) => {
+				if (!success) {
+					Log.error(new BusinessException('Unable to update tag: a tag with same label is already existing'));
+					errorHandler(BusinessMessages.CONY);
 					return;
 				}
 
-				callback(outcome);
+				this._dao.update(
+					tag,
+					(outcome) => {
+						if (!TSObject.exists(outcome)) {
+							errorHandler(BusinessMessages.DEFAULT);
+							return;
+						}
+
+						callback(outcome);
+					}
+				);
 			}
 		);
 	}
@@ -237,7 +260,7 @@ class TagBusiness implements IInternalTagBusiness {
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Unable to delete: provided tag is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -245,7 +268,7 @@ class TagBusiness implements IInternalTagBusiness {
 			tag,
 			(success) => {
 				if (!success) {
-					errorHandler('Ouch! An internal error has occured. Please try again');
+					errorHandler(BusinessMessages.DEFAULT);
 					return;
 				}
 
@@ -259,11 +282,21 @@ class TagBusiness implements IInternalTagBusiness {
 
 		if (!TSObject.exists(id)) {
 			Log.error(new BusinessException('Unable to find a tag: no id provided'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
-		this._dao.find(id, callback);
+		this._dao.find(
+			id,
+			(outcome) => {
+				if (TSObject.exists(outcome)) {
+					callback(outcome);
+				} else {
+					Log.error(new BusinessException('No tag found with id ' + id));
+					errorHandler(BusinessMessages.DEFAULT);
+				}
+			}
+		);
 	}
 
 	merge(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void {
@@ -275,7 +308,7 @@ class TagBusiness implements IInternalTagBusiness {
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to merge: provided list is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -332,7 +365,7 @@ class TagBusiness implements IInternalTagBusiness {
 						callback(outcome);
 					} else {
 						Log.error(new BusinessException('Unable to sort: an error has occured when pulling'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);

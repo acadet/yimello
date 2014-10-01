@@ -82,7 +82,7 @@ class ActiveRecordObject implements IActiveRecordObject {
 				data.push(selector.getSecond());
 
 				tx.execute(
-					'SELECT * FROM ' + table + ' WHERE ' + selector.getFirst() + ' = ?',
+					'SELECT * FROM ' + table + ' WHERE LOWER(' + selector.getFirst() + ') = LOWER(?)',
 					data,
 					(tx, outcome) => {
 						var s : SQLRowSet;

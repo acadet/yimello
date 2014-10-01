@@ -4,7 +4,7 @@ class BookmarkFormMenu extends OverlayMenu {
 	//region Fields
 
 	private _updatingBookmark : Bookmark;
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 	private _listener : IBookmarkFormMenuListener;
 
 	private _bookmarkIcon : DOMElement;
@@ -18,7 +18,7 @@ class BookmarkFormMenu extends OverlayMenu {
 	
 	//region Constructors
 
-	constructor(subscriber : IBookmarkFormMenuListener, notifier : Notifier) {
+	constructor(subscriber : IBookmarkFormMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-bookmark-form-menu-wrapper'));
 
 		this._listener = subscriber;
@@ -52,14 +52,21 @@ class BookmarkFormMenu extends OverlayMenu {
 			DOMElementEvents.Submit,
 			(args) => {
 				args.preventDefault();
-
-				if (TSObject.exists(this._updatingBookmark)) {
-					this._update();
-				} else {
-					this._add();
-				}
 			}
 		);
+
+		form
+			.findSingle('.js-confirm-button')
+			.on(
+				DOMElementEvents.Click,
+				(args) => {
+					if (TSObject.exists(this._updatingBookmark)) {
+						this._update();
+					} else {
+						this._add();
+					}
+				}
+			);
 
 		this._bookmarkIcon = form.findSingle('.js-bookmark-icon');
 		this._urlInput = form.findSingle('input[name="url"]');
@@ -93,25 +100,29 @@ class BookmarkFormMenu extends OverlayMenu {
 				return;
 			}
 
-			this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(url));
-
 			if (FormHelper.isFilled(this._titleInput.getValue())
 				|| FormHelper.isFilled(this._descriptionInput.getValue())) {
 				return;
 			}
 
-			this._notifier.inform('Processing URL...');
+			this._notifier.inform(PresenterMessages.APE);
 
 			URLDetailsProvider.getDetails(
 				url,
 				(title, description) => {
-					this._notifier.inform('Done!');
+					this._bookmarkIcon.setAttribute('src', FaviconHelper.getSrc(url));
 					this._titleInput.setValue(title);
 					this._descriptionInput.setValue(description);
+					this._notifier.inform(PresenterMessages.DONE);
 				},
 				(type, msg) => {
 					Log.warn('An error has occured while processing URL: ' + msg);
-					this._notifier.warn('Ouch! I failed pulling data from your URL... Please check it again');
+					this._bookmarkIcon.setAttribute('src', FaviconHelper.getDefaultSrc());
+					if (type === URLDetailsProviderError.Ajax) {
+						this._notifier.warn(PresenterMessages.PARROT);
+					} else {
+						this._notifier.warn(PresenterMessages.MULE);
+					}
 				}
 			);
 		};
@@ -193,7 +204,7 @@ class BookmarkFormMenu extends OverlayMenu {
 					t = new Tag();
 					t
 						.setId(e.getData('id'))
-						.setLabel(e.getData('label'));
+						.setLabel(e.getText());
 
 					outcome.add(t);
 				}

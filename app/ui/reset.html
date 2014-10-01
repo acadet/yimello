@@ -1,13 +1,32 @@
 <script type="text/javascript" src="js/output.js"></script>
 <script type="text/javascript">
 	if (confirm('Reset db?')) {
-		DataAccessObject.initialize(function(success) {
-			if (success) {
-				DataAccessObject.clean();
-				alert('Database cleaned');
-			} else {
-				alert('An error occured when initializing');
+		BusinessFactory.buildTag(
+			function(tagBusiness) {
+				tagBusiness.sortByLabelAsc(
+					function(outcome) {
+						outcome.forEach(function(e) { tagBusiness.delete(e); });
+						BusinessFactory.buildBookmark(
+							function(bkBusiness) {
+								bkBusiness.sortByViewsDescThenByTitleAsc(
+									function(outcome) {
+										var i = outcome.getLength();
+										outcome.forEach(
+											function(e) { 
+												bkBusiness.delete(e); 
+												i--;
+												if (i == 0) {
+													alert('Database cleaned!');
+												}
+											}
+										);
+									}
+								);
+							}
+						);
+					}
+				);
 			}
-		});		
+		);
 	}
 </script>

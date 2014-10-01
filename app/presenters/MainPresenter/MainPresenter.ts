@@ -22,6 +22,7 @@ class MainPresenter
 	private _tagFormMenu : TagFormMenu;
 	private _tagDeletionMenu : TagDeletionMenu;
 	private _importBrowserMenu : ImportBrowserMenu;
+	private _exportBrowserMenu : ExportBrowserMenu;
 	private _importBackupMenu : ImportBackupMenu;
 	private _createBackupMenu : CreateBackupMenu;
 
@@ -123,6 +124,7 @@ class MainPresenter
 		this._tagDeletionMenu = new TagDeletionMenu(this, super.getNotifier());
 
 		this._importBrowserMenu = new ImportBrowserMenu(this, super.getNotifier());
+		this._exportBrowserMenu = new ExportBrowserMenu(super.getNotifier());
 
 		this._importBackupMenu = new ImportBackupMenu(this, super.getNotifier());
 		this._createBackupMenu = new CreateBackupMenu(super.getNotifier());
@@ -220,12 +222,12 @@ class MainPresenter
 	//region IBookmarkFormMenuListener
 
 	onBookmarkAddition() : void {
-		super.getNotifier().inform('Yes! A new buddy is joining us :)');
+		super.getNotifier().inform(PresenterMessages.SLOTH);
 		this._bookmarkList.refresh();
 	}
 
 	onBookmarkUpdate() : void {
-		super.getNotifier().inform('All your changes have been saved');
+		super.getNotifier().inform(PresenterMessages.BEAR);
 		this._bookmarkList.refresh();
 	}
 
@@ -234,7 +236,8 @@ class MainPresenter
 	//region IBookmarkDeletionMenuListener
 
 	onBookmarkDeletion() : void {
-		super.getNotifier().inform('Bye bye old chap :(');
+		super.getNotifier().inform(PresenterMessages.KOODOO);
+		this._bookmarkList.refresh();
 	}
 
 	//endregion IBookmarkDeletionMenuListener
@@ -242,11 +245,11 @@ class MainPresenter
 	//region ITagFormMenuListener
 
 	onTagAddition() : void {
-		super.getNotifier().inform('Welcome on board!');
+		super.getNotifier().inform(PresenterMessages.FERRET);
 	}
 
 	onTagUpdate() : void {
-		super.getNotifier().inform('Alright, everything was stored');
+		super.getNotifier().inform(PresenterMessages.TOAD);
 	}
 
 	//endregion ITagFormMenuListener
@@ -254,7 +257,8 @@ class MainPresenter
 	//region ITagDeletionMenuListener
 
 	onTagDeletion() : void {
-		super.getNotifier().inform('See you mate :(');
+		super.getNotifier().inform(PresenterMessages.FAWN);
+		this._bookmarkList.sortMostPopular();
 	}
 
 	//endregion ITagDeletionMenuListener
@@ -262,7 +266,7 @@ class MainPresenter
 	//region IImportBrowserMenuListener
 
 	onImportFromBrowser() : void {
-		super.getNotifier().inform('Done!');
+		super.getNotifier().inform(PresenterMessages.DONE);
 		this._bookmarkList.refresh();
 	}
 
@@ -271,7 +275,7 @@ class MainPresenter
 	//region IImportBackupMenuListener
 
 	onImportBackup() : void {
-		super.getNotifier().inform('Done!');
+		super.getNotifier().inform(PresenterMessages.DONE);
 		this._bookmarkList.refresh();
 	}
 

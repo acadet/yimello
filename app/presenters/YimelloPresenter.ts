@@ -3,7 +3,7 @@
 class YimelloPresenter extends Presenter {
 	//region Fields
 
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 
 	//endregion Fields
 	
@@ -54,7 +54,7 @@ class YimelloPresenter extends Presenter {
 		);
 	}
 
-	getNotifier() : Notifier {
+	getNotifier() : INotifier {
 		return this._notifier;
 	}
 

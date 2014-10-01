@@ -5,13 +5,13 @@ class ImportBackupMenu extends OverlayMenu {
 
 	private _spinner : DOMElement;
 	private _listener : IImportBackupMenuListener;
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(listener : IImportBackupMenuListener, notifier : Notifier) {
+	constructor(listener : IImportBackupMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-import-backup-menu-wrapper'));
 
 		this._setUp();
@@ -68,7 +68,7 @@ class ImportBackupMenu extends OverlayMenu {
 			(args) => {
 				args.preventDefault();
 				this._showSpinner();
-				this._notifier.inform('Processing...');
+				this._notifier.inform(PresenterMessages.GNU);
 
 				BusinessFactory.buildTagBookmark(
 					(business) => {

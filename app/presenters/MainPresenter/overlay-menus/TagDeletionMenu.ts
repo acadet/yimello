@@ -4,14 +4,14 @@ class TagDeletionMenu extends OverlayMenu {
 	//region Fields
 
 	private _listener : ITagDeletionMenuListener;
-	private _notifier : Notifier;
+	private _notifier : INotifier;
 	private _current : Tag;
 	
 	//endregion Fields
 	
 	//region Constructors
 
-	constructor(listener : ITagDeletionMenuListener, notifier : Notifier) {
+	constructor(listener : ITagDeletionMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-tag-deletion-menu-wrapper'));
 
 		this._listener = listener;

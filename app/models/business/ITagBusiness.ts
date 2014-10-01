@@ -6,12 +6,6 @@
 interface ITagBusiness {
 	isValueValid(value : string) : boolean;
 
-	// TODO : test
-	isNotAlreadyExisting(label : string, callback : Action<boolean>) : void;
-
-	// TODO : test
-	isNotAlreadyExistingButNotProvided(label : string, tag : Tag, callback : Action<boolean>) : void;
-
 	// compare(newLabel : string, exisitingLabel : string) : boolean;
 
 	add(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void;

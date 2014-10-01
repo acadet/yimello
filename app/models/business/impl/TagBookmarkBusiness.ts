@@ -85,33 +85,48 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		}
 
 		p = coll.getAt(index);
+
 		this
 			._args
-			.getTagBusiness()
-			.merge(
-				p.getSecond(),
-				(outcome) => {
-					var tags : IList<Tag> = outcome;
+			.getBookmarkBusiness()
+			.isNotAlreadyExisting(
+				p.getFirst().getURL(),
+				(success) => {
+					if (!success) {
+						Log.error(new BusinessException('Unable to import bookmark, one has already same URL'));
+						this._addRecursiveBookmark(index + 1, coll, callback, errorHandler);
+						return;
+					}
 
 					this
 						._args
-						.getBookmarkBusiness()
-						.add(
-							p.getFirst(),
+						.getTagBusiness()
+						.merge(
+							p.getSecond(),
 							(outcome) => {
-								this.bindTags(
-									outcome,
-									tags,
-									() => {
-										this._addRecursiveBookmark(index + 1, coll, callback, errorHandler);
-									},
-									errorHandler
-								);
+								var tags : IList<Tag> = outcome;
+
+								this
+									._args
+									.getBookmarkBusiness()
+									.add(
+										p.getFirst(),
+										(outcome) => {
+											this.bindTags(
+												outcome,
+												tags,
+												() => {
+													this._addRecursiveBookmark(index + 1, coll, callback, errorHandler);
+												},
+												errorHandler
+											);
+										},
+										errorHandler
+									);
 							},
 							errorHandler
 						);
-				},
-				errorHandler
+				}
 			);
 	}
 
@@ -173,11 +188,24 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		this
 			._args
-			.getBookmarkDAO()
-			.addRaw(
-				bookmark,
+			.getBookmarkBusiness()
+			.isNotAlreadyExisting(
+				bookmark.getURL(),
 				(success) => {
-					this._addBKList(currentIndex + 1, list, callback);
+					if (!success) {
+						Log.error(new BusinessException('Unable to add bookmark: url is already used'));
+						this._addBKList(currentIndex + 1, list, callback);
+					} else {
+						this
+						._args
+						.getBookmarkDAO()
+						.addRaw(
+							bookmark,
+							(success) => {
+								this._addBKList(currentIndex + 1, list, callback);
+							}
+						);
+					}
 				}
 			);
 	}
@@ -197,11 +225,24 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		this
 			._args
-			.getTagDAO()
-			.addRaw(
-				tag,
+			.getTagBusiness()
+			.isNotAlreadyExisting(
+				tag.getLabel(),
 				(success) => {
-					this._addTagList(currentIndex + 1, list, callback);
+					if (!success) {
+						Log.error(new BusinessException('Unable to add tag: label is already used'));
+						this._addTagList(currentIndex + 1, list, callback);
+					} else {
+						this
+							._args
+							.getTagDAO()
+							.addRaw(
+								tag,
+								(success) => {
+									this._addTagList(currentIndex + 1, list, callback);
+								}
+							);
+					}
 				}
 			);
 	}
@@ -219,7 +260,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to sort tags: provided bookmark is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -233,61 +274,106 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 						callback(outcome);
 					} else {
 						Log.error(new BusinessException('Unable to sort tags: no outcome was returned'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);
 	}
 
 	addMergeAndBind(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void {
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		if (tags.getLength() < 1) {
+			Log.error(new BusinessException('Unable to add: no tags provided'));
+			errorHandler(BusinessMessages.FOX);
+			return;
+		}
+
 		this
 			._args
 			.getBookmarkBusiness()
-			.add(
-				bookmark,
-				(outcome) => {
-					var bk : Bookmark;
-
-					bk = outcome;
+			.isNotAlreadyExisting(
+				bookmark.getURL(),
+				(success) => {
+					if (!success) {
+						Log.error(new BusinessException('Unable to add: a bookmark with same URL is already existing'));
+						errorHandler(BusinessMessages.PANDA);
+						return;
+					}
 
 					this
 						._args
-						.getTagBusiness()
-						.merge(
-							tags,
+						.getBookmarkBusiness()
+						.add(
+							bookmark,
 							(outcome) => {
-								this.bindTags(bk, outcome, callback, errorHandler);
+								var bk : Bookmark;
+
+								bk = outcome;
+
+								this
+									._args
+									.getTagBusiness()
+									.merge(
+										tags,
+										(outcome) => {
+											this.bindTags(bk, outcome, callback, errorHandler);
+										},
+										errorHandler
+									);
 							},
 							errorHandler
 						);
-				},
-				errorHandler
+				}
 			);
 	}
 
 	updateMergeAndBind(bookmark : Bookmark, tags : IList<Tag>, callback? : Action0, errorHandler? : Action<string>) : void {
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		if (tags.getLength() < 1) {
+			Log.error(new BusinessException('Unable to update: no tags provided'));
+			errorHandler(BusinessMessages.FOX);
+			return;
+		}
+
 		this
 			._args
 			.getBookmarkBusiness()
-			.update(
+			.isNotAlreadyExistingButNotProvided(
+				bookmark.getURL(),
 				bookmark,
-				(outcome) => {
-					var bk : Bookmark;
-
-					bk = outcome;
+				(success) => {
+					if (!success) {
+						Log.error(new BusinessException('Unable to update bookmark, one with same URL is already existing'));
+						errorHandler(BusinessMessages.PANDA);
+						return;
+					}
 
 					this
 						._args
-						.getTagBusiness()
-						.merge(
-							tags,
+						.getBookmarkBusiness()
+						.update(
+							bookmark,
 							(outcome) => {
-								this.updateTagBinding(bk, outcome, callback, errorHandler);
+								var bk : Bookmark;
+
+								bk = outcome;
+
+								this
+									._args
+									.getTagBusiness()
+									.merge(
+										tags,
+										(outcome) => {
+											this.updateTagBinding(bk, outcome, callback, errorHandler);
+										},
+										errorHandler
+									);
 							},
 							errorHandler
 						);
-				},
-				errorHandler
+				}
 			);
 	}
 
@@ -302,13 +388,13 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to bind: provided bookmark is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to bind: provided tag list is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -329,7 +415,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 						callback();
 					} else {
 						Log.error(new BusinessException('Unable to bind tags: an error has occured when adding relations'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);
@@ -346,13 +432,13 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		if (!TSObject.exists(bookmark)) {
 			Log.error(new BusinessException('Unable to bind: provided bookmark is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
 		if (!TSObject.exists(tags)) {
 			Log.error(new BusinessException('Unable to bind: provided tag list is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -373,7 +459,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 						callback();
 					} else {
 						Log.error(new BusinessException('Unable to bind: an error occured when updating'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);
@@ -388,7 +474,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		if (!TSObject.exists(tag)) {
 			Log.error(new BusinessException('Unable to sort bookmarks: provided tag is null'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.DEFAULT);
 			return;
 		}
 
@@ -402,7 +488,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 						callback(outcome);
 					} else {
 						Log.error(new BusinessException('Unable to sort bookmarks: an error has occured when sorting'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 					}
 				}
 			);
@@ -417,7 +503,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		if (dataTransfer.files.length < 1) {
 			Log.error(new BusinessException('No import: there is no file'));
-			errorHandler('Ouch! An internal error has occured. Please try again');
+			errorHandler(BusinessMessages.WEASEL);
 			return;
 		}
 
@@ -452,6 +538,42 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	// TODO : test
+	exportToBrowser(callback : Action<string>, errorHandler? : Action<string>) : void {
+		var outcome : StringBuffer;
+		var timestamp : number;
+
+		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
+
+		timestamp = Date.now();
+		outcome = new StringBuffer('<!DOCTYPE NETSCAPE-Bookmark-file-1>');
+		outcome
+			.append('<!-- Backup from Yimello -->')
+			.append('<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">')
+			.append('<TITLE>Bookmarks</TITLE>')
+			.append('<H1>Bookmarks</H1>')
+			.append('<DL><p>')
+			.append('<DT><H3 ADD_DATE="' + timestamp + '" LAST_MODIFIED="' + timestamp + '">Yimello</H3>')
+			.append('<DL><p>');
+
+		this
+			._args
+			.getBookmarkDAO()
+			.sortByTitleAsc(
+				(result) => {
+					result.forEach(
+						(e) => {
+							outcome
+								.append('<DT><A HREF="' + e.getURL() + '">')
+								.append(e.getTitle() + '</A>');
+						}
+					);
+					outcome.append('</DL><p></DL><p>');
+
+					callback(outcome.toString());
+				}
+			);
+	}
+
 	search(input : string, callback : Action<IList<ScoredBookmark>>, errorHandler? : Action<string>) : void {
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
@@ -466,7 +588,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 					if (!TSObject.exists(outcome)) {
 						Log.error(new BusinessException('Unable to search: an error has occured when getting data'));
-						errorHandler('Ouch! An internal error has occured. Please try again');
+						errorHandler(BusinessMessages.DEFAULT);
 						return;
 					}
 
@@ -602,7 +724,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					(error) => {
 						if (error) {
 							Log.error(new BusinessException(error));
-							errorHandler('Ouch! An internal error has occured. Please try again');
+							errorHandler(BusinessMessages.DEFAULT);
 						} else {
 							callback();
 						}
@@ -622,7 +744,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 		if (dataTransfer.files.length < 1) {
 			Log.error(new BusinessException('Unable to import: no file provided'));
-			errorHandler('Whoops! An error has occured while importing your file. Please try again');
+			errorHandler(BusinessMessages.WEASEL);
 			return;
 		}
 
