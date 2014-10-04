@@ -1,7 +1,7 @@
 /// <reference path="../../../dependencies.ts" />
 
 class BusinessMessages {
-	static DEFAULT : string = 'Ouch! An internal error has occured. Please try again';
+	static DEFAULT : string = 'Ouch! An inner error has occured. Please try again';
 
 	// BookmarkBusiness
 	static COATI : string = 'Ow! Your URL is invalid. Please check it again';

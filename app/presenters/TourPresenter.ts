@@ -31,11 +31,6 @@ class TourPresenter extends YimelloPresenter {
 	 */
 	private _tags : DOMElement;
 
-	/**
-	 * Current available tag id
-	 */
-	private _tagID : number;
-
 	private _tagInput : DOMElement;
 
 	private _urlInput : DOMElement;
@@ -46,12 +41,6 @@ class TourPresenter extends YimelloPresenter {
 	//endregion Fields
 	
 	//region Constructors
-
-	constructor() {
-		super();
-
-		this._tagID = 0;
-	}
 
 	//endregion Constructors
 	
@@ -124,7 +113,6 @@ class TourPresenter extends YimelloPresenter {
 		BusinessFactory.buildTag(
 			(business) => {
 				var tag : DOMElement;
-				var img : DOMElement;
 				var tagObj : Tag;
 
 				if (!business.isValueValid(value)) {
@@ -136,14 +124,8 @@ class TourPresenter extends YimelloPresenter {
 
 				// Start to build a new tag
 				tag =
-					DOMElement.fromString('<li><p>' + value + '</p></li>');
+					DOMElement.fromString('<li>' + value + '</li>');
 				tag.addClass('tag');
-				img = DOMElement.fromString('<img />');
-				img.setAttribute('src', "assets/img/x-mark-icon.png");
-				img.addClass('delete-tag');
-				img.setData('tag-id', NumberHelper.toString(this._tagID++));
-
-				tag.append(img);
 				this._tags.append(tag);
 
 				tagObj = new Tag();
@@ -152,8 +134,8 @@ class TourPresenter extends YimelloPresenter {
 				this._currentTags.add(tagObj);
 
 				// On click on delete icon, remove bound tag
-				img.on(DOMElementEvents.Click, (e) => {
-					img.off(DOMElementEvents.Click);
+				tag.on(DOMElementEvents.Click, (e) => {
+					tag.off(DOMElementEvents.Click);
 					tag.remove();
 					this._currentTags.remove(tagObj);
 				});

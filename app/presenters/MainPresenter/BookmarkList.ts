@@ -17,6 +17,8 @@ class BookmarkList implements IBookmarkContextMenuListener {
 
 	private _state : BookmarkListStates;
 	private _currentTag : Tag;
+
+	private _currentLabel : DOMElement;
 	
 	//endregion Fields
 	
@@ -27,6 +29,7 @@ class BookmarkList implements IBookmarkContextMenuListener {
 		this._source = DOMTree.findSingle('.js-bookmark-list');
 		this._defaultContent = DOMTree.findSingle('.js-default-bookmark-list');
 		this._ctxtMenu = new BookmarkContextMenu(this);
+		this._currentLabel = DOMTree.findSingle('.js-current-tag');
 	}
 	
 	//endregion Constructors
@@ -34,6 +37,10 @@ class BookmarkList implements IBookmarkContextMenuListener {
 	//region Methods
 	
 	//region Private Methods
+
+	private _setCurrentLabel(value : string) : void {
+		this._currentLabel.setText(value);
+	}
 
 	private _build(values : IList<Bookmark>) : void {
 		if (values.getLength() === 0) {
@@ -62,12 +69,13 @@ class BookmarkList implements IBookmarkContextMenuListener {
 												bookmark.setViews(bookmark.getViews() + 1);
 												business.update(bookmark);
 												NodeWindow.openExternal(bookmark.getURL());
+												this.refresh();
 											}
 										);
 									}
 								);
 							} else if (args.getWhich() === 3) {
-								this._ctxtMenu.show(e.getData('id'), args.getPageY(), args.getPageX());
+								this._ctxtMenu.show(e.getData('id'), e.getData('url'), args.getPageY(), args.getPageX());
 							}
 						}
 					);
@@ -81,6 +89,7 @@ class BookmarkList implements IBookmarkContextMenuListener {
 
 	sortMostPopular() : void {
 		this._state = BookmarkListStates.MostPopular;
+		this._setCurrentLabel('Most popular');
 		BusinessFactory.buildBookmark(
 			(business) => {
 				business.sortByViewsDescThenByTitleAsc(
@@ -94,6 +103,7 @@ class BookmarkList implements IBookmarkContextMenuListener {
 
 	sortForTag(tag : Tag) : void {
 		this._state = BookmarkListStates.Tag;
+		this._setCurrentLabel(tag.getLabel());
 		this._currentTag = tag;
 		BusinessFactory.buildTagBookmark(
 			(business) => {
@@ -109,6 +119,7 @@ class BookmarkList implements IBookmarkContextMenuListener {
 
 	search(input : string) : void {
 		this._state = BookmarkListStates.Search;
+		this._setCurrentLabel('Search Results');
 		BusinessFactory.buildTagBookmark(
 			(business) => {
 				business.search(

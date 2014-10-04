@@ -5,6 +5,7 @@ class BookmarkContextMenu extends ContextMenu {
 
 	private _listener : IBookmarkContextMenuListener;
 	private _id : string;
+	private _url : string;
 	
 	//endregion Fields
 	
@@ -14,6 +15,26 @@ class BookmarkContextMenu extends ContextMenu {
 		super(DOMTree.findSingle('.js-bookmark-context-menu'));
 
 		this._listener = listener;
+
+		DOMTree
+			.findSingle('.js-bookmark-context-menu-facebook-share')
+			.on(
+				DOMElementEvents.Click,
+				(args) => {
+					NodeWindow.openExternal('http://www.facebook.com/sharer.php?u=' + this._url);
+					super.hide();
+				}
+			);
+
+		DOMTree
+			.findSingle('.js-bookmark-context-menu-twitter-share')
+			.on(
+				DOMElementEvents.Click,
+				(args) => {
+					NodeWindow.openExternal('http://twitter.com/share?url=' + this._url);
+					super.hide();
+				}
+			);
 
 		DOMTree
 			.findSingle('.js-bookmark-context-menu-edit')
@@ -46,8 +67,9 @@ class BookmarkContextMenu extends ContextMenu {
 	
 	//region Public Methods
 
-	show(id : string, top : number, left : number) : void {
+	show(id : string, url : string, top : number, left : number) : void {
 		this._id = id;
+		this._url = url;
 		super._show(top, left);
 	}
 	

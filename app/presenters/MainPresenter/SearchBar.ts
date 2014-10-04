@@ -41,7 +41,7 @@ class SearchBar {
 					this._listener.onSearchCancel();
 				}
 			},
-			700
+			500
 		);
 	}
 

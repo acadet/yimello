@@ -124,37 +124,9 @@ a {
         }
 
         color : $black;
+
+        &.dark {
+            background-color : #eee;
+        }
     }
 }
-
-// .error-message {
-//  position : absolute;
-//  top : 10px;
-//  right : 30px;
-
-//  max-width : 300px;
-
-//  display : none;
-//  z-index : 0;
-//  background-color : #7EB530;
-//  @include border-radius(10px);
-
-//  p {
-//      margin : 10px 15px;
-
-//      font : {
-//          family : $ptSans;
-//          size : 0.9em;
-//      }
-
-//      color : white;
-//  }
-
-//  &.error {
-//      background-color : #DD381D;
-//  }
-
-//  &.warning {
-//      background-color : #EB6841;
-//  }
-// }

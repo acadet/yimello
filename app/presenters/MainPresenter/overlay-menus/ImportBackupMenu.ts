@@ -14,6 +14,9 @@ class ImportBackupMenu extends OverlayMenu {
 	constructor(listener : IImportBackupMenuListener, notifier : INotifier) {
 		super(DOMTree.findSingle('.js-import-backup-menu-wrapper'));
 
+		this._listener = listener;
+		this._notifier = notifier;
+
 		this._setUp();
 	}
 	

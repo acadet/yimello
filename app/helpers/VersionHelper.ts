@@ -5,7 +5,7 @@ class VersionHelper {
 	//region Fields
 	
 	private static _target : string = 'http://yimello.adriencadet.com/version';
-	private static _version : string = '0.2.2';
+	private static _version : string = '0.3.0';
 
 	//endregion Fields
 	

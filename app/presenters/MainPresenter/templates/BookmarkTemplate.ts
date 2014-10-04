@@ -9,7 +9,7 @@ class BookmarkTemplate {
 		values.forEach(
 			(e) => {
 				template
-					.append('<li data-id="' + e.getId() + '">')
+					.append('<li data-id="' + e.getId() + '" data-url="' + e.getURL() + '">')
 					.append('<div class="bookmark-favicon-wrapper">')
 					.append('<img src="' + FaviconHelper.getSrc(e.getURL()) + '">')
 					.append('</div>')

@@ -36,6 +36,7 @@ class IntroPresenter extends YimelloPresenter {
 				if (!success) {
 					var body : DOMElement, icon : DOMElement;
 					var originalWidth : number, originalHeight : number;
+					var duration : number = 600;
 
 					body = DOMTree.findSingle('.js-body');
 					icon = body.findSingle('.js-update-icon');
@@ -64,7 +65,7 @@ class IntroPresenter extends YimelloPresenter {
 							top : body.getHeight() - 100 - (originalHeight / 2),
 							left : (body.getWidth() - originalWidth * 2) / 2
 						},
-						600,
+						duration,
 						'easeOutBack'
 					);
 
@@ -75,22 +76,23 @@ class IntroPresenter extends YimelloPresenter {
 								marginLeft : (originalWidth * 2 - 50) / 2,
 								marginTop : (originalHeight * 2 - 50) / 2
 							},
-							600,
+							duration,
 							'easeOutBack',
 							(o) => {
-								var t : Timer;
+								icon.addClass('pulse');
 
-								t = new Timer(
-									(o) => {
-										if (this._mustExit) {
+								if (this._mustExit) {
+									var t : Timer;
+
+									t = new Timer(
+										(o) => {
 											this._exit();
-										} else {
-											this._mustExit = true;
-											icon.addClass('pulse');
-										}
-									},
-									350
-								);
+										},
+										3000
+									);
+								} else {
+									this._mustExit = true;
+								}
 							}
 						);
 				} else {

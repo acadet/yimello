@@ -25,8 +25,6 @@ class MainPresenter
 	private _exportBrowserMenu : ExportBrowserMenu;
 	private _importBackupMenu : ImportBackupMenu;
 	private _createBackupMenu : CreateBackupMenu;
-
-	private _currentTag : DOMElement;
 	
 	//endregion Fields
 	
@@ -100,10 +98,6 @@ class MainPresenter
 				}
 			);
 	}
-
-	private _setCurrentTag(value : string) : void {
-		this._currentTag.setText(value);
-	}
 	
 	//endregion Private Methods
 	
@@ -128,8 +122,6 @@ class MainPresenter
 
 		this._importBackupMenu = new ImportBackupMenu(this, super.getNotifier());
 		this._createBackupMenu = new CreateBackupMenu(super.getNotifier());
-
-		this._currentTag = DOMTree.findSingle('.js-current-tag');
 
 		this.onMostPopularSelection();
 	}
@@ -169,13 +161,11 @@ class MainPresenter
 	onMostPopularSelection() : void {
 		this._searchBar.reset();
 		this._bookmarkList.sortMostPopular();
-		this._setCurrentTag('Most popular');
 	}
 
 	onTagSelection(t : Tag) : void {
 		this._searchBar.reset();
 		this._bookmarkList.sortForTag(t);
-		this._setCurrentTag(t.getLabel());
 	}
 
 	onTagEditionRequest(id : string) : void {
@@ -210,7 +200,6 @@ class MainPresenter
 
 	onSearchRequest(input : string) : void {
 		this._bookmarkList.search(input);
-		this._setCurrentTag('Search Results');
 	}
 
 	onSearchCancel() : void {
