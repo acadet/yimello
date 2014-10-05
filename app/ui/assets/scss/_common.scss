@@ -1,127 +1,132 @@
-@import "normalize";
-@import "utils";
-@import "fonts";
+@import 'normalize';
+@import 'utils';
+@import 'fonts';
 
-$imgFolder : '../img/';
-$appWidth : 800px;
-$appHeight: 528px;
-$headerHeight : 27px;
-$blockHeight : $appHeight - $headerHeight;
+$img-folder: '../img/';
+$app-width: 800px;
+$app-height: 525px;
+$header-height: 25px;
+$body-height: $app-height - $header-height;
+
+$red: #dd381d;
+$green: #7eb530;
+$orange: #eb6c17;
+$yellow: #f6e741;
+$blue : #22a8e8;
+$black : #3d3e44;
 
 body {
-	position: absolute;
-	top: 0px;
-	left: 0px;
+    position: absolute;
+    top: 0;
+    left: 0;
 
-	width: 100%;
-	height: 100%;
-	margin: 0;
-	
-	overflow: hidden;
-	opacity: 0;
+    overflow: hidden;
 
-	* {
-		font-weight: 400;
-		font-style: normal;
-	}
+    width: 100%;
+    height: 100%;
+    margin: 0;
 
-	-webkit-user-select: none;
+    -webkit-user-select: none;
 }
 
 a {
-	text-decoration: none;
-	color : inherit;
+    text-decoration: none;
 
-	&:hover {
-		text-decoration: none;
-	}
-
-	&:visited {
-		color: inherit;
-	}
+    color: inherit;
+    &:hover {
+        text-decoration: none;
+    }
+    &:visited {
+        color: inherit;
+    }
 }
 
 .header {
-	position : absolute;
-	top : 0;
-	left : 0;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
 
-	width : 100%;
-	height : 25px;
+    width: 100%;
+    height: $header-height;
 
-	background-color : #eee;
-	border-bottom : 2px solid #ccc;
-	z-index : 2;
-	cursor : pointer;
+    cursor: pointer;
 
-	-webkit-app-region: drag;
+    background-color: #1c1c1c;
 
-	ul {
-		margin : 2.5px 20px;
-		padding : 0;
+    -webkit-app-region: drag;
 
-		list-style-type: none;
+    ul {
+        margin: 5px 20px;
+        padding: 0;
 
-		li {
-			margin : 0;
-			padding : 0 5px 0 0;
+        list-style-type: none;
 
-			display : inline-block;
+        li {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 0;
 
-			img {
-				opacity : 1;
+            img {
+                -webkit-app-region: no-drag;
+                opacity : 0.75;
 
-				-webkit-app-region: no-drag;
+                @include transition(opacity, .25s, ease);
 
-				@include transition(opacity, 0.5s, ease);
-
-				&:hover {
-					opacity : 0.8;
-				}
-			}
-		}
-	}
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+    }
 }
 
 .body {
-	position : absolute;
-	top : $headerHeight;
-	left : 0;
+    position: absolute;
+    z-index: 1;
+    top: $header-height;
+    left: 0;
 
-	width : 100%;
-	height : $blockHeight;
+    width: 100%;
+    height: $body-height;
 
-	z-index : 1;
+    opacity: 0;
 }
 
-.error-message {
-	position : absolute;
-	top : 10px;
-	right : 30px;
+.notifier {
+    position : fixed;
+    z-index : 99;
+    display : none;
+    width : 200px;
 
-	max-width : 300px;
+    &.inform {
+        background-color : $blue;
+    }
 
-	display : none;
-	z-index : 0;
-	background-color : #7EB530;
-	@include border-radius(10px);
+    &.warn {
+        background-color : $orange;
+    }
 
-	p {
-		margin : 10px 15px;
+    &.alert {
+        background-color : $red;
+    }
 
-		font : {
-			family : $ptSans;
-			size : 0.9em;
-		}
+    .notifier-content {
+        background-color : white;
+        width : 195px;
+        margin : 0 0 0 5px;
+        padding : 10px 15px;
+        @include box-sizing(border-box);
 
-		color : white;
-	}
+        font : {
+            family : $oxygen;
+            size : 0.8em;
+        }
 
-	&.error {
-		background-color : #DD381D;
-	}
+        color : $black;
 
-	&.warning {
-		background-color : #EB6841;
-	}
+        &.dark {
+            background-color : #eee;
+        }
+    }
 }

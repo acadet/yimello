@@ -1,4 +1,4 @@
-# Tmp files
+# Tmp files/Project files
 .DS_Store
 *~
 .tscache/
@@ -7,6 +7,7 @@
 .recognizer
 node_modules/
 tscommand*.txt
+yimello.sublime-workspace
 
 # Special files & folders
 release/

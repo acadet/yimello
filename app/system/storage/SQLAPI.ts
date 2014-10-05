@@ -102,7 +102,11 @@ interface ISQLTransactionErrorCallback {
 	(error : SQLError) : void;
 }
 
-class SQLDatabase {
+interface ISQLDatabase {
+	transaction(success : ISQLTransactionCallback, error? : ISQLTransactionErrorCallback) : void;
+}
+
+class SQLDatabase implements ISQLDatabase {
 	private _db : any;
 
 	constructor(dbObj : any) {
@@ -123,14 +127,14 @@ class SQLDatabase {
 			(o) => {
 				if (callback !== null) {
 					callback(new SQLDatabase(o));
-				}				
+				}
 			}
 		);
 
 		return new SQLDatabase(db);
 	}
 
-	transaction(success : ISQLTransactionCallback, error : ISQLTransactionErrorCallback = null) : void {
+	transaction(success : ISQLTransactionCallback, error? : ISQLTransactionErrorCallback) : void {
 		this._db.transaction(
 			(o) => {
 				success(new SQLTransaction(o));

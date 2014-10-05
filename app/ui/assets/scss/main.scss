@@ -1,628 +1,553 @@
 @import "common";
+@import "pulser";
 
-$black: #333333;
-$blue: #0c7cbb;
-$lightBlue : #22A8E8;
-$orange : #EB6841;
-$red : #DD381D;
-$green : #7EB530;
+$aside-menu-width : 200px;
+$main-view-search-bar-height : 40px;
+
+::-webkit-scrollbar { 
+	background : none;
+}
+::-webkit-scrollbar-button {
+	display : none;
+}
+::-webkit-scrollbar-track {
+	background : none;
+}
+::-webkit-scrollbar-track-piece { 
+	background : transparentize(white, 0.9);
+}
+::-webkit-scrollbar-thumb {
+	background : transparentize(white, 0.5);
+}
+::-webkit-scrollbar-corner       { /* 6 */ }
+::-webkit-resizer                { /* 7 */ }
+
+._button {
+	min-width : 125px;
+	padding : 5px 15px;
+	margin : 0 5px;
+	display : inline-block;
+	border : 1px solid transparent;
+	font : {
+		family : $oxygen;
+		size : 0.9em;
+	}
+	text-align : center;
+	color : white;
+	background : transparentize(white, 0.75);
+	outline : none;
+	cursor : pointer;
+
+	@include transition(background-color, .25s, ease);
+	@include border-radius(5px);
+}
+
+.confirm-button {
+	@extend ._button;
+
+	&:hover {
+		background-color : $blue;
+	}
+}
+
+.cancel-button {
+	@extend ._button;
+
+	&:hover {
+		background-color : $red;
+	}
+}
+
+.main-view-wrapper, ._overlay-menu-wrapper {
+	position : absolute;
+	top : 0;
+	left : 0;
+	width : 100%;
+	height : 100%;
+}
 
 .main-view-wrapper {
-	position: absolute;
-	top: 0;
-	left: 0;
-
-	width: 100%;
-	height: 100%;
-
 	z-index : 1;
-}
 
-.panel-wrapper {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-
-	width: 25%;
-	height: 100%;
-
-	background-color: $black;
-
-	.icon-wrapper {
+	.aside-menu, .main-view {
 		position : absolute;
 		top : 0;
+		height : 100%;
+
+		@include transition(left, .5s, ease);
+	}
+}
+
+.aside-menu {
+	left : - $aside-menu-width;
+	width : $aside-menu-width;
+	background-color : $black;
+	box-shadow: inset -5px 0 15px transparentize(black, 0.5);
+
+	&.visible {
 		left : 0;
-
-		width: 100%;
-		padding: 10px 0px;
-
-		border-bottom: 3px solid rgba(0, 0, 0, 0.2);
 	}
-
-	.tag-list {
-		position : absolute;
-		left : 0;
-
-		width: 100%;
-
-		overflow : auto;
-	}
-}
-
-.panel-wrapper .icon-wrapper .icons {
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
-	text-align: center;
-
-	.icon {
-		display: inline-block;
-		vertical-align: middle;
-		padding: 5px 10px;
-		cursor: pointer;
-
-		@include transition(opacity, 0.5s, ease);
-
-		&:hover {
-			opacity : 0.8;
-		}
-	}
-}
-
-.panel-wrapper .tag-list .tags {
-	list-style-type: none;
-	margin: 0;
-	padding: 0 0 15px 0;
-
-	opacity : 0;
-
-	li {
-		margin: 0;
-		padding : 5px 15px;
-
-		@include transition(background-color, 0.5s, ease);
-
-		&.active {
-			background-color : $lightBlue;
-		}
-
-		&:hover:not(.active) {
-			background-color : #484848;
-		}
-
-		&:hover {
-			img {
-				opacity : 1;
-			}
-		}
-
-		p, img {
-			cursor : pointer;
-			display : inline-block;
-			vertical-align : middle;
-		}
-
-		p {
-			margin : 0;
-			width : 95px;
-
-			font: {
-				family: $ptSans;
-				size: 1em;
-			}
-			word-break : break-word;
-
-			color: white;
-		}
-
-		img {
-			margin : 0 5px;
-
-			opacity : 0;
-			@include transition(opacity, 0.5s, ease);
-
-			&:hover {
-				opacity : 0.7;
-			}
-		}
-	}
-}
-
-.bookmark-wrapper {
-	position: absolute;
-	top: 0px;
-	left: 25%;
-
-	width: 75%;
-	height: 90%;
-
-	background-color: white;
 
 	ul {
 		margin : 0;
 		padding : 0;
-		width : 100%;
-		height: 100%;
+		list-style-type: none;
 
-		list-style-type : none;
-		overflow : auto;
-		
 		li {
-			vertical-align : middle;
-
-			display : inline-block;
-			padding: 10px 15px;
-			width: 33.3%;
-			height: 33.3%;
-			overflow : hidden;
-			@include box-sizing(border-box);
-
-			text-align : center;
-
-			cursor: pointer;
-			@include transition(background-color, 0.5s, ease);
+			padding : 10px 15px;
+			border-bottom : 1px solid transparentize(black, 0.75);
+			color : white;
+			font : {
+				family : $oxygen;
+				size : 0.9em;
+			}
+			cursor : pointer;
+			@include transition(background-color, .5s, ease);
 
 			&:hover {
-				background-color : #eee;
+				background-color : transparentize(white, 0.9);
 			}
 		}
 	}
 }
 
-.bookmark-wrapper ul li {
-	h3, p {
-		word-wrap : break-word;
+.main-view, ._overlay-menu-wrapper {
+	background-image : url($img-folder + 'main-background.png');
+}
+
+.main-view {
+	width : 100%;
+
+	&.background {
+		left : $aside-menu-width;
 	}
 
-	h3 {
-		margin: 0;
-
-		font: {
-			size: 1em;
-			family : $ptSans;
-		}
-
-		color: $black;		
+	.main-view-header, .main-view-content, .search-bar {
+		position : absolute;
+		left : 0;
+		width : 100%;
 	}
 
-	p {
-		font: {
-			size: 0.8em;
-			family : $ptSans;
-		}
-		text-align: justify;
-
-		color: #ccc;
-	}
-
-	img {
-		width : 16px;
+	.main-view-header, .search-bar {
+		z-index : 2;
 	}
 }
 
-.bookmark-wrapper ul li.search-result {
-	padding : 5px 10px;
-	margin : 10px 15px;
-	width : auto;
-	height : auto;
-	display : block;
-
-	border : 2px solid #eee;
-
-	.details-wrapper, .score-wrapper {
-		display : inline-block;
-		vertical-align : middle;
-	}
-
-	.details-wrapper {
-		width : 75%;
-
-		.header-wrapper, p {
-			display : block;
-		}
-
-		.header-wrapper {
-			text-align : left;
-
-			img, h3 {
-				display : inline-block;
-				vertical-align : middle;
-			}
-
-			img {
-				margin : 0 10px 5px 0;
-			}
-
-			h3 {
-				max-width : 300px;
-			}
-		}
-	}
-
-	.score-wrapper {
-		width : 25%;
-
-		h4 {
-			display : inline;
-
-			font: {
-				size : 1em;
-				family : $ptSans;
-			}
-			text-align : center;
-
-			&.accurate {
-				color : $green;
-			}
-
-			&.high {
-				color : $lightBlue;
-			}
-
-			&.medium {
-				color : $orange;
-			}
-
-			&.low {
-				color : $red;
-			}
-		}
-	}
-}
-
-.bookmark-wrapper .default-content {
-	display : none;
-
-	font : {
-		family : $ptSans;
-		size : 1.5em;
-	}
-	text-align : center;
-
-	color : #eee;
-}
-
-.search-wrapper {
-	position: absolute;
-	top: 90%;
-	left: 25%;
-
-	width: 75%;
-	height: 10%;
-
-	background-color : $blue;
-
-	img, form {
-		display: inline-block;
-		vertical-align: middle;
-	}
-
-	img {
-		margin: 10px 20px;
-	}
-
-	form {
-		height: 100%;
-		width: $appWidth * 0.75 - 95px;
-
-		@include placeholder-color(transparentize(white, 0.5));
-	}
-}
-
-.search-wrapper form input {
-	width: 100%;
-	height: 100%;
-	padding: 5px 10px;
+.main-view-header {
+	top : 0;
+	padding : 10px 15px;
 	@include box-sizing(border-box);
 
-	font: {
-		family: $ptSans;
-		size: 1em;
-	}
-
-	outline: none;
-	border : none;
-	background: none;
-	color: white;
-}
-
-.bookmark-form-wrapper {
-	position: absolute;
-	top: 0;
-	left: 100%;
-
-	width: 100%;
-	height: 100%;
-
-	background-color : $black;
-
-	.bookmark-icon {
-		max-width : 32px;
-
+	img, p {
+		display : inline-block;
+		vertical-align : middle;
+		margin : 0px 5px;
 		cursor : pointer;
 	}
 
-	ul {
-		margin: 0;
-		padding: 0;
-		width: 100%;
-		height: 100%;
-
-		list-style-type : none;
-
-		li {
-			padding: 0;
-			display : inline-block;
-			height: 100%;
-
-			vertical-align : top;
-
-			&.column {
-				width: 32px;
-				padding: 0 20px;
-
-				text-align : center;
-			}
-		}
-	}
-
-	form {
-		margin: 15px 0;
-		padding: 0 25px;
-		width: $appWidth - 72 * 2;
-		
-		text-align: center;
-		@include box-sizing(border-box);
-
-		p {
-			margin: 1em 0;
-		}
-	}
-}
-
-.bookmark-form-wrapper .cancel-trigger {
-	opacity : 0.5;
-	cursor : pointer;
-
-	@include transition(opacity, 0.5s, ease);
-
-	&:hover {
-		opacity : 1;
-	}
-}
-
-@mixin flat-button($primary, $secondary) {
-	min-width : 200px;
-	min-height : 30px;
-	padding: 10px 15px;
-
-	font : {
-		family : $ptSans;
-		size: 1em;
-	}
-
-	color : white;
-	background-color : $primary;
-	border : 1px solid $secondary;
-	cursor : pointer;
-	outline : none;
-	text-align : center;
-
-	&:active {
-		background-color : $secondary;
-	}
-}
-
-form .save-button {
-	@include flat-button($green, #71a02e);
-}
-
-form .delete-button, form .cancel-button {
-	@include flat-button($red, #B52C17);
-}
-
-.bookmark-form-wrapper form input,
-.bookmark-form-wrapper form textarea {
-	width: 300px;
-	padding: 5px 10px;
-
-	font : {
-		family : $ptSans;
-		size: 1em;
-	}
-
-	outline: none;
-	border : 2px solid #555;
-	background-color : $black;
-	color : white;
-	@include transition(border-color, 0.5s, ease);
-
-	&:focus {
-		border-color : $lightBlue;
-	}
-
-	&.error {
-		border-color : $red;
-	}
-}
-
-.bookmark-form-wrapper form input {
-	height: 20px;
-}
-
-.bookmark-form-wrapper form textarea {
-	height: 80px;
-}
-
-.bookmark-form-wrapper form .tag-list {
-	margin: 0;
-	padding: 0;
-
-	list-style-type: none;
-
-	li {
-		vertical-align: middle;
-		padding: 5px;
-		margin: 5px 10px;
-		display: inline-block;
-
-		background-color : #ccc;
+	img {
 		@include transition(opacity, 0.5s, ease);
 
 		&:hover {
 			opacity : 0.5;
 		}
+	}
 
-		p, img {
-			display: inline-block;
+	p {
+		color : white;
+		font : {
+			family : $oxygen;
+			size : 1em;
+		}
+	}
+}
+
+.search-bar {
+	top : $body-height - $main-view-search-bar-height;
+	height : $main-view-search-bar-height;
+
+	background-color : transparent;
+
+	@include transition(background-color, 0.5s, ease);
+
+	&.active, &:hover:not(.active) {
+		background-color : transparentize(black, 0.5);
+	}
+
+	ul {
+		margin : 5px 10px 5px 10px;
+		padding : 0;
+		list-style-type : none;
+
+		li {
+			display : inline-block;
+			vertical-align : middle;
+			padding : 0;
+			height : $main-view-search-bar-height - 10px;
+			@include box-sizing(border-box);
+
+			&.icon, &.clickable-icon {
+				padding : 5px;
+			}
+
+			&.clickable-icon {
+				cursor : pointer;
+				@include transition(opacity, .5s, ease);
+
+				&:hover:not(.hidden) {
+					opacity : 0.75;
+				}
+			}
+
+			&.hidden {
+				opacity : 0;
+				cursor : default;
+			}
+		}
+	}
+
+	ul li input {
+		width : $app-width - (30 * 2) - 20 - 10;
+		height : 100%;
+		border : none;
+		outline : none;
+		padding : 0 5px 0 20px;
+		background : transparent;
+		color : white;
+		@include box-sizing(border-box);
+
+		font : {
+			family : $oxygen;
+			size : 0.9em;
+		}
+
+		&::-webkit-input-placeholder {
+			opacity : 0;
+			@include transition(opacity, 0.5s, ease);
+		}
+
+		&:focus::-webkit-input-placeholder, &:hover::-webkit-input-placeholder {
+			color : transparentize(white, 0.25);
+			opacity : 1;
+		}
+	}
+}
+
+.main-view-content {
+	top : 0;
+	height : 100%;
+	overflow : auto;
+	z-index : 1;
+
+	ul {
+		margin : 10px 20px 30px 20px;
+		padding : 0;
+		list-style-type : none;
+		overflow-x : hidden;
+	}
+
+	ul li {
+		width : 70%;
+		margin : 20px auto;
+		background-color : transparentize(black, 0.75);
+		border-bottom : 2px solid transparentize(black, 0.7);
+		cursor : pointer;
+		@include border-radius(5px);
+		@include transition(background-color, .5s, ease);
+
+		&:hover {
+			background-color : transparentize(black, 0.5);
+		}
+
+		.bookmark-favicon-wrapper, .bookmark-details-wrapper {
+			display : inline-block;
 			vertical-align : middle;
 		}
 
-		p {
-			margin : 0;
-			font : {
-				family : $montserrat;
-				size : 0.8em;
-			} 
-			color : $black;
-			cursor : default;
+		.bookmark-favicon-wrapper {
+			width : 25%;
+			text-align : center;
+		}
+
+		.bookmark-details-wrapper {
+			width : 75%;
+			margin : 1em 0;
 		}
 
 		img {
-			margin-left : 4px;
-			cursor : pointer;
+			width : 16px;
+			padding : 15px;
+			background-color : transparentize(white, 0.75);
+			@include border-radius(50%);
 		}
-	}
-}
 
-.bookmark-form-wrapper form .save-buton {
-	width: 200px;
-	height: 20px;
-	padding: 5px 10px;
+		h2, p {
+			font-family : $oxygen;
+			margin : 0.5em 1em;
+			word-break : break-word;
+		}
 
-	outline: none;
-	background-color: #22a8e8;
-	color: white;
-}
-
-.overlay {
-	position : absolute;
-	top : 0;
-	left: 0;
-
-	width : 100%;
-	height : 100%;
-	display : none;
-
-	z-index : 0;
-	background : rgba(0, 0, 0, 0.6);
-	opacity : 0;
-}
-
-.overlay .tag-form-wrapper, .overlay .menu-pannel {
-	position : absolute;
-
-	padding : 10px 0;
-	display : none;
-
-	background-color : $black;
-	@include border-radius(10px);
-}
-
-.overlay .menu-pannel {
-	ul {
-		list-style-type: none;
-		margin : 5px 10px;
-		padding : 0;
-
-		li {
-			margin : 10px;
-			padding : 2px 5px 2px 10px;
-
-			font : {
-				family : $ptSans;
-				size : 1em;
-			}
-
+		h2 {
+			font-weight : normal;
 			color : white;
-			cursor : pointer;
-			border-left : 5px solid rgba(255, 255, 255, 0);
-
-			@include transition(border-color, 0.5s, ease);
-
-			&:hover {
-				border-color : $blue;
-			}
+			font-size : 1em;
+			line-height : 1.8em;
 		}
-	}
-}
-
-.overlay .tag-form-wrapper {
-	form {
-		margin : 10px 20px;
 
 		p {
-			margin : 0;
-
-			&:first-child {
-				margin-bottom : 1em;
-			}
+			color : #ccc;
+			font-size : 0.8em;
+			text-align : justify;
+			line-height : 1.6em;
 		}
+	}
 
-		input {
-			padding : 5px 10px;
-			width : 100%;
-			min-height : 40px;
-			@include box-sizing(border-box);
+	.default-bookmark-list {
+		display : none;
+		font: {
+			size : 1.2em;
+			family : $oxygen;
+		}
+		margin : 3em 1em;
+		color : transparentize(white, 0.25);
+		text-align : center;
+	}
+}
 
-			font : {
-				family : $ptSans;
-				size : 1em;
+._overlay-menu-wrapper {
+	z-index : 2;
+	display : none;
+	opacity : 0;
+	overflow : auto;
+	overflow-X : hidden;
+
+	.overlay-menu {
+		margin : 30px;
+
+		form {
+			text-align : center;
+
+			textarea, input[type="text"] {
+				width : 250px;
+				padding : 10px;
+				outline : none;
+				border : none;
+				background-color : transparentize(black, 0.75);
+				font : {
+					family : $oxygen;
+					size : 0.9em;
+				}
+				color : white;
+				@include border-radius(5px);
+
+				@include transition(background-color, .5s, ease);
+
+				&:focus {
+					background-color : transparentize(black, 0.5);
+				}
+
+				&::-webkit-input-placeholder {
+					color : transparentize(white, 0.25);
+				}
 			}
 
-			outline : none;
-			border : none;
-		}
-
-		button {
-			margin : 0;
+			textarea {
+				height : 150px;
+			}
 		}
 	}
 }
 
-.drag-area {
-	position : absolute;
-	top : -100%;
-	left : 0;
+.tag-list-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
 
-	width : 100%;
-	height : 100%;
-
-	display : none;
-	z-index : 0;
-	background-color : $blue;
-	cursor : pointer;
-
-	h1, h2 {
-		text-align : center;
+	h2, li {
 		color : white;
+		font-family : $oxygen;
+		word-break : break-word;
 	}
 
-	h1 {
-		margin : 175px 20px 20px 20px;
+	ul {
+		margin : 0;
+		padding : 0;
+		list-style-type : none;
 
-		font : {
-			family : $montserrat;
-			size : 2.5em;
+		li {
+			display : inline-block;
+			margin : 10px 2.5%;
+			width : 28%;
+			font-size : 0.9em;
+			cursor : pointer;
+			vertical-align : top;
 		}
 	}
 
 	h2 {
-		margin : 10px 20px;
+		margin : 1.5em 0 0.5em 0;
+		font-size : 1.2em;
+		font-weight : normal;
+		padding : 0 50px 2px 10px;
 
+		&.index {
+			border-bottom : 2px solid transparentize(white, 0.70);
+			color : transparentize(white, 0.70);
+			margin-right : $app-width * .70;
+		}
+
+		&:not(.index) {
+			cursor : pointer;
+		}
+	}
+}
+
+.bookmark-form-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+
+	form .bookmark-icon {
+		width : 16px;
+		padding : 15px;
+		background-color : transparentize(white, 0.75);
+		@include border-radius(50%);
+	}
+
+	form ul {
+		width : 300px;
+		margin : 0;
+		padding : 0;
+		list-style-type : none;
+		display : inline-block;
+
+		li {
+			display : inline-block;
+			vertical-align : middle;
+			padding : 2.5px 10px;
+			margin : 5px;
+			font : {
+				family : $oxygen;
+				size : 0.8em;
+			}
+			color : white;
+			background-color : transparentize(white, 0.75);
+			cursor : pointer;
+
+			@include transition(background-color, .5s, ease);
+
+			&:hover:not(.active) {
+				background-color : transparentize(white, .5);
+			}
+
+			&.active {
+				background-color : $blue;
+			}
+		}
+	}
+}
+
+.bookmark-deletion-menu-wrapper, .tag-deletion-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+
+	.overlay-menu {
+		margin-top : 200px;
+	}
+
+	p {
+		color : white;
 		font : {
-			family : $montserrat;
-			size : 1.5em;
+			family : $oxygen;
+			size : 1.2em;
+		}
+		text-align : center;
+		margin : 1em;
+	}
+}
+
+.tag-form-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+
+	.overlay-menu {
+		margin-top : 180px;
+	}
+}
+
+.drag-file-area, .export-area {
+	@extend .overlay-menu;
+
+	text-align : center;
+	height : $body-height - 70;
+
+	h1 {
+		font : {
+			family : $oxygen;
+			size : 2em;
+		}
+		margin : 1em;
+		color : white;
+	}
+}
+
+.drag-file-area {
+	.pulser {
+		@include pulser(white);
+		display : none;
+	}
+}
+
+.export-area {
+	textarea {
+		background : transparentize(black, 0.5);
+		color : white;
+		font : {
+			family : $oxygen;
+			size : 0.8em;
+		}
+		padding : 10px 15px;
+		height : 200px;
+		width : 300px;
+		outline : none;
+		border : none;
+		overflow : hidden;
+	}
+}
+
+.import-browser-menu-wrapper,
+.export-browser-menu-wrapper,
+.import-backup-menu-wrapper,
+.create-backup-menu-wrapper {
+	@extend ._overlay-menu-wrapper;
+}
+
+.context-menu {
+	position : absolute;
+	display : none;
+	z-index : 99;
+	width : 150px;
+
+	background-color : white;
+	@include border-radius(5px);
+	box-shadow : 5px 5px 5px 0 transparentize(black, 0.5);
+
+	&.visible {
+		display : block;
+	}
+
+	ul {
+		margin : 5px 0;
+		padding : 0;
+		list-style-type: none;
+
+		li {
+			color : $black;
+			font : {
+				family : $oxygen;
+				size : 0.9em;
+			}
+			padding : 5px 5px 5px 20px;
+			word-break : break-word;
+			cursor : pointer;
+
+			&:hover {
+				background-color : $blue;
+			}
 		}
 	}
 }

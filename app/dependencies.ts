@@ -15,6 +15,7 @@
 /// <reference path="system/DOMTree.ts" />
 /// <reference path="system/strings/StringBuffer.ts" />
 /// <reference path="system/node-webkit/NodeWindow.ts" />
+/// <reference path="system/node-webkit/Presenter.ts" />
 /// <reference path="system/Regex.ts" />
 /// <reference path="system/Log.ts" />
 /// <reference path="system/Pair.ts" />
@@ -39,13 +40,13 @@
 // Storage part
 
 /// <reference path="system/storage/SQLAPI.ts" />
+/// <reference path="system/storage/ActiveRecord/IActiveRecordObject.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordConfig.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordException.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordHelper.ts" />
 /// <reference path="system/storage/ActiveRecord/ActiveRecordObject.ts" />
 
 // Ajax part
-
 
 /// <reference path="system/ajax/AjaxRequest.ts" />
 /// <reference path="system/ajax/AjaxRequestDataType.ts" />
@@ -60,54 +61,84 @@
 /// <reference path="helpers/URLDetailsProvider.ts" />
 /// <reference path="helpers/SecurityHelper.ts" />
 /// <reference path="helpers/FaviconHelper.ts" />
+/// <reference path="helpers/VersionHelper.ts" />
+
+// Beans part
+
+/// <reference path="models/beans/Bookmark.ts" />
+/// <reference path="models/beans/Tag.ts" />
 
 // DAO part
 
+/// <reference path="models/utils/AROFactory.ts" />
 /// <reference path="models/dao/utils/DAOException.ts" />
-/// <reference path="models/dao/DAOTables.ts" />
-/// <reference path="models/dao/DataAccessObject.ts" />
-/// <reference path="models/dao/BookmarkDAO.ts" />
-/// <reference path="models/dao/TagDAO.ts" />
+/// <reference path="models/dao/IBookmarkDAO.ts" />
+/// <reference path="models/dao/ITagDAO.ts" />
+/// <reference path="models/dao/ITagBookmarkDAO.ts" />
+/// <reference path="models/dao/utils/DataAccessObject.ts" />
+/// <reference path="models/dao/impl/BookmarkDAO.ts" />
+/// <reference path="models/dao/impl/TagDAO.ts" />
+/// <reference path="models/dao/impl/TagBookmarkDAO.ts" />
+/// <reference path="models/dao/utils/DAOTables.ts" />
+/// <reference path="models/utils/DAOFactory.ts" />
 
 // Business part
+/// <reference path="models/business/utils/IInternalBookmarkBusiness.ts" />
+/// <reference path="models/business/utils/IInternalTagBusiness.ts" />
+/// <reference path="models/business/utils/InternalBusinessFactory.ts" />
+/// <reference path="models/business/utils/TagBookmarkBusinessArgs.ts" />
 /// <reference path="models/business/utils/BusinessException.ts" />
 /// <reference path="models/business/IBookmarkBusiness.ts" />
 /// <reference path="models/business/impl/BookmarkBusiness.ts" />
 /// <reference path="models/business/ITagBusiness.ts" />
 /// <reference path="models/business/impl/TagBusiness.ts" />
-/// <reference path="models/business/utils/ScoredBookmarkDAO.ts" />
+/// <reference path="models/business/utils/ScoredBookmark.ts" />
 /// <reference path="models/business/ITagBookmarkBusiness.ts" />
 /// <reference path="models/business/impl/TagBookmarkBusiness.ts" />
-/// <reference path="models/business/utils/BusinessMediator.ts" />
+/// <reference path="models/utils/BusinessFactory.ts" />
 
 // Presenters part
 
-/// <reference path="presenters/utils/NotificationMessage.ts" />
-/// <reference path="presenters/utils/PresenterException.ts" />
-/// <reference path="presenters/Presenter.ts" />
 /// <reference path="presenters/YimelloPresenter.ts" />
-/// <reference path="presenters/utils/PresenterMediator.ts" />
 /// <reference path="presenters/IntroPresenter.ts" />
 /// <reference path="presenters/TourPresenter.ts" />
 
 // Main presenter
+/// <reference path="presenters/MainPresenter/context-menus/ContextMenu.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/BookmarkContextMenu.ts" />
 
-/// <reference path="presenters/MainPresenter/utils/MainPresenterMediator.ts" />
-/// <reference path="presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/Menu/interfaces/IMenuControlSubscriber.ts" />
-/// <reference path="presenters/MainPresenter/Menu/interfaces/ISubMenuOwner.ts" />
-/// <reference path="presenters/MainPresenter/TagList.ts" />
-/// <reference path="presenters/MainPresenter/BookmarkForm.ts" />
-/// <reference path="presenters/MainPresenter/BookmarkList.ts" />
-/// <reference path="presenters/MainPresenter/MainPresenter.ts" />
-/// <reference path="presenters/MainPresenter/Menu/SubMenu.ts" />
-/// <reference path="presenters/MainPresenter/Menu/TagFormSubMenu.ts" />
-/// <reference path="presenters/MainPresenter/Menu/MenuSubMenu.ts" />
-/// <reference path="presenters/MainPresenter/Menu/MenuControl.ts" />
-/// <reference path="presenters/MainPresenter/Menu/utils/DragFileArea.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/OverlayMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/BookmarkFormMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/TagListMenu.ts" />
 
 //grunt-start
-/// <reference path="helpers/VersionHelper.ts" />
+/// <reference path="models/business/utils/BusinessMessages.ts" />
+/// <reference path="presenters/MainPresenter/BookmarkList.ts" />
+/// <reference path="presenters/MainPresenter/MainPresenter.ts" />
+/// <reference path="presenters/MainPresenter/SearchBar.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/TagContextMenu.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/interfaces/IBookmarkContextMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/context-menus/interfaces/ITagContextMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/IBookmarkListListener.ts" />
+/// <reference path="presenters/MainPresenter/interfaces/ISearchBarListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/BookmarkDeletionMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/CreateBackupMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/ExportBrowserMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/ImportBackupMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/ImportBrowserMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/TagDeletionMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/TagFormMenu.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IBookmarkDeletionMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IBookmarkFormMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IImportBackupMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/IImportBrowserMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagDeletionMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagFormMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/overlay-menus/interfaces/ITagListMenuListener.ts" />
+/// <reference path="presenters/MainPresenter/templates/BookmarkTemplate.ts" />
+/// <reference path="presenters/MainPresenter/templates/TagBookmarkFormTemplate.ts" />
+/// <reference path="presenters/MainPresenter/templates/TagListTemplate.ts" />
+/// <reference path="presenters/utils/INotifier.ts" />
+/// <reference path="presenters/utils/Notifier.ts" />
+/// <reference path="presenters/utils/PresenterMessages.ts" />
 //grunt-end

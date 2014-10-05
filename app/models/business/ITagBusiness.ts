@@ -4,40 +4,39 @@
  * Business layer for tags
  */
 interface ITagBusiness {
-	engineTag(tag : TagDAO) : void;
-
 	isValueValid(value : string) : boolean;
 
-	// TODO : test
-	isAlreadyExisting(label : string, callback : Action<boolean>) : void;
+	// compare(newLabel : string, exisitingLabel : string) : boolean;
 
-	// TODO : test
-	compare(newLabel : string, exisitingLabel : string) : boolean;
-
-	add(tag : TagDAO, callback? : Action<TagDAO>, errorHandler? : Action<string>) : void;
+	add(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void;
 
 	/**
 	 * Adds a list of tags into DB
-	 * @param {IList<TagDAO>}         tags     [description]
-	 * @param {Action<IList<TagDAO>>} callback Callback with new tags as argument
+	 * @param {IList<Tag>}         tags     [description]
+	 * @param {Action<IList<Tag>>} callback Callback with new tags as argument
 	 */
-	addList(tags : IList<TagDAO>, callback? : Action<IList<TagDAO>>, errorHandler? : Action<string>) : void;
+	addList(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void;
 
 	// TODO : test
-	update(tag : TagDAO, callback? : Action<TagDAO>, errorHandler? : Action<string>) : void;
+	update(tag : Tag, callback? : Action<Tag>, errorHandler? : Action<string>) : void;
 
 	/**
 	 * Deletes a tag from DB
-	 * @param {TagDAO}          tag      [description]
+	 * @param {Tag}          tag      [description]
 	 * @param {Action<boolean>} callback Callback with a succeed arg
 	 */
-	delete(tag : TagDAO, callback? : Action0, errorHandler? : Action<string>) : void;
+	delete(tag : Tag, callback? : Action0, errorHandler? : Action<string>) : void;
+
+	// TODO : test
+	find(id : string, callback : Action<Tag>, errorHandler? : Action<string>) : void;
 
 	/**
 	 * From specified tag list, adds new ones into DB and do nothing
 	 * with other ones. Used labels to compare
-	 * @param {IList<TagDAO>}         tags     [description]
-	 * @param {Action<IList<TagDAO>>} callback Callback with new tags updated. All tags are into DB
+	 * @param {IList<Tag>}         tags     [description]
+	 * @param {Action<IList<Tag>>} callback Callback with new tags updated. All tags are into DB
 	 */
-	merge(tags : IList<TagDAO>, callback? : Action<IList<TagDAO>>, errorHandler? : Action<string>) : void;
+	merge(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void;
+
+	sortByLabelAsc(callback : Action<IList<Tag>>, errorHandler? : Action<string>) : void;
 }

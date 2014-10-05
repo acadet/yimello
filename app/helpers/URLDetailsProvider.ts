@@ -80,7 +80,7 @@ class URLDetailsProvider extends TSObject {
 				success(title, description);
 			});
 		} else {
-			errorHandler(URLDetailsProviderError.BadURL, 'URL is bad formatted');
+			errorHandler(URLDetailsProviderError.BadURL, 'You provided a bad URL');
 		}
 	}
 

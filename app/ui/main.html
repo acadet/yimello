@@ -4,9 +4,10 @@
         <title>Yimello</title>
 
         <link rel="stylesheet" type="text/css" href="assets/css/main.css">
-        <script type="text/javascript">
+        <script type="text/javascript">      
             var gui = require('nw.gui');
-            
+            var FileAPI = require('fs');
+                  
             if (typeof(window.require) !== "undefined") {
                 window.requireNode = window.require;
                 window.require = undefined;
@@ -14,7 +15,7 @@
         </script>
         <script type="text/javascript">
             var _mainClass = 'MainPresenter';
-            var _libs = ['jquery', 'jqueryUI'];
+            var _libs = ['jquery', 'jqueryClickout'];
         </script>
         <script type="text/javascript" src="js/libs/require.2.1.9.js" data-main="js/boot"></script>
     </head>
@@ -26,111 +27,154 @@
             </ul>
         </header>
 
-        <div class="body">
-            <div class="main-view-wrapper js-main-view-wrapper">
-
-                <div class="panel-wrapper js-panel-wrapper">
-                    <div class="icon-wrapper js-icon-wrapper">
-                        <ul class="icons">
-                            <li class="icon js-menu-trigger">
-                                <img src="assets/img/menu-icon.png" />
-                            </li>
-                            <li class="icon js-bookmark-add-trigger">
-                                <img src="assets/img/bookmark-icon.png" />
-                            </li>
-                            <li class="icon js-tag-form-trigger">
-                                <img src="assets/img/tag-icon.png" />
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="tag-list js-tag-list-wrapper">
-                        <ul class="tags js-tag-list">
-                            <li class="js-search-tab">
-                                <p>Search results</p>
-                            </li>
-                            <li class="js-most-popular">
-                                <p>Most popular</p>
-                            </li>
-                        </ul>
-                    </div>
+        <div class="body js-body">
+            
+            <div class="main-view-wrapper">
+                <div class="aside-menu js-menu">
+                    <ul>
+                        <li class="js-tag-list-trigger">Browse tags</li>
+                        <li class="js-bookmark-form-trigger">Add bookmark</li>
+                        <li class="js-tag-form-trigger">Add tag</li>
+                        <li class="js-tour-trigger">Get a tour again</li>
+                        <li class="js-import-browser-trigger">Import from browser</li>
+                        <li class="js-export-browser-trigger">Export to browser</li>
+                        <li class="js-import-backup-trigger">Import backup</li>
+                        <li class="js-create-backup-trigger">Create backup</li>
+                    </ul>    
                 </div>
 
-                <div class="bookmark-wrapper js-bookmark-wrapper">
-                    <ul class="js-bookmark-list"></ul>
-                    <p class="default-content js-default-content">No bookmarks to display :(</p>
-                </div>
+                <div class="main-view js-main-view">
+                    <div class="main-view-header">
+                        <img src="assets/img/menu-icon.png" class="js-menu-trigger">
+                        <p class="js-current-tag">Most popular</p>
+                    </div>
 
-                <div class="search-wrapper js-search-engine">
-                    <img src="assets/img/search-icon.png" />
-                    <form action="#" method="post">
-                        <input type="text" name="searchField" placeholder="Type something to search" />
-                    </form>
+                    <div class="main-view-content">
+                        <ul class="bookmark-list js-bookmark-list"></ul>
+                        <p class="default-bookmark-list js-default-bookmark-list">No bookmarks :(</p>
+                    </div>
+
+                    <div class="search-bar js-search-bar">
+                        <ul>
+                            <li class="icon"><img src="assets/img/search-icon.png"></li>
+                            <li><input type="text" placeholder="Type anything to start searching"></li>
+                            <li class="clickable-icon hidden js-clear-search-bar"><img src="assets/img/clear-icon.png"></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            <!-- Bookmark form -->
-            <div class="bookmark-form-wrapper js-bookmark-form-wrapper">
-                <ul class="bookmark-form-wrapper-list">
-                    <li class="column">
-                        <img src="assets/img/right-arrow-icon.png" class="cancel-trigger js-cancel-trigger" />
-                    </li>
-                    <li>
-                        <form action="#" method="post">
-                            <img src="assets/img/default-bookmark-icon.png" class="bookmark-icon js-bookmark-icon" />
-                            <p>
-                                <input type="text" name="url" placeholder="http://" />
-                            </p>
-                            <p>
-                                <input type="text" name="title" placeholder="An awesome title" />
-                            </p>
-                            <p>
-                                <textarea name="description" placeholder="Write something useful about your bookmark"></textarea>
-                            </p>
-                            <ul class="tag-list js-form-tag-list">
-                                
-                            </ul>
-                            <p>
-                                <input type="text" name="tags" placeholder="Press Enter to end a tag" list="tag-suggestions" />
-                                <datalist id="tag-suggestions" class="js-tag-suggestions">
-                                </datalist>
-                            </p>
-                            <p>
-                                <button type="button" class="save-button js-save-button">Save</button>
-                                <button type="button" class="delete-button js-delete-button">Delete</button>
-                            </p>
-                        </form>
-                    </li>
-                    <li class="column"></li>
+            <!-- Overlay menus -->
+    
+            <div class="tag-list-menu-wrapper js-tag-list-menu-wrapper">
+                <div class="overlay-menu js-tag-list-menu"></div>
             </div>
 
-            <div class="overlay js-overlay">
-                <div class="tag-form-wrapper js-tag-form-wrapper">
+            <div class="bookmark-form-menu-wrapper js-bookmark-form-menu-wrapper">
+                <div class="overlay-menu js-bookmark-form-menu">
                     <form action="#" method="post">
-                        <p><input type="text" name="tag" placeholder="My amazing tag" /></p>
+                        <img src="assets/img/default-bookmark-icon.png" class="bookmark-icon js-bookmark-icon">
+                        <p><input type="text" name="url" placeholder="http://"></p>
+                        <p><input type="text" name="title" placeholder="An awesome title"></p>
                         <p>
-                            <button type="button" class="save-button js-save-tag-button">Save</button>
-                            <button type="button" class="cancel-button js-cancel-tag-button">Cancel</button>
+                            <textarea name="description" placeholder="Write something useful about your bookmark"></textarea>
+                        </p>
+                        <ul class="js-available-tags"></ul>
+                        <p><input type="text" name="tag" placeholder="Press enter to add a new tag"></p>
+                        <p>
+                            <a href="#" class="js-confirm-button confirm-button">Save</a>
+                            <a href="#" class="js-bookmark-form-cancel cancel-button">Cancel</a>
                         </p>
                     </form>
                 </div>
+            </div>
 
-                <div class="menu-pannel js-menu-pannel">
-                    <ul>
-                        <li class="js-tour-trigger">Get a tour again</li>
-                        <li class="js-import-browser">Import from web browser</li>
-                        <li class="js-import-backup">Import a backup file</li>
-                    </ul>
+            <div class="bookmark-deletion-menu-wrapper js-bookmark-deletion-menu-wrapper">
+                <div class="overlay-menu js-bookmark-deletion-menu">
+                    <p>Are you sure you want to remove this bookmark?</p>
+                    <p>
+                        <a href="#" class="confirm-button js-bookmark-deletion-confirm">Here we go</a>
+                        <a href="#" class="cancel-button js-bookmark-deletion-cancel">I change my mind</a>
+                    </p>
                 </div>
             </div>
 
-            <div class="drag-area js-drag-area">
-                <h1>Drag your file here</h1>
-                <h2>Otherwise, just click</h2>
+            <div class="tag-form-menu-wrapper js-tag-form-menu-wrapper">
+                <div class="overlay-menu js-tag-form-menu">
+                    <form action="#" method="post">
+                        <p><input type="text" name="label" placeholder="My amazing tag"></p>
+                        <p>
+                            <input type="submit" value="Save" class="confirm-button">
+                            <button type="button" class="js-tag-form-cancel cancel-button">Cancel</button>
+                        </p>
+                    </form>
+                </div>
             </div>
 
-            <div class="error-message js-error-message">
-                <p></p>
+            <div class="tag-deletion-menu-wrapper js-tag-deletion-menu-wrapper">
+                <div class="overlay-menu js-tag-deletion-menu">
+                    <p>Are you sure you want to remove this tag?</p>
+                    <p>
+                        <a href="#" class="confirm-button js-tag-deletion-confirm">Here we go</a>
+                        <a href="#" class="cancel-button js-tag-deletion-cancel">I change my mind</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="import-browser-menu-wrapper js-import-browser-menu-wrapper">
+                <div class="drag-file-area js-import-browser-menu">
+                    <h1>Drag your file here</h1>
+                    <div class="pulser js-spinner"></div>
+                    <p><a href="#" class="cancel-button js-import-browser-cancel">Cancel</a></p>
+                </div>
+            </div>
+
+             <div class="export-browser-menu-wrapper js-export-browser-menu-wrapper">
+                <div class="export-area js-export-browser-menu">
+                    <h1>Copy/Paste this content into a HTML file</h1>
+                    <textarea readonly></textarea>
+                    <p><a href="#" class="confirm-button js-export-browser-confirm">I am done</a></p>
+                </div>
+            </div>
+
+            <div class="import-backup-menu-wrapper js-import-backup-menu-wrapper">
+                <div class="drag-file-area js-import-backup-menu">
+                    <h1>Drag your file here</h1>
+                    <div class="pulser js-spinner"></div>
+                    <p><a href="#" class="cancel-button js-import-backup-cancel">Cancel</a></p>
+                </div>
+            </div>
+
+            <div class="create-backup-menu-wrapper js-create-backup-menu-wrapper">
+                <div class="export-area js-create-backup-menu">
+                    <h1>Copy/Paste this content into a JSON file</h1>
+                    <textarea readonly></textarea>
+                    <p><a href="#" class="confirm-button js-create-backup-confirm">I am done</a></p>
+                </div>
+            </div>
+
+            <!-- Context menus -->
+
+            <div class="context-menu js-bookmark-context-menu">
+                <ul>
+                    <li class="js-bookmark-context-menu-facebook-share">Facebook</li>
+                    <li class="js-bookmark-context-menu-twitter-share">Twitter</li>
+                    <li class="js-bookmark-context-menu-edit">Edit</li>
+                    <li class="js-bookmark-context-menu-remove">Remove</li>
+                </ul>
+            </div>
+
+             <div class="context-menu js-tag-context-menu">
+                <ul>
+                    <li class="js-tag-context-menu-edit">Edit</li>
+                    <li class="js-tag-context-menu-remove">Remove</li>
+                </ul>
+            </div>
+
+            <!-- Notifier -->
+
+            <div class="notifier js-notifier">
+                <div class="notifier-content js-notifier-content"></div>
             </div>
         </div>
     </body>

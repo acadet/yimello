@@ -2,8 +2,6 @@
 
 $black : #333333;
 $blue : #22A8E8;
-$green : #7EB530;
-$red : #DD381D; 
 
 .flat-button {
 	padding: 10px 15px;
@@ -164,34 +162,22 @@ $red : #DD381D;
 
 		display: inline-block;
 		padding: 5px 10px;
-		margin: 2px 5px;
+		margin: 4px 10px;
 		
+		cursor : pointer;
+
+		font: {
+			family: $montserrat;
+			size: 1em;
+		}
+
+		color: $black;	
 		background-color: #E9EAEF;
-		
 
-		p, 
-		img {
-			vertical-align: middle;
+		@include transition(opacity, .5s, ease);
 
-			display: inline-block;
-		}
-
-		p {
-			margin: 2px 5px;
-
-			font: {
-				family: $montserrat;
-				size: 1em;
-			}
-
-			color: $black;	
-			
-		}
-
-		img {
-			margin-left: 5px;
-
-			cursor: pointer;
+		&:hover {
+			opacity : 0.75;
 		}
 	}
 }

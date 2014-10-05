@@ -1,27 +1,27 @@
-$fontFolder: '../fonts/';
+$font-folder: '../fonts/';
 
 $montserrat: 'montserrat_regular';
-$ptSans: 'pt_sans_regular';
+$oxygen : 'oxygen';
 
 @font-face {
   font-family: $montserrat;
-  src: url($fontFolder + 'Montserrat-Regular.eot'); /* IE9 Compat Modes */
-  src: url($fontFolder + 'Montserrat-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url($fontFolder + 'Montserrat-Regular.woff') format('woff'), /* Modern Browsers */
-       url($fontFolder + 'Montserrat-Regular.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url($fontFolder + 'Montserrat-Regular.svg#95d90f2cd2aa64bdfee0e9f34c516e71') format('svg'); /* Legacy iOS */
+  src: url($font-folder + 'Montserrat-Regular.eot'); /* IE9 Compat Modes */
+  src: url($font-folder + 'Montserrat-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url($font-folder + 'Montserrat-Regular.woff') format('woff'), /* Modern Browsers */
+       url($font-folder + 'Montserrat-Regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url($font-folder + 'Montserrat-Regular.svg#95d90f2cd2aa64bdfee0e9f34c516e71') format('svg'); /* Legacy iOS */
        
   font-style:   normal;
   font-weight:  400;
 }
 
 @font-face {
-  font-family: $ptSans;
-  src: url($fontFolder + 'PTS55F.eot'); /* IE9 Compat Modes */
-  src: url($fontFolder + 'PTS55F.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url($fontFolder + 'PTS55F.woff') format('woff'), /* Modern Browsers */
-       url($fontFolder + 'PTS55F.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url($fontFolder + 'PTS55F.svg#f39585f1b656e5f9297b79e526233403') format('svg'); /* Legacy iOS */
+  font-family: $oxygen;
+  src: url($font-folder + 'Oxygen.eot'); /* IE9 Compat Modes */
+  src: url($font-folder + 'Oxygen.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url($font-folder + 'Oxygen.woff') format('woff'), /* Modern Browsers */
+       url($font-folder + 'Oxygen.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url($font-folder + 'Oxygen.svg#990bf420df89c0c6edf606be2022cbea') format('svg'); /* Legacy iOS */
        
   font-style:   normal;
   font-weight:  400;

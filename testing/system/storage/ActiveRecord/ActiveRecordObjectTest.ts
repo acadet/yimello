@@ -1,459 +1,266 @@
 /// <reference path="../../../test_dependencies.ts" />
 
-/**
- * Wraps extra data used for ARO testing
- */
-module ActiveRecordObjectTestUtils {
-	export class Person extends TSObject {
-		id : number;
-		firstName : string;
-		lastName : string;
-
-		static toPerson(o : any) : Person {
-			var p : Person = new Person();
-			p.id = o.id;
-			p.firstName = o.firstName;
-			p.lastName = o.lastName;
-
-			return p;
-		}
-
-		fromPerson() : any {
-			var o : any = {};
-
-			o.id = this.id;
-			o.firstName = this.firstName;
-			o.lastName = this.lastName;
-
-			return o;
-		}
-
-		equals(obj : any) : boolean {
-			var p : Person;
-
-			if (obj instanceof Person) {
-				p = <Person> obj;
-
-				if (this.id !== p.id) {
-					return false;
-				}
-
-				if (this.firstName !== p.firstName) {
-					return false;
-				}
-
-				if (this.lastName !== p.lastName) {
-					return false;
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-	}
-}
-
-/**
- * Tests ARO
- */
 class ActiveRecordObjectTest extends UnitTestClass {
-	private _config : ActiveRecordConfig;
+	private _aro : ActiveRecordObject;
+	private _database : Mocks.ARO.Database;
+	private _transaction : Mocks.ARO.Transaction;
 
-	constructor() {
-		super();
-
-		this._config = new ActiveRecordConfig(
-			'yimello-test',
-			'1.0',
-			1 * 1024
-		);
-
-		ActiveRecordObject.init(this._config);
+	private _setUp() : void {
+		this._transaction = new Mocks.ARO.Transaction();
+		this._database = new Mocks.ARO.Database();
+		this._database.setTransaction(this._transaction);
+		this._aro = new ActiveRecordObject(this._database);
 	}
 
-	setUp() : void { }
-
-	tearDown(): void {
+	private _tearDown(): void {
+		this._transaction = null;
+		this._database = null;
+		this._aro = null;
 	}
 
-	/**
-	 * Tests Get method with a converter
-	 */
+	ActiveRecordObjectConstructorTest() : void {
+		// Arrange
+		var aro : ActiveRecordObject;
+		var database : ISQLDatabase;
+
+		database = new Mocks.ARO.Database();
+
+		// Act
+		aro = new ActiveRecordObject(database);
+
+		// Assert
+		this.isTrue(TSObject.exists(aro));
+	}
+
 	ActiveRecordObjectGetTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
-				var createRequest : StringBuffer;
-				var insertRequest1 : StringBuffer, insertRequest2 : StringBuffer;
+				var p1 : any = {}, p2 : any = {};
 
-				// Create fake table, insert data and check if 
-				// each entry is get
-				createRequest = new StringBuffer('CREATE TABLE people (');
-				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
-				createRequest.append('firstName VARCHAR(255), ');
-				createRequest.append('lastName VARCHAR(255))');
+				this._setUp();
 
-				insertRequest1 = new StringBuffer('INSERT INTO people VALUES(');
-				insertRequest1.append('1, "Al", "Pacino")');
+				p1.id = 1;
+				p1.firstName = 'Al';
+				p1.lastName = 'Pacino';
 
-				insertRequest2 = new StringBuffer('INSERT INTO people VALUES(');
-				insertRequest2.append('2, "Sean", "Connery")');
+				p2.id = 2;
+				p2.firstName = 'Sean';
+				p2.lastName = 'Connery';
 
-				ActiveRecordObject.executeSQL(
-					'DROP TABLE IF EXISTS people',
-					(r) => {
-						ActiveRecordObject.executeSQL(
-							createRequest.toString(),
-							(r) => {
-								ActiveRecordObject.executeSQL(
-									insertRequest1.toString(),
-									(r) => {
-										ActiveRecordObject.executeSQL(
-											insertRequest2.toString(),
-											(r) => {
-												// Act
-												ActiveRecordObject.get(
-													'people',
-													(outcome) => {
-														// Assert
-														var p1 : ActiveRecordObjectTestUtils.Person;
-														var p2 : ActiveRecordObjectTestUtils.Person;
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p1).push(p2));
 
-														this.isTrue(TSObject.exists(outcome));
-														this.areIdentical(2, outcome.getLength());
+				// Act
+				this._aro.get(
+					'foo',
+					(outcome) => {
+						// Assert
+						this.areIdentical('SELECT * FROM foo', this._transaction.getStatement());
+						this.isTrue(TSObject.exists(outcome));
+						this.areIdentical(2, outcome.getLength());
+						this.isTrue(Mocks.Utils.Person.toPerson(p1).equals(outcome.getAt(0)));
+						this.isTrue(Mocks.Utils.Person.toPerson(p2).equals(outcome.getAt(1)));
 
-														p1 = new ActiveRecordObjectTestUtils.Person();
-														p1.id = 1;
-														p1.firstName = 'Al';
-														p1.lastName = 'Pacino';
-														this.isTrue(p1.equals(outcome.getAt(0)));
-
-														p2 = new ActiveRecordObjectTestUtils.Person();
-														p2.id = 2;
-														p2.firstName = 'Sean';
-														p2.lastName = 'Connery';
-														this.isTrue(p2.equals(outcome.getAt(1)));
-
-														ActiveRecordObject.executeSQL(
-															'DROP TABLE people',
-															(outcome) => {
-																UnitTestClass.done();
-															}
-														);
-													},
-													ActiveRecordObjectTestUtils.Person.toPerson
-												);
-											}
-										);
-									}
-								);
-							}
-						);
-					}
+						this._tearDown();
+						UnitTestClass.done();
+					},
+					Mocks.Utils.Person.toPerson
 				);
 			}
 		);
 	}
 
-	/**
-	 * Tests Get method without a converter
-	 */
 	ActiveRecordObjectGetWithoutConverterTest() : void {
-		// TODO
-		this.fail();
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var p1 : any = {}, p2 : any = {};
+
+				this._setUp();
+
+				p1.id = 1;
+				p1.firstName = 'Al';
+				p1.lastName = 'Pacino';
+
+				p2.id = 2;
+				p2.firstName = 'Sean';
+				p2.lastName = 'Connery';
+
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p1).push(p2));
+
+				// Act
+				this._aro.get(
+					'foo',
+					(outcome) => {
+						// Assert
+						this.areIdentical('SELECT * FROM foo', this._transaction.getStatement());
+						this.isTrue(TSObject.exists(outcome));
+						this.areIdentical(2, outcome.getLength());
+						this.areIdentical(p1, outcome.getAt(0));
+						this.areIdentical(p2, outcome.getAt(1));
+
+						this._tearDown();
+						UnitTestClass.done();
+					}
+				);
+			}
+		);
 	}
 
 	ActiveRecordObjectFindTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
-				var createRequest : StringBuffer;
-				var insertRequest1 : StringBuffer, insertRequest2 : StringBuffer;
+				var p : any = {};
 
-				// Create fake table, insert data and check if 
-				// each entry is get
-				createRequest = new StringBuffer('CREATE TABLE people (');
-				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
-				createRequest.append('firstName VARCHAR(255), ');
-				createRequest.append('lastName VARCHAR(255))');
+				this._setUp();
 
-				insertRequest1 = new StringBuffer('INSERT INTO people VALUES(');
-				insertRequest1.append('1, "Al", "Pacino")');
+				p.id = 15;
+				p.firstName = 'Al';
+				p.lastName = 'Pacino';
 
-				insertRequest2 = new StringBuffer('INSERT INTO people VALUES(');
-				insertRequest2.append('2, "Sean", "Connery")');
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p));
 
-				ActiveRecordObject.executeSQL(
-					'DROP TABLE IF EXISTS people',
-					(r) => {
-						ActiveRecordObject.executeSQL(
-							createRequest.toString(),
-							(r) => {
-								ActiveRecordObject.executeSQL(
-									insertRequest1.toString(),
-									(r) => {
-										ActiveRecordObject.executeSQL(
-											insertRequest2.toString(),
-											(r) => {
-												// Act
-												ActiveRecordObject.find(
-													'people',
-													new Pair<string, any>('id', 2),
-													(outcome) => {
-														// Assert
-														var p : ActiveRecordObjectTestUtils.Person;
+				// Act
+				this._aro.find(
+					'foo',
+					new Pair<string, any>('id', 15),
+					(outcome) => {
+						// Assert
+						this.areIdentical('SELECT * FROM foo WHERE id = ?', this._transaction.getStatement());
+						this.areIdentical(15, this._transaction.getArguments()[0]);
+						this.isTrue(TSObject.exists(outcome));
+						this.isTrue(Mocks.Utils.Person.toPerson(p).equals(outcome));
 
-														this.isTrue(TSObject.exists(outcome));
-
-														p = new ActiveRecordObjectTestUtils.Person();
-														p.id = 2;
-														p.firstName = 'Sean';
-														p.lastName = 'Connery';
-														this.isTrue(p.equals(outcome));
-
-														ActiveRecordObject.executeSQL(
-															'DROP TABLE people',
-															(outcome) => {
-																UnitTestClass.done();
-															}
-														);
-													},
-													ActiveRecordObjectTestUtils.Person.toPerson
-												);
-											}
-										);
-									}
-								);
-							}
-						);
-					}
+						this._tearDown();
+						UnitTestClass.done();
+					},
+					Mocks.Utils.Person.toPerson
 				);
 			}
 		);
 	}
 
 	ActiveRecordObjectFindWithoutConverterTest() : void {
-		this.fail();
+		UnitTestClass.queue(
+			() => {
+				// Arrange
+				var p : any = {};
+
+				this._setUp();
+
+				p.id = 15;
+				p.firstName = 'Al';
+				p.lastName = 'Pacino';
+
+				this._transaction.setSuccessOutcome(new Mocks.ARO.SQLRowSet().push(p));
+
+				// Act
+				this._aro.find(
+					'foo',
+					new Pair<string, any>('id', 15),
+					(outcome) => {
+						// Assert
+						this.areIdentical('SELECT * FROM foo WHERE id = ?', this._transaction.getStatement());
+						this.areIdentical(15, this._transaction.getArguments()[0]);
+						this.isTrue(TSObject.exists(outcome));
+						this.areIdentical(p, outcome);
+						
+						this._tearDown();
+						UnitTestClass.done();
+					}
+				);
+			}
+		);
 	}
 
-	/**
-	 * Tests insert method
-	 */
 	ActiveRecordObjectInsertTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
 				var data : IList<any>;
-				var createRequest : StringBuffer;
-				var expectedPerson : ActiveRecordObjectTestUtils.Person;
 
-				// Insert person and test if entry is valid into DB
-				expectedPerson = new ActiveRecordObjectTestUtils.Person();
-				expectedPerson.id = 1;
-				expectedPerson.firstName = 'Timothy';
-				expectedPerson.lastName = 'Dalton';
+				this._setUp();
 
 				data = new ArrayList<any>();
-				data.add(expectedPerson.id);
-				data.add(expectedPerson.firstName);
-				data.add(expectedPerson.lastName);
+				data.add(2);
+				data.add('Hello!');
+				data.add('Bye!');
 
-				createRequest = new StringBuffer('CREATE TABLE people (');
-				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
-				createRequest.append('firstName VARCHAR(255), ');
-				createRequest.append('lastName VARCHAR(255))');
-
-				ActiveRecordObject.executeSQL(
-					'DROP TABLE IF EXISTS people',
-					(r) => {
-						ActiveRecordObject.executeSQL(
-							createRequest.toString(),
-							(r) => {
-								// Act
-								ActiveRecordObject.insert(
-									'people',
-									data,
-									(outcome) => {
-										// Assert
-										this.isTrue(outcome);
-
-										ActiveRecordObject.executeSQL(
-											'SELECT * FROM people',
-											(outcome) => {
-												var set : SQLRowSet;
-
-												this.isTrue(TSObject.exists(outcome));
-
-												set = outcome.getRows();
-												this.isTrue(TSObject.exists(set));
-												this.areIdentical(1, set.getLength());
-
-												this.isTrue(
-													expectedPerson.equals(ActiveRecordObjectTestUtils.Person.toPerson(set.item(0))));
-
-												ActiveRecordObject.executeSQL(
-													'DROP TABLE people',
-													(outcome) => {
-														UnitTestClass.done();
-													}
-												);
-											}
-										);
-									}
-								);
-							}
-						);
+				// Act
+				this._aro.insert(
+					'bar',
+					data,
+					(success) => {
+						// Assert
+						this.isTrue(success);
+						this.areIdentical('INSERT INTO bar VALUES (?, ?, ?)', this._transaction.getStatement());
+						this.areIdentical(data.toArray(), this._transaction.getArguments());
+						
+						this._tearDown();
+						UnitTestClass.done();
 					}
 				);
 			}
 		);
 	}
 
-	/**
-	 * Tests Update method
-	 */
 	ActiveRecordObjectUpdateTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
-				var createRequest : StringBuffer;
-				var insertRequest : StringBuffer;
-				var selector : Pair<string, any>;
 				var data : IDictionary<string, any>;
-				var expectedPerson : ActiveRecordObjectTestUtils.Person;
 
-				// Create fake table, insert data then update it
-				// Finally test if entry is one expected
-				createRequest = new StringBuffer('CREATE TABLE people (');
-				createRequest.append('id INT PRIMARY KEY NOT NULL, ');
-				createRequest.append('firstName VARCHAR(255), ');
-				createRequest.append('lastName VARCHAR(255))');
-
-				insertRequest = new StringBuffer('INSERT INTO people VALUES ');
-				insertRequest.append('(1, "Sam", "Neill")');
-
-				selector = new Pair<string, any>('id', 1);
+				this._setUp();
 
 				data = new Dictionary<string, any>();
-				data.add('firstName', 'Harvey');
-				data.add('lastName', 'Keitel');
+				data.add('first_name', 'Robert');
+				data.add('last_name', 'De Niro');
 
-				expectedPerson = new ActiveRecordObjectTestUtils.Person();
-				expectedPerson.id = 1;
-				expectedPerson.firstName = 'Harvey';
-				expectedPerson.lastName = 'Keitel';
-
-				ActiveRecordObject.executeSQL(
-					'DROP TABLE IF EXISTS people',
-					(r) => {
-						ActiveRecordObject.executeSQL(
-							createRequest.toString(),
-							(r) => {
-								ActiveRecordObject.executeSQL(
-									insertRequest.toString(),
-									(r) => {
-										// Act
-										ActiveRecordObject.update(
-											'people',
-											selector,
-											data,
-											(outcome) => {
-												// Assert
-												this.isTrue(outcome);
-
-												ActiveRecordObject.executeSQL(
-													'SELECT * FROM people',
-													(outcome) => {
-														var set : SQLRowSet;
-
-														this.isTrue(TSObject.exists(outcome));
-
-														set = outcome.getRows();
-														this.isTrue(TSObject.exists(set));
-														this.areIdentical(1, set.getLength());
-
-														this.isTrue(
-															expectedPerson.equals(
-																ActiveRecordObjectTestUtils.Person.toPerson(set.item(0))
-															)
-														);
-
-														ActiveRecordObject.executeSQL(
-															'DROP TABLE people',
-															(outcome) => {
-																UnitTestClass.done();
-															}
-														);
-													}
-												);
-											}
-										);
-									}
-								);
-							}
+				// Act
+				this._aro.update(
+					'people',
+					new Pair<string, any>('id', 15),
+					data,
+					(success) => {
+						// Assert
+						this.isTrue(success);
+						this.areIdentical(
+							'UPDATE people SET first_name = ?, last_name = ? WHERE id = ?',
+							this._transaction.getStatement()
 						);
+
+						this.areIdentical(3, this._transaction.getArguments().length);
+						this.areIdentical('Robert', this._transaction.getArguments()[0]);
+						this.areIdentical('De Niro', this._transaction.getArguments()[1]);
+						this.areIdentical(15, this._transaction.getArguments()[2]);
+						
+						this._tearDown();
+						UnitTestClass.done();
 					}
 				);
 			}
 		);
 	}
 
-	/**
-	 * Tests delete method
-	 */
 	ActiveRecordObjectDeleteTest() : void {
 		UnitTestClass.queue(
 			() => {
 				// Arrange
-				var createRequest : StringBuffer;
-				var insertRequest : StringBuffer;
+				this._setUp();
 
-				// Insert fake data. Try getting them after deleting
-				createRequest = new StringBuffer('CREATE TABLE people ');
-				createRequest.append('(id INTEGER PRIMARY KEY NOT NULL, ');
-				createRequest.append('name VARCHAR(255) NOT NULL)');
-
-				insertRequest = new StringBuffer('INSERT INTO people VALUES ');
-				insertRequest.append('(1, "Bruce Willis")');
-
-				ActiveRecordObject.executeSQL(
-					'DROP TABLE IF EXISTS people',
-					(r) => {
-						ActiveRecordObject.executeSQL(
-							createRequest.toString(),
-							(r) => {
-								ActiveRecordObject.executeSQL(
-									insertRequest.toString(),
-									(r) => {
-										// Act
-										ActiveRecordObject.delete(
-											'people',
-											new Pair<string, any>('id', 1),
-											(outcome) => {
-												// Assert
-												this.isTrue(outcome);
-
-												ActiveRecordObject.get(
-													'people',
-													(outcome) => {
-														this.isTrue(TSObject.exists(outcome));
-														this.areIdentical(0, outcome.getLength());
-
-														ActiveRecordObject.executeSQL(
-															'DROP TABLE people',
-															(outcome) => {
-																UnitTestClass.done();
-															}
-														);
-													}
-												);
-											}
-										);
-									}
-								);
-							}
-						);
+				// Act
+				this._aro.delete(
+					'foobar',
+					new Pair<string, any>('id', 15),
+					(success) => {
+						// Assert
+						this.isTrue(success);
+						this.areIdentical('DELETE FROM foobar WHERE id = ?', this._transaction.getStatement());
+						this.areIdentical(15, this._transaction.getArguments()[0]);
+						
+						this._tearDown();
+						UnitTestClass.done();
 					}
 				);
 			}

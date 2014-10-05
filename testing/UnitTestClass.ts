@@ -17,9 +17,9 @@ class UnitTestClass extends tsUnit.TestClass {
 	
 	//region Private Methods
 	
-	private static _executeQueueFunc(f : Action0) : void {
-		DataAccessObject.clean((s) => f());
-	}
+	// private static _executeQueueFunc(f : Action0) : void {
+	// 	DataAccessObject.clean((s) => f());
+	// }
 
 	//endregion Private Methods
 	
@@ -45,7 +45,8 @@ class UnitTestClass extends tsUnit.TestClass {
 		if (TSObject.exists(UnitTestClass._queue)) {
 			if (UnitTestClass._queue.getLength() > 0) {
 				Log.inform('Starting async tests. ' + UnitTestClass._queue.getLength() + ' tests to run');
-				UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
+				//UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
+				UnitTestClass._queue.pop()();
 			}
 		}
 	}
@@ -68,7 +69,8 @@ class UnitTestClass extends tsUnit.TestClass {
 			if (UnitTestClass._queue.getLength() % 5 === 0) {
 				Log.inform(UnitTestClass._queue.getLength() + ' async tests remaining');
 			}
-			UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
+			//UnitTestClass._executeQueueFunc(UnitTestClass._queue.pop());
+			UnitTestClass._queue.pop()();
 		} else {
 			Log.inform('Last test was done');
 		}

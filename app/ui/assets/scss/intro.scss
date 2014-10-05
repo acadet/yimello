@@ -1,48 +1,38 @@
 @import "common";
 
 .body {
-	background: url($imgFolder + 'patchwork_bg.jpg');
-	background-position: center;
+	background: url($img-folder + 'intro-background.png');
 }
 
-.strap-wrapper, .hexagon {
-	position: absolute;
-}
-
-.hexagon {
-	opacity : 0;
-	z-index : 1;
-}
-
-.strap-wrapper {
-	text-align : center;
-}
-
-.intro-strap {
-	z-index : 2;
-}
-
-.update-notification {
-	width : 300px;
-
-	opacity : 0;
-
-	.gift, h1 {
-		margin : 0;
+@-webkit-keyframes pulse {
+	0% {
+		opacity : 1;
 	}
-
-	.gift {
-		float : left;
-		margin-right : 10px;
+	100% {
+		opacity : 0.25;
 	}
+}
 
-	h1 {
-		font : {
-			family : $ptSans;
-			size : 1.3em;
-		}
+@keyframes pulse {
+	0% {
+		opacity : 1;
+	}
+	100% {
+		opacity : 0.25;
+	}
+}
 
-		color : white;
-	}	
+.update-icon {
+	background-color : transparentize(black, .5);
+	opacity : 0;
+	position : absolute;
+	cursor : pointer;
+
+	@include border-radius(50%);
+
+	&.pulse {
+		-webkit-animation: pulse 1s alternate infinite ease-in-out;
+		animation : pulse 1s alternate infinite ease-in-out;
+	}
 }
 

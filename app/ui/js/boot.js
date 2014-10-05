@@ -1,21 +1,26 @@
-_libs.push('output');
-
 require.config({
 	baseUrl : 'js',
 	paths : {
-		'jquery' : 'libs/jquery.1.10.2'
+		'jquery' : 'libs/jquery.1.10.2',
+		'jqueryUI' : 'libs/jquery-ui-1.10.4.min',
+		'jqueryClickout' : 'libs/jquery.clickout'
 	},
 	shim : {
 		'jquery' : {
 			exports: 'jQuery'
+		},
+		'jqueryUI' : {
+			deps : [ 'jquery' ]
+		},
+		'jqueryClickout' : {
+			deps : [ 'jquery' ]
 		}
 	}
 });
 
-define('jqueryUI', ['jquery'], function() {
-	require(['libs/jquery-ui-1.10.4.min']);
-});
-
 require(_libs, function() {
-	var _bootClass = eval('new ' + _mainClass + '()');
+	require(['output'], function() {
+		var _bootClass = eval('new ' + _mainClass + '()');
+		_bootClass.onStart();
+	});
 });
