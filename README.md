@@ -8,18 +8,11 @@ Yimello is a tiny tool to save your bookmarks and browse them easily.
 Current version is a beta one. Then, you can encounter some issues when
 using it. Please open a ticket in tracker to notify me :) I'll appreciate.
 
-## Known issues
-
-* Troubles with menu animations
-* Import/export functions are experimental
-
 ## Future improvements 
 
-* Export to browser
-* Create a backup from app
-* A reset feature
-* Improve design
-* Social network sharing
+* Add more keyboard shorcuts
+* Improve performances
+* Increase sturdiness
 
 ## Baked with love <3
 

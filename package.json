@@ -19,6 +19,7 @@
     "grunt-mkdir": "~0.1.1",
     "grunt-node-webkit-builder": "~0.1.21",
     "grunt-zip": "~0.15.0",
-    "grunt-contrib-uglify": "~0.5.1"
+    "grunt-contrib-uglify": "~0.5.1",
+    "grunt-csscomb": "~3.0.0"
   }
 }

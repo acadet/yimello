@@ -247,6 +247,8 @@ module Mocks {
 
 				callback(this._findOutcome);
 			}
+
+			findByURL(url : string, callback : Action<Bookmark>) : void {}
 			
 			sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>) : void {
 				this._sortByViewsDescThenByTitleAscTimes++;

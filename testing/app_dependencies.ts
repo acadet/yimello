@@ -99,7 +99,6 @@
 
 // Presenters part
 
-/// <reference path="../app/presenters/utils/NotificationMessage.ts" />
 /// <reference path="../app/presenters/YimelloPresenter.ts" />
 /// <reference path="../app/presenters/IntroPresenter.ts" />
 /// <reference path="../app/presenters/TourPresenter.ts" />
@@ -112,26 +111,34 @@
 /// <reference path="../app/presenters/MainPresenter/overlay-menus/BookmarkFormMenu.ts" />
 /// <reference path="../app/presenters/MainPresenter/overlay-menus/TagListMenu.ts" />
 
-
 //grunt-start
+/// <reference path="../app/models/business/utils/BusinessMessages.ts" />
 /// <reference path="../app/presenters/MainPresenter/BookmarkList.ts" />
 /// <reference path="../app/presenters/MainPresenter/MainPresenter.ts" />
 /// <reference path="../app/presenters/MainPresenter/SearchBar.ts" />
-/// <reference path="../app/presenters/MainPresenter/TagList.ts" />
-/// <reference path="../app/presenters/MainPresenter/interfaces/IBookmarkFormSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/interfaces/IBookmarkListSubscriber.ts" />
+/// <reference path="../app/presenters/MainPresenter/context-menus/TagContextMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/context-menus/interfaces/IBookmarkContextMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/context-menus/interfaces/ITagContextMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/interfaces/IBookmarkListListener.ts" />
 /// <reference path="../app/presenters/MainPresenter/interfaces/ISearchBarListener.ts" />
-/// <reference path="../app/presenters/MainPresenter/interfaces/ITagListSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/MenuControl.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/MenuSubMenu.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/SubMenu.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/TagFormSubMenu.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/IMenuControlSubscriber.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/ISubMenuOwner.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/BookmarkDeletionMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/CreateBackupMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/ExportBrowserMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/ImportBackupMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/ImportBrowserMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/TagDeletionMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/TagFormMenu.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/IBookmarkDeletionMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/IBookmarkFormMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/IImportBackupMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/IImportBrowserMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/ITagDeletionMenuListener.ts" />
+/// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/ITagFormMenuListener.ts" />
 /// <reference path="../app/presenters/MainPresenter/overlay-menus/interfaces/ITagListMenuListener.ts" />
-/// <reference path="../app/presenters/MainPresenter/overlay-menus/utils/DragFileArea.ts" />
 /// <reference path="../app/presenters/MainPresenter/templates/BookmarkTemplate.ts" />
 /// <reference path="../app/presenters/MainPresenter/templates/TagBookmarkFormTemplate.ts" />
 /// <reference path="../app/presenters/MainPresenter/templates/TagListTemplate.ts" />
-/// <reference path="../app/presenters/MainPresenter/utils/MainPresenterMediator.ts" />
+/// <reference path="../app/presenters/utils/INotifier.ts" />
+/// <reference path="../app/presenters/utils/Notifier.ts" />
+/// <reference path="../app/presenters/utils/PresenterMessages.ts" />
 //grunt-end

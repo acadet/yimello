@@ -20,14 +20,16 @@ module Mocks {
 			sortByViewsDescThenByTitleAsc(callback : Action<IList<Bookmark>>, errorHandler? : Action<string>) : void {}
 
 			engineBookmark(bookmark : Bookmark) : void {}
+
+			isNotAlreadyExisting(url : string, callback : Action<boolean>) : void {}
+
+			isNotAlreadyExistingButNotProvided(url : string, bookmark : Bookmark, callback : Action<boolean>) : void {}
 		}
 
 		export class TagBusiness implements IInternalTagBusiness {
 			isValueValid(value : string) : boolean {
 				return true;
 			}
-
-			isNotAlreadyExisting(label : string, callback : Action<boolean>) : void {}
 
 			compare(newLabel : string, exisitingLabel : string) : boolean {
 				return true;
@@ -41,11 +43,17 @@ module Mocks {
 
 			delete(tag : Tag, callback? : Action0, errorHandler? : Action<string>) : void {}
 
+			find(id : string, callback : Action<Tag>, errorHandler? : Action<string>) : void {}
+
 			merge(tags : IList<Tag>, callback? : Action<IList<Tag>>, errorHandler? : Action<string>) : void {}
 
 			sortByLabelAsc(callback : Action<IList<Tag>>, errorHandler? : Action<string>) : void {}
 
 			engineTag(tag : Tag) : void {}
+
+			isNotAlreadyExisting(label : string, callback : Action<boolean>) : void {}
+
+			isNotAlreadyExistingButNotProvided(label : string, tag : Tag, callback : Action<boolean>) : void {}
 		}
 	}
 }

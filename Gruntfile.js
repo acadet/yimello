@@ -2,6 +2,7 @@ module.exports = function (grunt) {
 
     // load the task 
     grunt.loadNpmTasks("grunt-ts");
+    grunt.loadNpmTasks("grunt-csscomb");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-remove");
     grunt.loadNpmTasks("grunt-mkdir");
@@ -95,6 +96,17 @@ module.exports = function (grunt) {
 	                removeComments: true
 	            },
 	        }
+	    },
+	    csscomb : {
+	    	release : {
+	    		options : {
+					config : 'csscomb-config.json'
+	    		},    			
+    			expand : true,
+    			cwd : 'app/ui/assets/',
+    			src : ['**/*.scss'],
+    			dest : 'app/ui/assets/'
+	    	}
 	    },
 	    copy : {
 	    	appDependencies : {
