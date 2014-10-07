@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-    - "0.6"
-    - "0.8"
-    - "0.9"
+    - "0.11"
+before_install:
+    - "npm install -g grunt-cli"
 install:
-    - "sudo npm install -g grunt"
+    - "npm install grunt-ts"
 script:
     - "grunt ts:build --verbose --force"
     - "grunt ts:testing --verbose --force"
