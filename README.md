@@ -1,6 +1,6 @@
 ![Logo](http://yimello.adriencadet.com/assets/img/logo-250.png)
 
-# Yimello
+# Yimello [![Build Status](https://travis-ci.org/acadet/yimello.svg?branch=master)](https://travis-ci.org/acadet/yimello)
 
 Official website: http://yimello.adriencadet.com/
 
