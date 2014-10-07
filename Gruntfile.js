@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
 
     // load the task 
+    grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks("grunt-csscomb");
     grunt.loadNpmTasks("grunt-contrib-copy");
@@ -12,6 +13,24 @@ module.exports = function (grunt) {
 
     // Configure grunt here
     grunt.initConfig({
+    	watch : {
+    		build : {
+    			files : 'app/**/*.ts',
+    			tasks : ['ts:build'],
+    			options : {
+    				interrupt : true,
+    				atBegin : true
+    			}
+    		},
+    		testing : {
+    			files : ['**/*.ts', '!testing/app_dependencies.ts'],
+    			tasks : ['copy:appDependencies', 'ts:testing'],
+    			options : {
+    				interrupt : true,
+    				atBegin : true
+    			}
+    		}
+    	},
 	    ts: {
 	        // A specific target
 	        build: {
@@ -26,7 +45,7 @@ module.exports = function (grunt) {
 	            // If specified, the generate JavaScript files are placed here. Only works if out is not specified
 	            outDir: false,
 	            // If specified, watches this directory for changes, and re-runs the current target
-	            watch: 'app',                     
+	            watch: false,                     
 	            // Use to override the default options, http://gruntjs.com/configuring-tasks#options
 	            options: {     
 	                // 'es3' (default) | 'es5'
@@ -51,33 +70,6 @@ module.exports = function (grunt) {
 	            reference: 'testing/test_dependencies.ts',  
 	            // If specified, generate an out.js file which is the merged js file
 	            out: 'testing/output/test_output.js',
-	            // If specified, the generate JavaScript files are placed here. Only works if out is not specified
-	            outDir: false,
-	            // If specified, watches this directory for changes, and re-runs the current target
-	            watch: '.',                     
-	            // Use to override the default options, http://gruntjs.com/configuring-tasks#options
-	            options: {     
-	                // 'es3' (default) | 'es5'
-	                target: 'es3',
-	                // 'amd' (default) | 'commonjs'    
-	                module: 'commonjs',
-	                // true (default) | false
-	                sourceMap: false,
-	                // true | false (default)
-	                declaration: false,
-	                // true (default) | false
-	                removeComments: true
-	            },
-	        },
-	        release: {
-	            // The source TypeScript files, http://gruntjs.com/configuring-tasks#files
-	            src: ["app/**/*.ts"],
-	            // The source html files, https://github.com/grunt-ts/grunt-ts#html-2-typescript-support   
-	            html: false, 
-	            // If specified, generate this file that to can use for reference management
-	            reference: 'app/dependencies.ts',  
-	            // If specified, generate an out.js file which is the merged js file
-	            out: 'app/ui/js/output.js',
 	            // If specified, the generate JavaScript files are placed here. Only works if out is not specified
 	            outDir: false,
 	            // If specified, watches this directory for changes, and re-runs the current target
@@ -194,13 +186,13 @@ module.exports = function (grunt) {
 		}
 	});
 
-	grunt.registerTask('build', ['ts:build']);
-	grunt.registerTask('testing', ['copy:appDependencies', 'ts:testing']);
+	grunt.registerTask('build', ['watch:build']);
+	grunt.registerTask('testing', ['watch:testing']);
 	grunt.registerTask(
 		'release',
 		[
 			'remove:release', 
-			'ts:release',
+			'ts:build',
 			'mkdir:release',
 			'copy:release',
 			'uglify:release',

@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+	- 0.6
+	- 0.8
+	- 0.9
+install:
+	- sudo npm install -g grunt
+script:
+	- grunt ts:build --verbose --force
+	- grunt ts:testing --verbose --force
