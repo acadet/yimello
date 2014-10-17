@@ -1,6 +1,13 @@
 module.exports = function (grunt) {
-	var pkg = require('./release/src/package.json');
-	var version = pkg.version;
+	var pkg; 
+	var version;
+
+	try {
+		pkg = require('./release/src/package.json');
+		version = pkg.version;
+	} catch (e) {
+		console.log('Failed to load pkg');
+	}
 
     // load the task 
     grunt.loadNpmTasks("grunt-contrib-clean");
