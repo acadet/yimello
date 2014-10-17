@@ -15,6 +15,6 @@ backup.json
 
 # Transpiled files
 app/ui/js/output.js
-testing/output/test_output.js
+testing/out
 **/*.css
 

@@ -1,36 +1,72 @@
 module.exports = function (grunt) {
+	var pkg = require('./release/src/package.json');
+	var version = pkg.version;
 
     // load the task 
-    grunt.loadNpmTasks("grunt-contrib-watch");
-    grunt.loadNpmTasks("grunt-ts");
-    grunt.loadNpmTasks("grunt-csscomb");
+    grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.loadNpmTasks("grunt-remove");
+    //grunt.loadNpmTasks("grunt-csscomb");
     grunt.loadNpmTasks("grunt-mkdir");
-    grunt.loadNpmTasks("grunt-zip");
     grunt.loadNpmTasks("grunt-node-webkit-builder");
+    grunt.loadNpmTasks("grunt-shell");
+    grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks("grunt-contrib-uglify");
+    grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-zip");
 
     // Configure grunt here
     grunt.initConfig({
-    	watch : {
-    		build : {
-    			files : 'app/**/*.ts',
-    			tasks : ['ts:build'],
-    			options : {
-    				interrupt : true,
-    				atBegin : true
-    			}
-    		},
-    		testing : {
-    			files : ['**/*.ts', '!testing/app_dependencies.ts'],
-    			tasks : ['copy:appDependencies', 'ts:testing'],
-    			options : {
-    				interrupt : true,
-    				atBegin : true
-    			}
-    		}
+    	clean : {
+    		build : [
+    			'tscommand-*.txt'
+    		],
+    		release : [
+    			'release/src/app',
+    			'release/releases'
+	    	]
     	},
+    	copy : {
+			release : {
+				src : 'app/ui/**/*',
+				dest : 'release/src/'
+			}
+	    },
+	    // csscomb : {
+	    // 	release : {
+	    // 		options : {
+					// config : 'csscomb-config.json'
+	    // 		},    			
+    	// 		expand : true,
+    	// 		cwd : 'app/ui/assets/',
+    	// 		src : ['**/*.scss'],
+    	// 		dest : 'app/ui/assets/'
+	    // 	}
+	    // },
+	    mkdir : {
+	    	release : {
+	    		mode : 0700,
+	    		create : ['release/src/app']
+	    	}
+	    },
+	    nodewebkit : {
+	    	options : {
+	    		build_dir : 'release',
+	    		mac : true,
+	    		win : true,
+	    		linux32 : true,
+	    		linux64 : true,
+	    		mac_icns : 'release/src/logo.icns'
+	    	},
+	    	src : ['release/src/**/*']
+	    },
+	    shell : {
+	    	testing : {
+    			command : [
+    				'cd testing',
+    				'python buildLauncher.py out/output.js src 1 5000 false'
+    			].join('&&')
+	    	}
+	    },
 	    ts: {
 	        // A specific target
 	        build: {
@@ -60,119 +96,23 @@ module.exports = function (grunt) {
 	                removeComments: true
 	            },
 	        },
-	        // Another target
 	        testing: {                               
-	            // The source TypeScript files, http://gruntjs.com/configuring-tasks#files
-	            src: ["testing/**/*.ts"],
-	            // The source html files, https://github.com/grunt-ts/grunt-ts#html-2-typescript-support   
+	            src: ["testing/src/**/*.ts"],
 	            html: false, 
-	            // If specified, generate this file that to can use for reference management
-	            reference: 'testing/test_dependencies.ts',  
-	            // If specified, generate an out.js file which is the merged js file
-	            out: 'testing/output/test_output.js',
-	            // If specified, the generate JavaScript files are placed here. Only works if out is not specified
+	            reference: 'testing/src/references.ts',  
+	            out: 'testing/out/output.js',
 	            outDir: false,
-	            // If specified, watches this directory for changes, and re-runs the current target
 	            watch: false,                     
-	            // Use to override the default options, http://gruntjs.com/configuring-tasks#options
 	            options: {     
-	                // 'es3' (default) | 'es5'
-	                target: 'es3',
-	                // 'amd' (default) | 'commonjs'    
+	                target: 'es3',   
 	                module: 'commonjs',
-	                // true (default) | false
 	                sourceMap: false,
-	                // true | false (default)
 	                declaration: false,
-	                // true (default) | false
 	                removeComments: true
 	            },
 	        }
 	    },
-	    csscomb : {
-	    	release : {
-	    		options : {
-					config : 'csscomb-config.json'
-	    		},    			
-    			expand : true,
-    			cwd : 'app/ui/assets/',
-    			src : ['**/*.scss'],
-    			dest : 'app/ui/assets/'
-	    	}
-	    },
-	    copy : {
-	    	appDependencies : {
-	    		src : 'app/dependencies.ts',
-	    		dest : 'testing/app_dependencies.ts',
-	    		options : {
-					process : function(content, srcpath) {
-						return content.replace(/\<reference path=\"(.+\.ts)\" \/\>/gi, '<reference path="../app/$1" />');
-					}
-				}
-			},
-			release : {
-				src : 'app/ui/**/*',
-				dest : 'release/src/'
-			}
-	    },
-	    mkdir : {
-	    	release : {
-	    		mode : 0700,
-	    		create : ['release/src/app']
-	    	}
-	    },
-	    remove : {
-	    	options : {
-	    		trace : true
-	    	},
-	    	release : {
-	    		fileList : [
-	    			'release/releases/yimello-win.zip', 
-	    			'release/releases/yimello-mac.zip',
-	    			'release/releases/yimello-linux-32.zip',
-	    			'release/releases/yimello-linux-64.zip'
-	    		],
-	    		dirList : ['release/src/app', 'release/releases']
-	    	}
-	    },
-	    zip : {
-	    	releaseWin : {
-	    		cwd : 'release/releases/Yimello/win/',
-	    		src : ['release/releases/Yimello/win/**/*'],
-	    		dest : 'release/releases/yimello-win.zip',
-	    		compression : 'DEFLATE'
-	    	},
-	    	releaseMac : {
-	    		cwd : 'release/releases/Yimello/mac/',
-	    		src : ['release/releases/Yimello/mac/**/*'],
-	    		dest : 'release/releases/yimello-mac.zip',
-	    		compression : 'DEFLATE'
-	    	},
-	    	releaseLinux32 : {
-	    		cwd : 'release/releases/Yimello/linux32/',
-	    		src : ['release/releases/Yimello/linux32/**/*'],
-	    		dest : 'release/releases/yimello-linux-32.zip',
-	    		compression : 'DEFLATE'
-	    	},
-	    	releaseLinux64 : {
-	    		cwd : 'release/releases/Yimello/linux64/',
-	    		src : ['release/releases/Yimello/linux64/**/*'],
-	    		dest : 'release/releases/yimello-linux-64.zip',
-	    		compression : 'DEFLATE'
-	    	}
-	    },
-	    nodewebkit : {
-	    	options : {
-	    		build_dir : 'release',
-	    		mac : true,
-	    		win : true,
-	    		linux32 : true,
-	    		linux64 : true,
-	    		mac_icns : 'release/src/logo.icns'
-	    	},
-	    	src : ['release/src/**/*']
-	    },
-		uglify: {
+	    uglify: {
 			release: {
 				options : {
 					compress : true,
@@ -183,7 +123,51 @@ module.exports = function (grunt) {
 					'release/src/app/ui/js/output.js' : ['release/src/app/ui/js/output.js']
 				}
 			}
-		}
+		},
+    	watch : {
+    		build : {
+    			files : 'app/**/*.ts',
+    			tasks : ['ts:build', 'clean:build'],
+    			options : {
+    				interrupt : true,
+    				atBegin : true
+    			}
+    		},
+    		testing : {
+    			files : ['**/*.ts'],
+    			tasks : ['ts:testing', 'shell:testing', 'clean:build'],
+    			options : {
+    				interrupt : true,
+    				atBegin : true
+    			}
+    		}
+    	},
+	    zip : {
+	    	releaseWin : {
+	    		cwd : 'release/releases/Yimello/win/',
+	    		src : ['release/releases/Yimello/win/**/*'],
+	    		dest : 'release/releases/yimello-win-' + version + '.zip',
+	    		compression : 'DEFLATE'
+	    	},
+	    	releaseMac : {
+	    		cwd : 'release/releases/Yimello/mac/',
+	    		src : ['release/releases/Yimello/mac/**/*'],
+	    		dest : 'release/releases/yimello-mac-' + version + '.zip',
+	    		compression : 'DEFLATE'
+	    	},
+	    	releaseLinux32 : {
+	    		cwd : 'release/releases/Yimello/linux32/',
+	    		src : ['release/releases/Yimello/linux32/**/*'],
+	    		dest : 'release/releases/yimello-linux-32-' + version + '.zip',
+	    		compression : 'DEFLATE'
+	    	},
+	    	releaseLinux64 : {
+	    		cwd : 'release/releases/Yimello/linux64/',
+	    		src : ['release/releases/Yimello/linux64/**/*'],
+	    		dest : 'release/releases/yimello-linux-64-' + version + '.zip',
+	    		compression : 'DEFLATE'
+	    	}
+	    }
 	});
 
 	grunt.registerTask('build', ['watch:build']);
@@ -191,7 +175,7 @@ module.exports = function (grunt) {
 	grunt.registerTask(
 		'release',
 		[
-			'remove:release', 
+			'clean:release', 
 			'ts:build',
 			'mkdir:release',
 			'copy:release',
