@@ -22,7 +22,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	private _browseDLNode(
 		node : DOMElement,
 		currentTags : IList<Tag>,
-		collection : IList<Pair<Bookmark, IList<Tag>>>)
+		collection : IList<KeyValuePair<Bookmark, IList<Tag>>>)
 		: void
 	{
 		var i : number;
@@ -38,7 +38,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					b.setURL(a.getAttribute('href'));
 					b.setTitle(a.getText());
 
-					collection.add(new Pair<Bookmark, IList<Tag>>(b, currentTags));
+					collection.add(new KeyValuePair<Bookmark, IList<Tag>>(b, currentTags));
 				}
 			);
 
@@ -61,7 +61,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 				(e) => {
 					var l : IList<Tag>;
 
-					l = currentTags.clone();
+					l = <IList<Tag>>currentTags.select(x => true);
 					l.add(collectedTags.getAt(i));
 					this._browseDLNode(e, l, collection);
 					i++;
@@ -71,10 +71,10 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 	private _addRecursiveBookmark(
 		index : number,
-		coll : IList<Pair<Bookmark, IList<Tag>>>,
+		coll : IList<KeyValuePair<Bookmark, IList<Tag>>>,
 		callback? : Action0,
 		errorHandler? : Action<string>) : void {
-		var p : Pair<Bookmark, IList<Tag>>;
+		var p : KeyValuePair<Bookmark, IList<Tag>>;
 
 		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
@@ -90,7 +90,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			._args
 			.getBookmarkBusiness()
 			.isNotAlreadyExisting(
-				p.getFirst().getURL(),
+				p.getKey().getURL(),
 				(success) => {
 					if (!success) {
 						Log.error(new BusinessException('Unable to import bookmark, one has already same URL'));
@@ -102,7 +102,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 						._args
 						.getTagBusiness()
 						.merge(
-							p.getSecond(),
+							p.getValue(),
 							(outcome) => {
 								var tags : IList<Tag> = outcome;
 
@@ -110,7 +110,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 									._args
 									.getBookmarkBusiness()
 									.add(
-										p.getFirst(),
+										p.getKey(),
 										(outcome) => {
 											this.bindTags(
 												outcome,
@@ -512,7 +512,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		reader.onload =
 			(e) => {
 				var dlRoot : DOMElement;
-				var coll : IList<Pair<Bookmark, IList<Tag>>>;
+				var coll : IList<KeyValuePair<Bookmark, IList<Tag>>>;
 				var tags : IList<Tag>;
 				var defaultTag : Tag;
 
@@ -525,7 +525,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					DOMElement
 						.fromString('<ROOT>' + reader.result + '</ROOT>')
 						.findSingle('> DL');
-				coll = new ArrayList<Pair<Bookmark, IList<Tag>>>();
+				coll = new ArrayList<KeyValuePair<Bookmark, IList<Tag>>>();
 				this._browseDLNode(dlRoot, tags, coll);
 				this._addRecursiveBookmark(
 					0,
@@ -600,8 +600,8 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 						(pair) => {
 							var sbk : ScoredBookmark;
 							var currentScore : number;
-							var bk : Bookmark = pair.getFirst();
-							var tagList : IList<Tag> = pair.getSecond();
+							var bk : Bookmark = pair.getKey();
+							var tagList : IList<Tag> = pair.getValue();
 
 							sbk = new ScoredBookmark();
 							bk.hydrate(sbk);

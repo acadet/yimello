@@ -324,7 +324,7 @@ class TagBusiness implements IInternalTagBusiness {
 						tag.setLabel(StringHelper.trim(tag.getLabel()));
 
 						// Find a tag with same name
-						o = outcome.findFirst(e => StringHelper.compare(e.getLabel(), tag.getLabel()));
+						o = outcome.find(e => StringHelper.compare(e.getLabel(), tag.getLabel()));
 
 						if (o !== null) {
 							// A tag with same is already existing, nothing to do

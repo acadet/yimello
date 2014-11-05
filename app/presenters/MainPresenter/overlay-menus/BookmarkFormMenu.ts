@@ -320,7 +320,7 @@ class BookmarkFormMenu extends OverlayMenu {
 											.forEach(
 												(e) => {
 													if (TSObject.exists(
-															outcome.findFirst(
+															outcome.find(
 																(o) => (o.getId() === tags.getAt(i).getId())
 															)
 														)) {

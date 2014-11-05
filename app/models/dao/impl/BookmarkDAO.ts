@@ -83,7 +83,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 
 	update(bookmark : Bookmark, callback? : Action<Bookmark>) : void {
 		var dict : IDictionary<string, any>;
-		var selector : Pair<string, any>;
+		var selector : KeyValuePair<string, any>;
 
 		callback = ActionHelper.getValueOrDefault(callback);
 
@@ -99,7 +99,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 		dict.add('description', bookmark.getDescription());
 		dict.add('views', bookmark.getViews());
 
-		selector = new Pair<string, any>('id', bookmark.getId());
+		selector = new KeyValuePair<string, any>('id', bookmark.getId());
 
 		this.getARO().update(
 			DAOTables.Bookmarks,
@@ -136,7 +136,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 						.getARO()
 						.delete(
 							DAOTables.Bookmarks,
-							new Pair<string, any>('id', bookmark.getId()),
+							new KeyValuePair<string, any>('id', bookmark.getId()),
 							(success2) => {
 								callback(success1 && success2);
 							}
@@ -154,7 +154,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 			.getARO()
 			.find(
 				DAOTables.Bookmarks,
-				new Pair<string, any>('id', id),
+				new KeyValuePair<string, any>('id', id),
 				callback,
 				Bookmark.fromObject
 			);
@@ -165,7 +165,7 @@ class BookmarkDAO extends DataAccessObject implements IBookmarkDAO {
 			.getARO()
 			.find(
 				DAOTables.Bookmarks,
-				new Pair<string, any>('url', url),
+				new KeyValuePair<string, any>('url', url),
 				callback,
 				Bookmark.fromObject
 			);

@@ -21,6 +21,14 @@ class IntroPresenter extends YimelloPresenter {
 	
 	//region Private Methods
 
+	private _tryExit() : void {
+		if (this._mustExit) {
+			this._exit();
+		} else {
+			this._mustExit = true;
+		}
+	}
+
 	private _exit() : void {
 		if (CacheAPI.get('tour') === 'ok') {
 			NodeWindow.moveTo('main.html');
@@ -33,76 +41,74 @@ class IntroPresenter extends YimelloPresenter {
 	private _testVersion() : void {
 		VersionHelper.isUpToDate(
 			(success) => {
-				if (!success) {
-					var body : DOMElement, icon : DOMElement;
-					var originalWidth : number, originalHeight : number;
-					var duration : number = 600;
+				var body : DOMElement, icon : DOMElement;
+				var originalWidth : number, originalHeight : number;
+				var duration : number = 600;
 
-					body = DOMTree.findSingle('.js-body');
-					icon = body.findSingle('.js-update-icon');
-					originalWidth = 50;
-					originalHeight = 50;
+				if (success) {
+					this._tryExit();
+					return;
+				}
 
-					icon.on(
-						DOMElementEvents.Click,
-						(args) => {
-							NodeWindow.openExternal('http://yimello.adriencadet.com');
-						}
-					);
+				body = DOMTree.findSingle('.js-body');
+				icon = body.findSingle('.js-update-icon');
+				originalWidth = 50;
+				originalHeight = 50;
 
-					icon.setCss({
-						width : originalWidth,
-						height : originalHeight,
-						top : body.getHeight() - 100,
-						left : (body.getWidth() - originalWidth) / 2
-					});
+				icon.on(
+					DOMElementEvents.Click,
+					(args) => {
+						NodeWindow.openExternal('http://yimello.adriencadet.com');
+					}
+				);
 
-					icon.animateEasing(
+				icon.setCss({
+					width : originalWidth,
+					height : originalHeight,
+					top : body.getHeight() - 100,
+					left : (body.getWidth() - originalWidth) / 2
+				});
+
+				icon.animateEasing(
+					{
+						opacity : 1,
+						width : originalWidth * 2,
+						height : originalHeight * 2,
+						top : body.getHeight() - 100 - (originalHeight / 2),
+						left : (body.getWidth() - originalWidth * 2) / 2
+					},
+					duration,
+					'easeOutBack'
+				);
+
+				icon
+					.findSingle('img')
+					.animateEasing(
 						{
-							opacity : 1,
-							width : originalWidth * 2,
-							height : originalHeight * 2,
-							top : body.getHeight() - 100 - (originalHeight / 2),
-							left : (body.getWidth() - originalWidth * 2) / 2
+							marginLeft : (originalWidth * 2 - 50) / 2,
+							marginTop : (originalHeight * 2 - 50) / 2
 						},
 						duration,
-						'easeOutBack'
-					);
+						'easeOutBack',
+						(o) => {
+							icon.addClass('pulse');
 
-					icon
-						.findSingle('img')
-						.animateEasing(
-							{
-								marginLeft : (originalWidth * 2 - 50) / 2,
-								marginTop : (originalHeight * 2 - 50) / 2
-							},
-							duration,
-							'easeOutBack',
-							(o) => {
-								icon.addClass('pulse');
+							if (this._mustExit) {
+								var t : Timer<any>;
 
-								if (this._mustExit) {
-									var t : Timer;
-
-									t = new Timer(
-										(o) => {
-											this._exit();
-										},
-										3000
-									);
-								} else {
-									this._mustExit = true;
-								}
+								t = new Timer<any>(
+									(o) => {
+										this._exit();
+									},
+									3000
+								);
+							} else {
+								this._mustExit = true;
 							}
-						);
-				} else {
-					if (this._mustExit) {
-						this._exit();
-					} else {
-						this._mustExit = true;
-					}
-				}
-			}
+						}
+					);
+			},
+			(msg) => this._tryExit()
 		);
 	}
 
@@ -111,11 +117,11 @@ class IntroPresenter extends YimelloPresenter {
 	//region Public Methods
 	
 	onStart() : void {
-		var t : Timer;
+		var t : Timer<any>;
 
 		super.onStart();
 
-		t = new Timer(
+		t = new Timer<any>(
 			(o) => {
 				this._testVersion();
 			},
@@ -126,11 +132,7 @@ class IntroPresenter extends YimelloPresenter {
 			(business) => {
 				business.backup(
 					() => {
-						if (this._mustExit) {
-							this._exit();
-						} else {
-							this._mustExit = true;
-						}
+						this._tryExit();
 					}
 				);
 			}

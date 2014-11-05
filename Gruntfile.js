@@ -140,7 +140,7 @@ module.exports = function (grunt) {
     				atBegin : true
     			}
     		},
-    		testing : {
+    		test : {
     			files : ['**/*.ts'],
     			tasks : ['ts:testing', 'shell:testing', 'clean:build'],
     			options : {

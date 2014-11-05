@@ -125,7 +125,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 	}
 
 	removeBookmarkRelations(bookmark : Bookmark, callback? : Action<boolean>) : void {
-		var selector : Pair<string, any>;
+		var selector : KeyValuePair<string, any>;
 
 		callback = ActionHelper.getValueOrDefault(callback);
 
@@ -135,7 +135,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 			return;
 		}
 
-		selector = new Pair<string, any>('bookmark_id', bookmark.getId());
+		selector = new KeyValuePair<string, any>('bookmark_id', bookmark.getId());
 		this
 			.getARO()
 			.delete(
@@ -153,7 +153,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 	}
 
 	removeTagRelations(tag : Tag, callback? : Action<boolean>) : void {
-		var selector : Pair<string, any>;
+		var selector : KeyValuePair<string, any>;
 
 		callback = ActionHelper.getValueOrDefault(callback);
 
@@ -163,7 +163,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 			return;
 		}
 
-		selector = new Pair<string, any>('tag_id', tag.getId());
+		selector = new KeyValuePair<string, any>('tag_id', tag.getId());
 		this
 			.getARO()
 			.delete(
@@ -237,7 +237,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 			);
 	}
 
-	sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void {
+	sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<KeyValuePair<Bookmark, IList<Tag>>>>) : void {
 		var request : StringBuffer;
 
 		request = new StringBuffer('SELECT bk.id AS id, bk.url as url, bk.title AS title, bk.description AS description, ');
@@ -257,13 +257,13 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 			.executeSQL(
 				request.toString(),
 				(set) => {
-					var pairList : IList<Pair<Bookmark, IList<Tag>>>;
+					var pairList : IList<KeyValuePair<Bookmark, IList<Tag>>>;
 					var bk : Bookmark = null;
 					var l : IList<Tag>;
 					var outcome : SQLRowSet;
-					var p : Pair<Bookmark, IList<Tag>>;
+					var p : KeyValuePair<Bookmark, IList<Tag>>;
 
-					pairList = new ArrayList<Pair<Bookmark, IList<Tag>>>();
+					pairList = new ArrayList<KeyValuePair<Bookmark, IList<Tag>>>();
 
 					if (!TSObject.exists(set)) {
 						callback(pairList);
@@ -278,7 +278,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 
 						if (bk === null || bk.getId() !== item.id) {
 							if (bk !== null) {
-								p = new Pair<Bookmark, IList<Tag>>(bk, l);
+								p = new KeyValuePair<Bookmark, IList<Tag>>(bk, l);
 								pairList.add(p);
 							}
 
@@ -301,7 +301,7 @@ class TagBookmarkDAO extends DataAccessObject implements ITagBookmarkDAO {
 					}
 
 					if (bk !== null) {
-						p = new Pair<Bookmark, IList<Tag>>(bk, l);
+						p = new KeyValuePair<Bookmark, IList<Tag>>(bk, l);
 						pairList.add(p);
 					}
 

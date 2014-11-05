@@ -21,7 +21,7 @@ class VersionHelper {
 	
 	//region Public Methods
 	
-	static isUpToDate(callback : Action<boolean>, errorHandler : Action<string> = null) : void {
+	static isUpToDate(callback : Action<boolean>, errorHandler? : Action<string>) : void {
 		var get : GetRequest;
 
 		if (Environment.isOnline()) {

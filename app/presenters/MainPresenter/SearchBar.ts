@@ -7,7 +7,7 @@ class SearchBar {
 	private _bar : DOMElement;
 	private _input : DOMElement;
 	private _clear : DOMElement;
-	private _delayer : Timer;
+	private _delayer : Timer<any>;
 	
 	//endregion Fields
 	
@@ -33,7 +33,7 @@ class SearchBar {
 			this._delayer.stop();
 		}
 
-		this._delayer = new Timer(
+		this._delayer = new Timer<any>(
 			(o) => {
 				if (value.length > 0) {
 					this._listener.onSearchRequest(value);
