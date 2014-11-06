@@ -9,7 +9,7 @@ enum NotifierCodes {
 class Notifier implements INotifier {
 	//region Fields
 
-	private _timer : Timer;
+	private _timer : Timer<any>;
 	private _target : DOMElement;
 	private _content : DOMElement;
 	
@@ -60,7 +60,7 @@ class Notifier implements INotifier {
 			},
 			750,
 			(o) => {
-				this._timer = new Timer(
+				this._timer = new Timer<any>(
 					(o) => {
 						this._hide();
 						this._timer = null;

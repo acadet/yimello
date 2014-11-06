@@ -106,7 +106,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 		// Act
 		this._aro.find(
 			'foo',
-			new Pair<string, any>('id', 15),
+			new KeyValuePair<string, any>('id', 15),
 			(outcome) => {
 				// Assert
 				Assert.areEqual('SELECT * FROM foo WHERE LOWER(id) = LOWER(?)', this._transaction.getStatement());
@@ -133,7 +133,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 		// Act
 		this._aro.find(
 			'foo',
-			new Pair<string, any>('id', 15),
+			new KeyValuePair<string, any>('id', 15),
 			(outcome) => {
 				// Assert
 				Assert.areEqual('SELECT * FROM foo WHERE LOWER(id) = LOWER(?)', this._transaction.getStatement());
@@ -163,7 +163,9 @@ class ActiveRecordObjectTest extends UnitTestClass {
 				// Assert
 				Assert.isTrue(success);
 				Assert.areEqual('INSERT INTO bar VALUES (?, ?, ?)', this._transaction.getStatement());
-				Assert.areEqual(data.toArray(), this._transaction.getArguments());
+				Assert.areEqual(data.getAt(0), this._transaction.getArguments()[0]);
+				Assert.areEqual(data.getAt(1), this._transaction.getArguments()[1]);
+				Assert.areEqual(data.getAt(2), this._transaction.getArguments()[2]);
 				
 				obs.success();
 			}
@@ -181,7 +183,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 		// Act
 		this._aro.update(
 			'people',
-			new Pair<string, any>('id', 15),
+			new KeyValuePair<string, any>('id', 15),
 			data,
 			(success) => {
 				// Assert
@@ -207,7 +209,7 @@ class ActiveRecordObjectTest extends UnitTestClass {
 		// Act
 		this._aro.delete(
 			'foobar',
-			new Pair<string, any>('id', 15),
+			new KeyValuePair<string, any>('id', 15),
 			(success) => {
 				// Assert
 				Assert.isTrue(success);

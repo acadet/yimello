@@ -108,10 +108,10 @@ class TagDAOTest extends UnitTestClass {
 				Assert.areEqual(1, this._aro.updateTimes());
 				Assert.areEqual(DAOTables.Tags, this._aro.updateArgs()[0]);
 
-				Assert.areEqual('id', this._aro.updateArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.updateArgs()[1].getSecond());
+				Assert.areEqual('id', this._aro.updateArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.updateArgs()[1].getValue());
 
-				Assert.areEqual(1, this._aro.updateArgs()[2].getLength());
+				Assert.areEqual(1, this._aro.updateArgs()[2].getSize());
 				Assert.areEqual('bar', this._aro.updateArgs()[2].get('label'));
 
 				Assert.isNotNull(outcome);
@@ -140,8 +140,8 @@ class TagDAOTest extends UnitTestClass {
 
 				Assert.areEqual(1, this._aro.deleteTimes());
 				Assert.areEqual(DAOTables.Tags, this._aro.deleteArgs()[0]);
-				Assert.areEqual('id', this._aro.deleteArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.deleteArgs()[1].getSecond());
+				Assert.areEqual('id', this._aro.deleteArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.deleteArgs()[1].getValue());
 
 				Assert.isTrue(outcome);
 
@@ -187,8 +187,8 @@ class TagDAOTest extends UnitTestClass {
 				// Assert
 				Assert.areEqual(1, this._aro.findTimes());
 				Assert.areEqual(DAOTables.Tags, this._aro.findArgs()[0]);
-				Assert.areEqual('id', this._aro.findArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.findArgs()[1].getSecond());
+				Assert.areEqual('id', this._aro.findArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.findArgs()[1].getValue());
 				Assert.areEqual(Tag.fromObject, this._aro.findArgs()[3]);
 				Assert.areEqual(t, outcome);
 
@@ -211,8 +211,8 @@ class TagDAOTest extends UnitTestClass {
 				// Assert
 				Assert.areEqual(1, this._aro.findTimes());
 				Assert.areEqual(DAOTables.Tags, this._aro.findArgs()[0]);
-				Assert.areEqual('label', this._aro.findArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.findArgs()[1].getSecond());
+				Assert.areEqual('label', this._aro.findArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.findArgs()[1].getValue());
 				Assert.areEqual(Tag.fromObject, this._aro.findArgs()[3]);
 				Assert.areEqual(t, outcome);
 

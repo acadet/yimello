@@ -161,7 +161,7 @@ class TagBookmarkBusinessTest extends UnitTestClass {
 
 	TagBookmarkBusinessSearchAsyncTest(obs : IOscarObserver) : void {
 		// Arrange
-		var list : IList<Pair<Bookmark, IList<Tag>>>;
+		var list : IList<KeyValuePair<Bookmark, IList<Tag>>>;
 		var t1 : Tag, t2 : Tag;
 		var b1 : Bookmark, b2 : Bookmark;
 		var tags1 : IList<Tag>, tags2 : IList<Tag>;
@@ -171,13 +171,13 @@ class TagBookmarkBusinessTest extends UnitTestClass {
 		t1 = new Tag().setLabel('foobarbar');
 		t2 = new Tag().setLabel('barbar');
 
-		list = new ArrayList<Pair<Bookmark, IList<Tag>>>();
+		list = new ArrayList<KeyValuePair<Bookmark, IList<Tag>>>();
 		tags1 = new ArrayList<Tag>();
 		tags1.add(t1);
 		tags2 = new ArrayList<Tag>();
 		tags2.add(t2);
-		list.add(new Pair<Bookmark, IList<Tag>>(b1, tags1));
-		list.add(new Pair<Bookmark, IList<Tag>>(b2, tags2));
+		list.add(new KeyValuePair<Bookmark, IList<Tag>>(b1, tags1));
+		list.add(new KeyValuePair<Bookmark, IList<Tag>>(b2, tags2));
 
 		this._tagBookmarkDAO.setSortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome(list);
 

@@ -28,7 +28,7 @@ interface IActiveRecordObject {
 	 */
 	find<T>(
 		table : string,
-		selector : Pair<string, any>,
+		selector : KeyValuePair<string, any>,
 		callback : Action<T>,
 		converter? : Func<any, T>) : void;
 
@@ -49,7 +49,7 @@ interface IActiveRecordObject {
 	 */
 	update(
 		table : string,
-		selector : Pair<string, any>,
+		selector : KeyValuePair<string, any>,
 		data : IDictionary<string, any>,
 		callback? : Action<boolean>) : void;
 
@@ -59,5 +59,5 @@ interface IActiveRecordObject {
 	 * @param selector Key/Value to match
 	 * @param callback Optional callback to call with a success bool
 	 */
-	delete(table : string, selector : Pair<string, any>, callback? : Action<boolean>) : void;
+	delete(table : string, selector : KeyValuePair<string, any>, callback? : Action<boolean>) : void;
 }

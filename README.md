@@ -18,4 +18,6 @@ using it. Please open a ticket in tracker to notify me :) I'll appreciate.
 
 * Based on Node-Webkit framework
 * Uses TypeScript to produce JS code
+	- [Ludivine](https://github.com/acadet/ludivine) as core
+	- [Oscar](https://github.com/acadet/oscar) for testing
 * HTML5/CSS3/SASS for front-end 

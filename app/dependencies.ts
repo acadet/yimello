@@ -2,24 +2,17 @@
 
 /// <reference path="libs/jquery.d.ts" />
 /// <reference path="libs/jqueryui.d.ts" />
+/// <reference path="libs/ludivine.1.1.0.min.ts" />
 
 // System part
 
 /// <reference path="system/TSObject.ts" />
 /// <reference path="system/NumberHelper.ts" />
-/// <reference path="system/Timer.ts" />
-/// <reference path="system/Action.ts" />
-/// <reference path="system/Func.ts" />
-/// <reference path="system/Exception.ts" />
 /// <reference path="system/DOMElement.ts" />
 /// <reference path="system/DOMTree.ts" />
-/// <reference path="system/strings/StringBuffer.ts" />
 /// <reference path="system/node-webkit/NodeWindow.ts" />
 /// <reference path="system/node-webkit/Presenter.ts" />
 /// <reference path="system/Regex.ts" />
-/// <reference path="system/Log.ts" />
-/// <reference path="system/Pair.ts" />
-/// <reference path="system/Guid.ts" />
 /// <reference path="system/MathHelper.ts" />
 /// <reference path="system/StringHelper.ts" />
 /// <reference path="helpers/FormHelper.ts" />
@@ -27,15 +20,6 @@
 /// <reference path="system/storage/CacheAPI.ts" />
 /// <reference path="system/storage/FileAPI.ts" />
 /// <reference path="system/Random.ts" />
-
-// Collections parts
-
-/// <reference path="system/collections/utils/CollectionException.ts" />
-/// <reference path="system/collections/IList.ts" />
-/// <reference path="system/collections/impl/ArrayList.ts" />
-/// <reference path="system/collections/IDictionary.ts" />
-/// <reference path="system/collections/impl/Dictionary.ts" />
-/// <reference path="system/collections/Queue.ts" />
 
 // Storage part
 
@@ -56,6 +40,7 @@
 
 // Helpers part
 
+/// <reference path="helpers/ActionHelper.ts" />
 /// <reference path="helpers/ExceptionHandler.ts" />
 /// <reference path="helpers/URLHelper.ts" />
 /// <reference path="helpers/URLDetailsProvider.ts" />

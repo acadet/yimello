@@ -140,9 +140,9 @@ module.exports = function (grunt) {
     				atBegin : true
     			}
     		},
-    		testing : {
+    		test : {
     			files : ['**/*.ts'],
-    			tasks : ['ts:testing', 'shell:testing', 'clean:build'],
+    			tasks : ['ts:build', 'ts:testing', 'shell:testing', 'clean:build'],
     			options : {
     				interrupt : true,
     				atBegin : true
@@ -178,7 +178,7 @@ module.exports = function (grunt) {
 	});
 
 	grunt.registerTask('build', ['watch:build']);
-	grunt.registerTask('testing', ['watch:testing']);
+	grunt.registerTask('test', ['watch:test']);
 	grunt.registerTask(
 		'release',
 		[

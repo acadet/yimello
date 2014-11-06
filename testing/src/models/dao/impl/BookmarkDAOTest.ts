@@ -129,10 +129,10 @@ class BookmarkDAOTest extends UnitTestClass {
 				Assert.areEqual(1, this._aro.updateTimes());
 				Assert.areEqual(DAOTables.Bookmarks, this._aro.updateArgs()[0]);
 
-				Assert.areEqual('id', this._aro.updateArgs()[1].getFirst());
-				Assert.areEqual('bar', this._aro.updateArgs()[1].getSecond());
+				Assert.areEqual('id', this._aro.updateArgs()[1].getKey());
+				Assert.areEqual('bar', this._aro.updateArgs()[1].getValue());
 
-				Assert.areEqual(4, this._aro.updateArgs()[2].getLength());
+				Assert.areEqual(4, this._aro.updateArgs()[2].getSize());
 				Assert.areEqual('google.fr', this._aro.updateArgs()[2].get('url'));
 				Assert.areEqual('foo', this._aro.updateArgs()[2].get('title'));
 				Assert.areEqual('Amazing', this._aro.updateArgs()[2].get('description'));
@@ -165,8 +165,8 @@ class BookmarkDAOTest extends UnitTestClass {
 
 				Assert.areEqual(1, this._aro.deleteTimes());
 				Assert.areEqual(DAOTables.Bookmarks, this._aro.deleteArgs()[0]);
-				Assert.areEqual('id', this._aro.deleteArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.deleteArgs()[1].getSecond());
+				Assert.areEqual('id', this._aro.deleteArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.deleteArgs()[1].getValue());
 
 				Assert.isTrue(outcome);
 
@@ -213,8 +213,8 @@ class BookmarkDAOTest extends UnitTestClass {
 				// Assert
 				Assert.areEqual(1, this._aro.findTimes());
 				Assert.areEqual(DAOTables.Bookmarks, this._aro.findArgs()[0]);
-				Assert.areEqual('id', this._aro.findArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.findArgs()[1].getSecond());
+				Assert.areEqual('id', this._aro.findArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.findArgs()[1].getValue());
 				Assert.areEqual(Bookmark.fromObject, this._aro.findArgs()[3]);
 
 				Assert.areEqual(b, outcome);

@@ -77,7 +77,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 
 	update(tag : Tag, callback? : Action<Tag>) : void {
 		var dict : IDictionary<string, any>;
-		var selector : Pair<string, any>;
+		var selector : KeyValuePair<string, any>;
 
 		callback = ActionHelper.getValueOrDefault(callback);
 
@@ -90,7 +90,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 		dict = new Dictionary<string, any>();
 		dict.add('label', tag.getLabel());
 
-		selector = new Pair<string, any>('id', tag.getId());
+		selector = new KeyValuePair<string, any>('id', tag.getId());
 
 		this
 			.getARO()
@@ -129,7 +129,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 						.getARO()
 						.delete(
 							DAOTables.Tags,
-							new Pair<string, any>('id', tag.getId()),
+							new KeyValuePair<string, any>('id', tag.getId()),
 							(success2) => {
 								callback(success1 && success2);
 							}
@@ -147,7 +147,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 			.getARO()
 			.find(
 				DAOTables.Tags,
-				new Pair<string, any>('id', id),
+				new KeyValuePair<string, any>('id', id),
 				callback,
 				Tag.fromObject
 			);
@@ -158,7 +158,7 @@ class TagDAO extends DataAccessObject implements ITagDAO {
 			.getARO()
 			.find(
 				DAOTables.Tags,
-				new Pair<string, any>('label', label),
+				new KeyValuePair<string, any>('label', label),
 				callback,
 				Tag.fromObject
 			);

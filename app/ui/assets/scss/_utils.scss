@@ -22,7 +22,7 @@
 	border-radius: $value;
 }
 
-@mixin transition($property, $duration, $easing : linear, $delay : 0) {
+@mixin transition($property, $duration, $easing : linear, $delay : 0s) {
   -webkit-transition : $property $duration $easing $delay;
   -moz-transition : $property $duration $easing $delay;
   -ms-transition : $property $duration $easing $delay;

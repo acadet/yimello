@@ -17,5 +17,5 @@ interface ITagBookmarkDAO {
 
 	sortBookmarksByTitleAscForTag(tag : Tag, callback : Action<IList<Bookmark>>) : void;
 
-	sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void;
+	sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<KeyValuePair<Bookmark, IList<Tag>>>>) : void;
 }

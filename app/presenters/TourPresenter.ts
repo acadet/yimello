@@ -229,12 +229,12 @@ class TourPresenter extends YimelloPresenter {
 					business.createFromURL(
 						url,
 						(bookmark) => {
-							var t : Timer;
+							var t : Timer<any>;
 
 							this._currentBookmark = bookmark;
 							this._urlInput.addClass('success');
 
-							t = new Timer(
+							t = new Timer<any>(
 								(o) => {
 									this._swapSlide(TourPresenterSlides.Tags);
 								},
@@ -300,10 +300,10 @@ class TourPresenter extends YimelloPresenter {
 													this._currentBookmark,
 													this._currentTags,
 													() => {
-														var timer : Timer;
+														var timer : Timer<any>;
 
 														this._tagInput.addClass('success');
-														timer = new Timer(
+														timer = new Timer<any>(
 															(o) => {
 																this._swapSlide(TourPresenterSlides.End);
 															},

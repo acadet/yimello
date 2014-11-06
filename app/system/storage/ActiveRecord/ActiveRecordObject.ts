@@ -70,7 +70,7 @@ class ActiveRecordObject implements IActiveRecordObject {
 
 	find<T>(
 		table : string,
-		selector : Pair<string, any>,
+		selector : KeyValuePair<string, any>,
 		callback : Action<T>,
 		converter? : Func<any, T>) : void {
 	
@@ -79,10 +79,10 @@ class ActiveRecordObject implements IActiveRecordObject {
 				var data : Array<any>;
 
 				data = new Array<any>();
-				data.push(selector.getSecond());
+				data.push(selector.getValue());
 
 				tx.execute(
-					'SELECT * FROM ' + table + ' WHERE LOWER(' + selector.getFirst() + ') = LOWER(?)',
+					'SELECT * FROM ' + table + ' WHERE LOWER(' + selector.getKey() + ') = LOWER(?)',
 					data,
 					(tx, outcome) => {
 						var s : SQLRowSet;
@@ -161,7 +161,7 @@ class ActiveRecordObject implements IActiveRecordObject {
 	
 	update(
 		table : string,
-		selector : Pair<string, any>,
+		selector : KeyValuePair<string, any>,
 		data : IDictionary<string, any>,
 		callback? : Action<boolean>) : void {
 
@@ -181,22 +181,24 @@ class ActiveRecordObject implements IActiveRecordObject {
 
 				args = new ArrayList<any>();
 
-				data.forEach((k, v) => {
-					if (i !== 0) {
-						marks.append(', ');
+				data.forEach(
+					(pair) => {
+						if (i !== 0) {
+							marks.append(', ');
+						}
+
+						// Keys are used for request
+						marks.append(pair.getKey() + ' = ?');
+						// Values are used as prepared data
+						args.add(pair.getValue());
+						i++;
 					}
+				);
 
-					// Keys are used for request
-					marks.append(k + ' = ?');
-					// Values are used as prepared data
-					args.add(v);
-					i++;
-				});
-
-				args.add(selector.getSecond());
+				args.add(selector.getValue());
 
 				tx.execute(
-					'UPDATE ' + table + ' SET ' + marks.toString() + ' WHERE ' + selector.getFirst() + ' = ?',
+					'UPDATE ' + table + ' SET ' + marks.toString() + ' WHERE ' + selector.getKey() + ' = ?',
 					args.toArray(),
 					(tx, outcome) => {
 						callback(true);
@@ -212,7 +214,7 @@ class ActiveRecordObject implements IActiveRecordObject {
 		);
 	}
 
-	delete(table : string, selector : Pair<string, any>, callback? : Action<boolean>) : void {
+	delete(table : string, selector : KeyValuePair<string, any>, callback? : Action<boolean>) : void {
 		callback = ActionHelper.getValueOrDefault(callback);
 
 		this._database.transaction(
@@ -220,12 +222,12 @@ class ActiveRecordObject implements IActiveRecordObject {
 				var request : StringBuffer;
 
 				request = new StringBuffer('DELETE FROM ' + table);
-				request.append(' WHERE ' + selector.getFirst());
+				request.append(' WHERE ' + selector.getKey());
 				request.append(' = ?');
 
 				tx.execute(
 					request.toString(),
-					[selector.getSecond()],
+					[selector.getValue()],
 					(tx, outcome) => {
 						callback(true);
 					},
