@@ -51,7 +51,7 @@ module Mocks {
 
 			find<T>(
 				table : string,
-				selector : Pair<string, any>,
+				selector : KeyValuePair<string, any>,
 				callback : Action<T>,
 				converter? : Func<any, T>) : void {
 
@@ -70,7 +70,7 @@ module Mocks {
 
 			update(
 				table : string,
-				selector : Pair<string, any>,
+				selector : KeyValuePair<string, any>,
 				data : IDictionary<string, any>,
 				callback? : Action<boolean>) : void {
 
@@ -82,7 +82,7 @@ module Mocks {
 				}
 			}
 
-			delete(table : string, selector : Pair<string, any>, callback? : Action<boolean>) : void {
+			delete(table : string, selector : KeyValuePair<string, any>, callback? : Action<boolean>) : void {
 				this._deleteTimes++;
 				this._deleteArgs = [table, selector, callback];
 				if (TSObject.exists(callback)) {
@@ -487,7 +487,7 @@ module Mocks {
 			private _removeTagRelationsOutcome : boolean;
 			private _sortTagsByLabelAscForBookmarkOutcome : IList<Tag>;
 			private _sortBookmarksByTitleAscForTagOutcome : IList<Bookmark>;
-			private _sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome : IList<Pair<Bookmark, IList<Tag>>>;
+			private _sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome : IList<KeyValuePair<Bookmark, IList<Tag>>>;
 
 			private _addMultipleTagRelationsTimes : number;
 			private _updateBookmarkRelationsTimes : number;
@@ -565,7 +565,7 @@ module Mocks {
 				callback(this._sortBookmarksByTitleAscForTagOutcome);
 			}
 
-			sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<Pair<Bookmark, IList<Tag>>>>) : void {
+			sortBookmarksByTitleAscWithBoundTagsByLabelAsc(callback : Action<IList<KeyValuePair<Bookmark, IList<Tag>>>>) : void {
 				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscTimes++;
 				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscArgs = [callback];
 				callback(this._sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome);
@@ -602,7 +602,7 @@ module Mocks {
 				return this;
 			}
 
-			setSortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome(value : IList<Pair<Bookmark, IList<Tag>>>) : Mocks.DAO.TagBookmarkDAO {
+			setSortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome(value : IList<KeyValuePair<Bookmark, IList<Tag>>>) : Mocks.DAO.TagBookmarkDAO {
 				this._sortBookmarksByTitleAscWithBoundTagsByLabelAscOutcome = value;
 				return this;
 			}

@@ -275,9 +275,9 @@ class TagBusinessTest extends UnitTestClass {
 
 				Assert.isNotNull(outcome);
 				Assert.areEqual(3, outcome.getLength());
-				Assert.isNotNull(outcome.findFirst(e => e.getId() === 'foo'));
-				Assert.isNotNull(outcome.findFirst(e => e.getId() === 'bar'));
-				Assert.isNotNull(outcome.findFirst(e => e.getId() === 'foobar'));
+				Assert.isNotNull(outcome.find(e => e.getId() === 'foo'));
+				Assert.isNotNull(outcome.find(e => e.getId() === 'bar'));
+				Assert.isNotNull(outcome.find(e => e.getId() === 'foobar'));
 
 				obs.success();
 			}

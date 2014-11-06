@@ -122,8 +122,8 @@ class TagBookmarkDAOTest extends UnitTestClass {
 				// Check delete request
 				Assert.areEqual(1, this._aro.deleteTimes());
 				Assert.areEqual(DAOTables.TagBookmark, this._aro.deleteArgs()[0]);
-				Assert.areEqual('bookmark_id', this._aro.deleteArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.deleteArgs()[1].getSecond());
+				Assert.areEqual('bookmark_id', this._aro.deleteArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.deleteArgs()[1].getValue());
 
 				// Check insert requests
 				Assert.areEqual(2, this._aro.insertTimes());
@@ -152,8 +152,8 @@ class TagBookmarkDAOTest extends UnitTestClass {
 				// Check delete request
 				Assert.areEqual(1, this._aro.deleteTimes());
 				Assert.areEqual(DAOTables.TagBookmark, this._aro.deleteArgs()[0]);
-				Assert.areEqual('bookmark_id', this._aro.deleteArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.deleteArgs()[1].getSecond());
+				Assert.areEqual('bookmark_id', this._aro.deleteArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.deleteArgs()[1].getValue());
 
 				obs.success();
 			}
@@ -179,8 +179,8 @@ class TagBookmarkDAOTest extends UnitTestClass {
 				// Check delete request
 				Assert.areEqual(1, this._aro.deleteTimes());
 				Assert.areEqual(DAOTables.TagBookmark, this._aro.deleteArgs()[0]);
-				Assert.areEqual('tag_id', this._aro.deleteArgs()[1].getFirst());
-				Assert.areEqual('foo', this._aro.deleteArgs()[1].getSecond());
+				Assert.areEqual('tag_id', this._aro.deleteArgs()[1].getKey());
+				Assert.areEqual('foo', this._aro.deleteArgs()[1].getValue());
 
 				obs.success();
 			}
@@ -372,27 +372,27 @@ class TagBookmarkDAOTest extends UnitTestClass {
 				Assert.isNotNull(outcome);
 				Assert.areEqual(2, outcome.getLength());
 
-				Assert.areEqual('1', outcome.getAt(0).getFirst().getId());
-				Assert.areEqual('foo', outcome.getAt(0).getFirst().getTitle());
-				Assert.areEqual('google.fr', outcome.getAt(0).getFirst().getURL());
-				Assert.areEqual('Amazing!', outcome.getAt(0).getFirst().getDescription());
-				Assert.areEqual(56, outcome.getAt(0).getFirst().getViews());
+				Assert.areEqual('1', outcome.getAt(0).getKey().getId());
+				Assert.areEqual('foo', outcome.getAt(0).getKey().getTitle());
+				Assert.areEqual('google.fr', outcome.getAt(0).getKey().getURL());
+				Assert.areEqual('Amazing!', outcome.getAt(0).getKey().getDescription());
+				Assert.areEqual(56, outcome.getAt(0).getKey().getViews());
 
-				Assert.areEqual(2, outcome.getAt(0).getSecond().getLength());
-				Assert.areEqual('34', outcome.getAt(0).getSecond().getAt(0).getId());
-				Assert.areEqual('bar', outcome.getAt(0).getSecond().getAt(0).getLabel());
-				Assert.areEqual('45', outcome.getAt(0).getSecond().getAt(1).getId());
-				Assert.areEqual('barbar', outcome.getAt(0).getSecond().getAt(1).getLabel());
+				Assert.areEqual(2, outcome.getAt(0).getValue().getLength());
+				Assert.areEqual('34', outcome.getAt(0).getValue().getAt(0).getId());
+				Assert.areEqual('bar', outcome.getAt(0).getValue().getAt(0).getLabel());
+				Assert.areEqual('45', outcome.getAt(0).getValue().getAt(1).getId());
+				Assert.areEqual('barbar', outcome.getAt(0).getValue().getAt(1).getLabel());
 
-				Assert.areEqual('2', outcome.getAt(1).getFirst().getId());
-				Assert.areEqual('foobar', outcome.getAt(1).getFirst().getTitle());
-				Assert.areEqual('google.uk', outcome.getAt(1).getFirst().getURL());
-				Assert.areEqual('Formidable!', outcome.getAt(1).getFirst().getDescription());
-				Assert.areEqual(789, outcome.getAt(1).getFirst().getViews());
+				Assert.areEqual('2', outcome.getAt(1).getKey().getId());
+				Assert.areEqual('foobar', outcome.getAt(1).getKey().getTitle());
+				Assert.areEqual('google.uk', outcome.getAt(1).getKey().getURL());
+				Assert.areEqual('Formidable!', outcome.getAt(1).getKey().getDescription());
+				Assert.areEqual(789, outcome.getAt(1).getKey().getViews());
 
-				Assert.areEqual(1, outcome.getAt(1).getSecond().getLength());
-				Assert.areEqual('35', outcome.getAt(1).getSecond().getAt(0).getId());
-				Assert.areEqual('foobarbar', outcome.getAt(1).getSecond().getAt(0).getLabel());
+				Assert.areEqual(1, outcome.getAt(1).getValue().getLength());
+				Assert.areEqual('35', outcome.getAt(1).getValue().getAt(0).getId());
+				Assert.areEqual('foobarbar', outcome.getAt(1).getValue().getAt(0).getLabel());
 
 				obs.success();
 			}

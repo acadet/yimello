@@ -18,3 +18,5 @@ app/ui/js/output.js
 testing/out
 **/*.css
 
+
+*.cfg
