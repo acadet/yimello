@@ -2,7 +2,7 @@
 
 /// <reference path="libs/jquery.d.ts" />
 /// <reference path="libs/jqueryui.d.ts" />
-/// <reference path="libs/ludivine.1.1.0.min.ts" />
+/// <reference path="libs/ludivine.1.2.0.min.ts" />
 
 // System part
 

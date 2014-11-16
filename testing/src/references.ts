@@ -1,4 +1,4 @@
-/// <reference path="libs/oscar.1.0.2.min.ts" />
+/// <reference path="libs/oscar.1.0.4.min.ts" />
 
 /// <reference path="../../app/dependencies.ts" />
 

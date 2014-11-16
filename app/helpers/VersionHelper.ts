@@ -3,24 +3,24 @@
 // TODO : test
 class VersionHelper {
 	//region Fields
-	
+
 	private static _target : string = 'http://yimello.adriencadet.com/version';
-	private static _version : string = '0.3.2';
+	private static _version : string = '0.3.3';
 
 	//endregion Fields
-	
+
 	//region Constructors
-	
+
 	//endregion Constructors
-	
+
 	//region Methods
-	
+
 	//region Private Methods
-	
+
 	//endregion Private Methods
-	
+
 	//region Public Methods
-	
+
 	static isUpToDate(callback : Action<boolean>, errorHandler? : Action<string>) : void {
 		var get : GetRequest;
 
@@ -47,6 +47,6 @@ class VersionHelper {
 	}
 
 	//endregion Public Methods
-	
+
 	//endregion Methods
 }

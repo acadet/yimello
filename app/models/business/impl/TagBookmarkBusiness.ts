@@ -4,21 +4,21 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	//region Fields
 
 	private _args : TagBookmarkBusinessArgs;
-	
+
 	//endregion Fields
-	
+
 	//region Constructors
 
 	constructor(args : TagBookmarkBusinessArgs) {
 		this._args = args;
 	}
-	
+
 	//endregion Constructors
-	
+
 	//region Methods
-	
+
 	//region Private Methods
-	
+
 	private _browseDLNode(
 		node : DOMElement,
 		currentTags : IList<Tag>,
@@ -130,19 +130,6 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			);
 	}
 
-	private _addInScoredList(target : ScoredBookmark, list : IList<ScoredBookmark>) : void {
-		for (var i = 0; i < list.getLength(); i++) {
-			var e : ScoredBookmark = list.getAt(i);
-
-			if (target.getScore() > e.getScore()) {
-				list.insertAt(i, target);
-				return;
-			}
-		}
-
-		list.add(target);
-	}
-
 	private _addCouple(currentIndex : number, list : Array<any>, callback? : Action0) : void {
 		var e : any;
 		var t : Tag;
@@ -248,9 +235,9 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	}
 
 	//endregion Private Methods
-	
+
 	//region Public Methods
-	
+
 	sortTagsByLabelAscForBookmark(
 		bookmark : Bookmark,
 		callback : Action<IList<Tag>>,
@@ -469,7 +456,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 		tag : Tag,
 		callback : Action<IList<Bookmark>>,
 		errorHandler? : Action<string>) : void {
-		
+
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		if (!TSObject.exists(tag)) {
@@ -574,7 +561,10 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			);
 	}
 
-	search(input : string, callback : Action<IList<ScoredBookmark>>, errorHandler? : Action<string>) : void {
+	search(
+		input : string,
+		callback : Action<SortedList<ScoredBookmark, number>>,
+		errorHandler? : Action<string>) : void {
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
 
 		this
@@ -583,7 +573,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 			.sortBookmarksByTitleAscWithBoundTagsByLabelAsc(
 				(outcome) => {
 					var max : number;
-					var list : IList<ScoredBookmark>;
+					var list : SortedList<ScoredBookmark, number>;
 					var keywords : IList<string>;
 
 					if (!TSObject.exists(outcome)) {
@@ -593,7 +583,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					}
 
 					max = 0.0;
-					list = new ArrayList<ScoredBookmark>();
+					list = new SortedList<ScoredBookmark, number>(x => x.getScore(), false);
 					keywords = StringHelper.extractWords(input);
 
 					outcome.forEach(
@@ -633,7 +623,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 
 							max = (currentScore > max) ? currentScore : max;
 							sbk.setScore(currentScore);
-							this._addInScoredList(sbk, list);
+							list.add(sbk);
 						}
 					);
 
@@ -715,7 +705,7 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 	backup(callback? : Action0, errorHandler? : Action<string>) : void {
 		callback = ActionHelper.getValueOrDefaultNoArgs(callback);
 		errorHandler = ActionHelper.getValueOrDefault(errorHandler);
-		
+
 		this.rawBackup(
 			(result) => {
 				FileAPI.writeFile(
@@ -780,11 +770,11 @@ class TagBookmarkBusiness implements ITagBookmarkBusiness {
 					}
 				);
 			};
-		
+
 		reader.readAsText(dataTransfer.files[0]);
 	}
 
 	//endregion Public Methods
-	
+
 	//endregion Methods
 }

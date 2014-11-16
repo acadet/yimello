@@ -24,7 +24,7 @@ interface ITagBookmarkBusiness {
 		errorHandler? : Action<string>) : void;
 
 	/**
-	 * Sorts all bookmarks by title ascending 
+	 * Sorts all bookmarks by title ascending
 	 * @param {TagDAO}                     tag      [description]
 	 * @param {Action<IList<BookmarkDAO>>} callback [description]
 	 */
@@ -37,7 +37,10 @@ interface ITagBookmarkBusiness {
 
 	exportToBrowser(callback : Action<string>, errorHandler? : Action<string>) : void;
 
-	search(input : string, callback : Action<IList<ScoredBookmark>>, errorHandler? : Action<string>) : void;
+	search(
+		input : string,
+		callback : Action<SortedList<ScoredBookmark, number>>,
+		errorHandler? : Action<string>) : void;
 
 	rawBackup(callback : Action<any>, errorHandler? : Action<string>) : void;
 

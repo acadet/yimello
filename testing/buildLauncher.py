@@ -17,11 +17,14 @@ class BuildLauncher:
 
 		for root, dirs, files in os.walk(path):
 			for fileName in files:
-				with open(os.path.join(root, fileName), 'r') as f:
-					for line in f:
-						outcome = re.findall(pattern, line)
-						for e in outcome:
-							collected.append(e)
+				ext = os.path.splitext(fileName)[1]
+				
+				if ext == '.ts':
+					with open(os.path.join(root, fileName), 'r') as f:
+						for line in f:
+							outcome = re.findall(pattern, line)
+							for e in outcome:
+								collected.append(e)
 							
 		return collected
 
